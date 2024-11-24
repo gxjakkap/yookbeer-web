@@ -58,7 +58,7 @@ export default async function SignInPage(props: {
                   }
               }}
           >
-            <Button type="submit" className="bg-white">
+            <Button type="submit">
               <span><MsftIcons /></span>
               <span>Sign in with KMUTT account</span>
             </Button>

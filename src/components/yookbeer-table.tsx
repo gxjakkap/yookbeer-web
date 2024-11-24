@@ -35,11 +35,8 @@ import {
 import {
     Dialog,
     DialogContent,
-    DialogDescription,
-    DialogFooter,
     DialogHeader,
     DialogTitle,
-    DialogTrigger,
 } from "@/components/ui/dialog"
 import { getPresignedURLForYookbeerPic } from "@/app/(authorized)/actions"
 
@@ -158,7 +155,7 @@ export const columns: ColumnDef<YookbeerColumn>[] = [
     },
     {
         accessorKey: "course",
-        header: "ID",
+        header: "Course",
         cell: ({ row }) => (
             <div>{courseName[row.getValue("course") as number]}</div>
         ),
@@ -319,7 +316,7 @@ export function YookbeerTable({ data }: YookbeerTableProps){
         },
     })
     return (
-        <div className="w-[95vw] mx-10">
+        <div className="w-[85vw] lg:w-[95vw] mx-10">
           <div className="flex items-center py-4">
             {/* <Input
               placeholder="Filter id"
@@ -335,7 +332,7 @@ export function YookbeerTable({ data }: YookbeerTableProps){
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                     table.setGlobalFilter(event.target.value)
                 }
-                className="max-w-sm"
+                className="max-w-[10rem] lg:max-w-sm"
             />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -415,10 +412,10 @@ export function YookbeerTable({ data }: YookbeerTableProps){
             </Table>
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
-            <div className="flex-1 text-sm text-muted-foreground">
+            {/* <div className="flex-1 text-sm text-muted-foreground">
               {table.getFilteredSelectedRowModel().rows.length} of{" "}
               {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div>
+            </div> */}
             <div className="space-x-2">
               <Button
                 variant="outline"
