@@ -43,7 +43,7 @@ export default async function StudentProfilePage({ params }: Props){
                 <div className="mx-auto lg:mx-0">
                     <img className="max-w-[500px] max-h-[450px] rounded-md" src={imgUrl} alt={`${data.nicken}'s portrait`} />
                 </div>
-                <div className="flex flex-col gap-y-8 text-center mt-4 lg:mt-0">
+                <div className="flex flex-col gap-y-8 text-center lg:text-left mt-4 lg:mt-0">
                     <div className="flex flex-col">
                         <p className={`${promptReg.className} text-gray-700 text-xl`}>
                             <span className={`${promptMed.className}`}>Course: </span>
