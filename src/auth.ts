@@ -2,7 +2,8 @@ import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import NextAuth, { type DefaultSession } from "next-auth"
 import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id"
 
-import { accounts, db, sessions, users, verificationTokens } from "./db/schema"
+import { db } from "./db"
+import { accounts, sessions, users, verificationTokens } from "./db/schema"
 //import { user } from "../drizzle/schema"
 
 declare module "next-auth" {

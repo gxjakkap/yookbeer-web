@@ -2,7 +2,8 @@
 
 import { YookbeerColumn } from "@/components/admin-table"
 import { YookbeerUserColumn } from "@/components/admin-users-table"
-import { db, thirtyeight, users } from "@/db/schema"
+import { thirtyeight, users } from "@/db/schema"
+import { db } from "@/db"
 import { eq } from "drizzle-orm"
 
 export const updateStudent = async(id: string, data: Partial<YookbeerColumn>) => {

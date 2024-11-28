@@ -33,16 +33,13 @@ export default async function AuthorizedLayout({
       <div
         className={`antialiased flex flex-col bg-neutral-100 w-screen min-h-screen`}
       >
-        <NavigationMenu className="mt-5 ml-auto">
+        <NavigationMenu className="max-h-[6rem] mt-5 ml-auto">
           <NavigationMenuList className="flex gap-x-3 pr-12 text-xl">
             <NavigationMenuItem>
               <Link href='/'>List</Link>
             </NavigationMenuItem>
             {(session.user.role === "admin") && (
               <>
-                <NavigationMenuItem>
-                  <Link href='/admin'>EditData</Link>
-                </NavigationMenuItem>
                 <NavigationMenuItem>
                   <Link href='/admin/users'>ManageUsers</Link>
                 </NavigationMenuItem>
@@ -60,7 +57,7 @@ export default async function AuthorizedLayout({
             </NavigationMenuItem>
           </NavigationMenuList>
         </NavigationMenu>
-        <div className="mt-12 flex flex-1 grow flex-col lg:mt-0 mb-auto">
+        <div className="mt-12 flex flex-col lg:mt-0">
             {children} 
         </div>
       </div>

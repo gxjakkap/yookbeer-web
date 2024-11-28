@@ -3,7 +3,6 @@
 import * as React from "react"
 import {
   ColumnDef,
-  Row,
   /* ColumnFiltersState, */
   SortingState,
   VisibilityState,
@@ -32,15 +31,10 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import {
-    Dialog,
-    DialogContent,
-    DialogHeader,
-    DialogTitle,
-} from "@/components/ui/dialog"
-import { getPresignedURLForYookbeerPic } from "@/app/(authorized)/actions"
+import { ActionCell } from "./actioncell"
+import { redirect } from "next/navigation"
 
-interface YookbeerColumn {
+export interface YookbeerColumn {
     stdid: string,
     course: number,
     nameth: string | null,
@@ -59,204 +53,12 @@ interface YookbeerColumn {
 }
 
 interface YookbeerTableProps {
-    data: YookbeerColumn[]
+    data: YookbeerColumn[],
+    isAdmin: boolean
 }
 
 const courseName = ['REG', 'INT', 'HDS', 'RC']
 
-const PersonIcon = () => (
-    <svg xmlns="http://www.w3.org/2000/svg" className="w-2 h-2 text-black" viewBox="0 0 16 16">
-        <path d="M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2v9.255S12 12 8 12s-5 1.755-5 1.755V2a1 1 0 0 1 1-1h5.5z"/>
-    </svg>
-)
-
-const ImageDialog = ({ isOpen, onClose, imageUrl, studentName }: { 
-    isOpen: boolean, 
-    onClose: () => void, 
-    imageUrl: string | null,
-    studentName: string 
-}) => {
-    return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-md">
-                <DialogHeader>
-                    <DialogTitle>{studentName}</DialogTitle>
-                </DialogHeader>
-                <div className="flex items-center justify-center p-6">
-                    {imageUrl ? (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img 
-                            src={imageUrl} 
-                            alt={`Photo of ${studentName}`}
-                            className="max-w-full max-h-[60vh] object-contain rounded-lg"
-                        />
-                    ) : (
-                        <div className="text-gray-500">No image available</div>
-                    )}
-                </div>
-            </DialogContent>
-        </Dialog>
-    )
-}
-
-const ActionCell = (row: Row<YookbeerColumn>) => {
-    const imgName = row.original.img
-    const studentName = row.original.nameen
-    const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-    const [imageUrl, setImageUrl] = React.useState<string | null>(null)
-    const handleViewImage = async () => {
-        if (imgName) {
-            try {
-                const url = await getPresignedURLForYookbeerPic(imgName)
-                setImageUrl(url)
-                setIsDialogOpen(true)
-            } catch (error) {
-                console.error('Error fetching image URL:', error)
-                setImageUrl(null)
-                setIsDialogOpen(true)
-            }
-        } else {
-            setImageUrl(null)
-            setIsDialogOpen(true)
-        }
-    }
-
-    return (
-        <div className="flex">
-            <Button 
-                variant="ghost" 
-                size="icon"
-                onClick={handleViewImage}
-                className="h-8 w-8 p-0"
-            >
-                <PersonIcon />
-            </Button>
-            <ImageDialog
-                isOpen={isDialogOpen}
-                onClose={() => setIsDialogOpen(false)}
-                imageUrl={imageUrl}
-                studentName={studentName}
-            />
-        </div>
-    )
-}
-
-export const columns: ColumnDef<YookbeerColumn>[] = [
-    {
-        accessorKey: "stdid",
-        header: "ID",
-        cell: ({ row }) => {
-            const shrt = (row.getValue("stdid") as string).substring(7)
-            return (
-                <div>{shrt}</div>
-            )
-        },
-    },
-    {
-        accessorKey: "course",
-        header: "Course",
-        cell: ({ row }) => (
-            <div>{courseName[row.getValue("course") as number]}</div>
-        ),
-    },
-    {
-        accessorKey: "nameth",
-        header: "Name (TH)",
-        cell: ({ row }) => {
-            const x = (row.getValue("nameth") || "-") as string
-            return (
-                <div>{x}</div>
-            )
-        },
-    },
-    {
-        accessorKey: "nameen",
-        header: "Name",
-        cell: ({ row }) => (
-            <div>{row.getValue("nameen")}</div>
-        ),
-    },
-    {
-        accessorKey: "nickth",
-        header: "Nick (TH)",
-        cell: ({ row }) => {
-            const x = (row.getValue("nickth") || "-") as string
-            return (
-                <div>{x}</div>
-            )
-        },
-    },
-    {
-        accessorKey: "nicken",
-        header: "Nick",
-        cell: ({ row }) => (
-            <div>{row.getValue("nicken")}</div>
-        ),
-    },
-    {
-        accessorKey: "phone",
-        header: "Phone",
-        cell: ({ row }) => (
-            <div>{row.getValue("phone")}</div>
-        ),
-    },
-    {
-        accessorKey: "emailper",
-        header: "Email (per)",
-        cell: ({ row }) => <div className="lowercase">{row.getValue("emailper")}</div>,
-    },
-    {
-        accessorKey: "emailuni",
-        header: "Email (uni)",
-        cell: ({ row }) => <div className="lowercase">{row.getValue("emailuni")}</div>,
-    },
-    {
-        accessorKey: "facebook",
-        header: "FB",
-        cell: ({ row }) => {
-            const x = (row.getValue("facebook") || "-") as string
-            return (
-                <div>{x}</div>
-            )
-        },
-    },
-    {
-        accessorKey: "lineid",
-        header: "LINE",
-        cell: ({ row }) => {
-            const x = (row.getValue("lineid") || "-") as string
-            return (
-                <div>{x}</div>
-            )
-        },
-    },
-    {
-        accessorKey: "instagram",
-        header: "IG",
-        cell: ({ row }) => {
-            const x = (row.getValue("instagram") || "-") as string
-            return (
-                <div>{x}</div>
-            )
-        },
-    },
-    {
-        accessorKey: "discord",
-        header: "Discord",
-        cell: ({ row }) => {
-            const x = (row.getValue("discord") || "-") as string
-            return (
-                <div>{x}</div>
-            )
-        },
-    },
-    {
-        accessorKey: "action",
-        header: "Action",
-        cell: ({ row }) => ActionCell(row),
-    },
-]
 
 const filterKeys: Array<keyof YookbeerColumn> = [
     "stdid",
@@ -270,15 +72,131 @@ const filterKeys: Array<keyof YookbeerColumn> = [
 ]
  
 
-export function YookbeerTable({ data }: YookbeerTableProps){
+export function YookbeerTable({ data, isAdmin }: YookbeerTableProps){
     const [sorting, setSorting] = React.useState<SortingState>([])
     /* const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
         []
     ) */
     const [globalFilter, setGlobalFilter] = React.useState<string>("")
     const [columnVisibility, setColumnVisibility] =
-        React.useState<VisibilityState>({ 'emailper': false })
+        React.useState<VisibilityState>({ 'emailper': false, 'discord': false, 'lineid': false, 'facebook': false,  })
     const [rowSelection, setRowSelection] = React.useState({})
+
+    const columns: ColumnDef<YookbeerColumn>[] = [
+      {
+          accessorKey: "stdid",
+          header: "ID",
+          cell: ({ row }) => {
+              const shrt = (row.getValue("stdid") as string).substring(7)
+              return (
+                  <div>{shrt}</div>
+              )
+          },
+      },
+      {
+          accessorKey: "course",
+          header: "Course",
+          cell: ({ row }) => (
+              <div>{courseName[row.getValue("course") as number]}</div>
+          ),
+      },
+      {
+          accessorKey: "nameth",
+          header: "Name (TH)",
+          cell: ({ row }) => {
+              const x = (row.getValue("nameth") || "-") as string
+              return (
+                  <div>{x}</div>
+              )
+          },
+      },
+      {
+          accessorKey: "nameen",
+          header: "Name",
+          cell: ({ row }) => (
+              <div>{row.getValue("nameen")}</div>
+          ),
+      },
+      {
+          accessorKey: "nickth",
+          header: "Nick (TH)",
+          cell: ({ row }) => {
+              const x = (row.getValue("nickth") || "-") as string
+              return (
+                  <div>{x}</div>
+              )
+          },
+      },
+      {
+          accessorKey: "nicken",
+          header: "Nick",
+          cell: ({ row }) => (
+              <div>{row.getValue("nicken")}</div>
+          ),
+      },
+      {
+          accessorKey: "phone",
+          header: "Phone",
+          cell: ({ row }) => (
+              <div>{row.getValue("phone")}</div>
+          ),
+      },
+      {
+          accessorKey: "emailper",
+          header: "Email (per)",
+          cell: ({ row }) => <div className="lowercase">{row.getValue("emailper")}</div>,
+      },
+      {
+          accessorKey: "emailuni",
+          header: "Email (uni)",
+          cell: ({ row }) => <div className="lowercase">{row.getValue("emailuni")}</div>,
+      },
+      {
+          accessorKey: "facebook",
+          header: "FB",
+          cell: ({ row }) => {
+              const x = (row.getValue("facebook") || "-") as string
+              return (
+                  <div>{x}</div>
+              )
+          },
+      },
+      {
+          accessorKey: "lineid",
+          header: "LINE",
+          cell: ({ row }) => {
+              const x = (row.getValue("lineid") || "-") as string
+              return (
+                  <div>{x}</div>
+              )
+          },
+      },
+      {
+          accessorKey: "instagram",
+          header: "IG",
+          cell: ({ row }) => {
+              const x = (row.getValue("instagram") || "-") as string
+              return (
+                  <div>{x}</div>
+              )
+          },
+      },
+      {
+          accessorKey: "discord",
+          header: "Discord",
+          cell: ({ row }) => {
+              const x = (row.getValue("discord") || "-") as string
+              return (
+                  <div>{x}</div>
+              )
+          },
+      },
+      {
+          accessorKey: "action",
+          header: "Action",
+          cell: ({ row }) => ActionCell(row, isAdmin),
+      },
+  ]
     
     const table = useReactTable({
         data,
@@ -316,16 +234,8 @@ export function YookbeerTable({ data }: YookbeerTableProps){
         },
     })
     return (
-        <div className="w-[85vw] lg:w-[95vw] mx-10">
+        <div className="w-[85vw] lg:w-[95vw] min-h-screen mx-10">
           <div className="flex items-center py-4">
-            {/* <Input
-              placeholder="Filter id"
-              value={(table.getColumn("stdid")?.getFilterValue() as string) ?? ""}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                table.getColumn("stdid")?.setFilterValue(event.target.value)
-              }
-              className="max-w-sm"
-            /> */}
             <Input
                 placeholder="Search"
                 value={table.getState().globalFilter ?? ""}
@@ -387,6 +297,10 @@ export function YookbeerTable({ data }: YookbeerTableProps){
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
+                      onClick={() => {
+                        redirect(`/std/${row.original.stdid}`)
+                      }}
+                      className="cursor-pointer"
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
@@ -412,10 +326,6 @@ export function YookbeerTable({ data }: YookbeerTableProps){
             </Table>
           </div>
           <div className="flex items-center justify-end space-x-2 py-4">
-            {/* <div className="flex-1 text-sm text-muted-foreground">
-              {table.getFilteredSelectedRowModel().rows.length} of{" "}
-              {table.getFilteredRowModel().rows.length} row(s) selected.
-            </div> */}
             <div className="space-x-2">
               <Button
                 variant="outline"
