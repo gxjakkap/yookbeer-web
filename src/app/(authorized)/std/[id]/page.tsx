@@ -33,18 +33,17 @@ export default async function StudentProfilePage({ params }: Props){
     const { id } = await params
     const data = (await db.select().from(thirtyeight).where(eq(thirtyeight.stdid, id)).limit(1))[0]
     const imgUrl = await getPresignedURLForYookbeerPic(data.img || '')
-    console.log(data)
     return (
-        <div className={`${promptReg.className} bg-neutral-100 mx-auto flex flex-col gap-y-3`}>
-            <div className="flex flex-col gap-y-1">
-                <h1 className={`${promptMed.className} text-4xl text-zinc-900`}>{data.nameen}</h1>
-                <p className="text-gray-600 text-xl">{data.stdid} - {data.nicken}</p>
+        <div className={`${promptReg.className} bg-neutral-100 mx-auto flex flex-col gap-y-3 pb-14`}>
+            <div className="flex flex-col lg:gap-y-1 text-center lg:text-left">
+                <h1 className={`${promptMed.className} text-[1.875rem] lg:text-4xl text-zinc-900`}>{data.nameen}</h1>
+                <p className="text-gray-600 text-lg lg:text-xl">{data.stdid} - {data.nicken}</p>
             </div>
             <div className="flex flex-col lg:flex-row gap-x-20">
-                <div className="">
+                <div className="mx-auto lg:mx-0">
                     <img className="max-w-[500px] max-h-[450px] rounded-md" src={imgUrl} alt={`${data.nicken}'s portrait`} />
                 </div>
-                <div className="flex flex-col gap-y-8">
+                <div className="flex flex-col gap-y-8 text-center mt-4 lg:mt-0">
                     <div className="flex flex-col">
                         <p className={`${promptReg.className} text-gray-700 text-xl`}>
                             <span className={`${promptMed.className}`}>Course: </span>
@@ -78,7 +77,7 @@ export default async function StudentProfilePage({ params }: Props){
                             </p>
                         ) : (<></>)}
                     </div>
-                    <div className="flex flex-col">
+                    <div className="flex flex-col mx-auto">
                         <p className={`${promptBold.className} text-gray-700 text-xl`}>Socials</p>
                         <div className="flex gap-x-6 mt-3">
                             {(data.lineid) ? (<a href={`https://line.me/R/ti/p/~${data.lineid}`} className="w-10 h-10 text-neutral-400"><LineIcon className="w-12 h-12" /></a>) : (<></>)}
@@ -93,7 +92,7 @@ export default async function StudentProfilePage({ params }: Props){
                             {data.emerphone}
                         </p>
                         <p className={`${promptReg.className} text-gray-700 text-xl`}>
-                            <span className={`${promptMed.className}`}>Relations: </span>
+                            <span className={`${promptMed.className}`}>Relation: </span>
                             {data.emerrelation}
                         </p>
                     </div>

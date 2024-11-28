@@ -297,13 +297,18 @@ export function YookbeerTable({ data, isAdmin }: YookbeerTableProps){
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
-                      onClick={() => {
-                        redirect(`/std/${row.original.stdid}`)
-                      }}
+                     
                       className="cursor-pointer"
                     >
                       {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id}>
+                        <TableCell 
+                          key={cell.id}
+                          onClick={() => {
+                            if (cell.column.id !== "action"){
+                              redirect(`/std/${row.original.stdid}`)
+                            }
+                          }}
+                        >
                           {flexRender(
                             cell.column.columnDef.cell,
                             cell.getContext()

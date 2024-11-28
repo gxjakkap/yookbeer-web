@@ -242,7 +242,7 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
     }
 
     return (
-        <div className="flex">
+        <div className="action-cell flex" data-column="action">
             <Button 
                 variant="ghost" 
                 size="icon"
