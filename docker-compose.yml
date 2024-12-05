@@ -10,7 +10,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   web:
-    image: ghcr.io/gxjakkap/yookbeer-web:latest
+    image: ghcr.io/gxjakkap/yookbeer-web:main
     ports: 
       - "8080:8080"
     env_file: ".env"
