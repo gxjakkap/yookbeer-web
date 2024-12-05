@@ -10,7 +10,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
 
   web:
-    image: e44d460154dc586c1f3b2c0e55c09dffa5a01a46437d14a088408fc54541bff6
+    image: ghcr.io/gxjakkap/yookbeer-web:latest
     container_name: yookbeer
     ports: 
       - "8080:8080"
