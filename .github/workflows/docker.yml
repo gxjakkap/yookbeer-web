@@ -2,7 +2,12 @@ name: build-docker-image
 on:
   push:
     paths:
-      - '/**/*'
+      - 'src/**/*'
+      - 'public/**/*'
+      - '*.config.*'
+      - 'Dockerfile'
+      - 'docker-compose.yml'
+      - 'package.json'
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
