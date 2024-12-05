@@ -1,12 +1,16 @@
 /* eslint-disable @next/next/no-img-element */
-import { db } from "@/db"
-import { thirtyeight } from "@/db/schema"
+
 import { eq } from "drizzle-orm"
 import { Prompt } from "next/font/google"
+import { notFound } from "next/navigation"
+
+import { db } from "@/db"
+import { thirtyeight } from "@/db/schema"
 import { getPresignedURLForYookbeerPic } from "../../actions"
 import { LineIcon } from "@/components/svg/socials/line"
 import { InstagramIcon } from "@/components/svg/socials/ig"
 import { FacebookIcon } from "@/components/svg/socials/fb"
+
 
 interface Props {
     params: Promise<{ id: string }>
@@ -31,7 +35,11 @@ const courseName = ['Regular Program', 'International Program', 'Health Data Sci
 
 export default async function StudentProfilePage({ params }: Props){
     const { id } = await params
-    const data = (await db.select().from(thirtyeight).where(eq(thirtyeight.stdid, id)).limit(1))[0]
+    const dataArr = (await db.select().from(thirtyeight).where(eq(thirtyeight.stdid, id)).limit(1))
+    if (dataArr.length < 1){
+        notFound()
+    }
+    const data = dataArr[0]
     const imgUrl = await getPresignedURLForYookbeerPic(data.img || '')
     return (
         <div className={`${promptReg.className} bg-neutral-100 mx-auto flex flex-col gap-y-3 pb-14`}>
