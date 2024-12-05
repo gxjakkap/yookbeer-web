@@ -65,5 +65,5 @@ volumes:
   db-data:
 
 networks:
-  app-network:
+  yookbeer:
     driver: bridge
