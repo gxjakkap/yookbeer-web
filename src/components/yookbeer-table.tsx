@@ -32,7 +32,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { ActionCell } from "./actioncell"
-import { redirect } from "next/navigation"
+import { redirect, RedirectType } from "next/navigation"
 
 export interface YookbeerColumn {
     stdid: string,
@@ -305,7 +305,10 @@ export function YookbeerTable({ data, isAdmin }: YookbeerTableProps){
                           key={cell.id}
                           onClick={() => {
                             if (cell.column.id !== "action"){
-                              redirect(`/std/${row.original.stdid}`)
+                              redirect(
+                                `/std/${row.original.stdid}`,
+                                RedirectType.push
+                              )
                             }
                           }}
                         >
