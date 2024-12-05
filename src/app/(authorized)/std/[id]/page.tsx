@@ -77,7 +77,7 @@ export default async function StudentProfilePage({ params }: Props){
                             </p>
                         ) : (<></>)}
                     </div>
-                    <div className="flex flex-col mx-auto">
+                    <div className="flex flex-col mx-auto lg:mx-0">
                         <p className={`${promptBold.className} text-gray-700 text-xl`}>Socials</p>
                         <div className="flex gap-x-6 mt-3">
                             {(data.lineid) ? (<a href={`https://line.me/R/ti/p/~${data.lineid}`} className="w-10 h-10 text-neutral-400"><LineIcon className="w-12 h-12" /></a>) : (<></>)}
