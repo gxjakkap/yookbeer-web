@@ -9,10 +9,23 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
+  reverse-proxy:
+    image: traefik:v3.1
+    command:
+      - "--providers.docker"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
   web:
     image: ghcr.io/gxjakkap/yookbeer-web:main
-    ports: 
-      - "8080:8080"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.guestbook.rule=Host(`yb.guntxjakka.me`)"
+      - "com.centurylinklabs.watchtower.enable=true"
     env_file: ".env"
     deploy:
       mode: replicated
