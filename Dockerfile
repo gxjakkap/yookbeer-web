@@ -42,5 +42,5 @@ USER nextjs
 EXPOSE 8080
 
 ENV PORT=8080
-ENV HOSTNAME="localhost"
+ENV HOSTNAME="0.0.0.0"
 CMD ["node", "server.js"]
