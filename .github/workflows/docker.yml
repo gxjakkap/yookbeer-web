@@ -6,7 +6,6 @@ on:
       - 'public/**/*'
       - '*.config.*'
       - 'Dockerfile'
-      - 'docker-compose.yml'
       - 'package.json'
       - '.github/workflows/**/*'
 env:

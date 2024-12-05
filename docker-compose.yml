@@ -11,7 +11,6 @@ services:
 
   web:
     image: ghcr.io/gxjakkap/yookbeer-web:latest
-    container_name: yookbeer
     ports: 
       - "8080:8080"
     env_file: ".env"
