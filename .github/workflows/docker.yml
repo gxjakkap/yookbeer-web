@@ -8,6 +8,7 @@ on:
       - 'Dockerfile'
       - 'docker-compose.yml'
       - 'package.json'
+      - '.github/workflows/**/*'
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
