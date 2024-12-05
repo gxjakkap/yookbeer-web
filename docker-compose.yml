@@ -17,6 +17,10 @@ services:
       - "--entrypoints.web.address=:80"
     ports:
       - "8080:80"
+    depends_on:
+      - web
+    networks:
+      - yookbeer
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 
@@ -24,13 +28,16 @@ services:
     image: ghcr.io/gxjakkap/yookbeer-web:main
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.guestbook.rule=Host(`yb.guntxjakka.me`)"
+      - "traefik.http.routers.web.rule=Host(`localhost`)"
+      - "traefik.http.services.web.loadbalancer.server.port=8080"
       - "com.centurylinklabs.watchtower.enable=true"
     env_file: ".env"
     deploy:
       mode: replicated
       replicas: 2
     restart: always
+    networks:
+      - yookbeer
     depends_on:
       db:
         condition: service_healthy
@@ -40,6 +47,8 @@ services:
     restart: always
     user: postgres
     env_file: ".env"
+    networks:
+      - yookbeer
     volumes:
       - db-data:/var/lib/postgresql/data
     environment:
@@ -54,3 +63,7 @@ services:
       retries: 5
 volumes:
   db-data:
+
+networks:
+  app-network:
+    driver: bridge
