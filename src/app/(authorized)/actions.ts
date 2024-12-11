@@ -1,5 +1,6 @@
 'use server'
 
+import { auth } from "@/auth"
 import { searchThirtyeight } from "@/lib/search"
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
@@ -14,6 +15,8 @@ const S3 = new S3Client({
 })
 
 export async function getPresignedURLForYookbeerPic(imgName: string) {
+    const session = await auth()
+    if (!session || !['admin', 'user'].includes(session.user.role!)) return ''
     const url = await getSignedUrl(
         S3,
         new GetObjectCommand({ Bucket: "yookbeer", Key: `${imgName}` }),
