@@ -28,10 +28,6 @@ export async function getPresignedURLForYookbeerPic(imgName: string) {
 
 export async function nSearch(q: string){
     if (!q.trim()) return []
-    console.log(q)
     const results = await searchThirtyeight(q)
-
-    console.log(results)
-
     return results
 }
