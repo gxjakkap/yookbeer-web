@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/table"
 import { ActionCell } from "./actioncell"
 import { redirect, RedirectType } from "next/navigation"
+import { courseName } from "@/lib/const"
 
 export interface YookbeerColumn {
     stdid: string,
@@ -56,8 +57,6 @@ interface YookbeerTableProps {
     data: YookbeerColumn[],
     isAdmin: boolean
 }
-
-const courseName = ['REG', 'INT', 'HDS', 'RC']
 
 
 const filterKeys: Array<keyof YookbeerColumn> = [

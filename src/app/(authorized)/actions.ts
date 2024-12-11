@@ -1,5 +1,6 @@
 'use server'
 
+import { searchThirtyeight } from "@/lib/search"
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
@@ -19,4 +20,15 @@ export async function getPresignedURLForYookbeerPic(imgName: string) {
         { expiresIn: 3600 },
     )
     return url
+}
+
+
+export async function nSearch(q: string){
+    if (!q.trim()) return []
+    console.log(q)
+    const results = await searchThirtyeight(q)
+
+    console.log(results)
+
+    return results
 }

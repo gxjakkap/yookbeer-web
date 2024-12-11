@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/navigation-menu"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { Spotlight } from "@/components/spotlight"
 
 export const metadata: Metadata = {
   title: "yookbeer",
@@ -60,6 +61,7 @@ export default async function AuthorizedLayout({
         <div className="mt-12 flex flex-col lg:mt-0">
             {children} 
         </div>
+        <Spotlight />
       </div>
   )
 }

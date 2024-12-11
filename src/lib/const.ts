@@ -1,0 +1,1 @@
+export const courseName = ['REG', 'INT', 'HDS', 'RC']

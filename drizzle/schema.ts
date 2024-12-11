@@ -1,12 +1,31 @@
-import { pgTable, unique, text, timestamp, varchar, foreignKey, integer, primaryKey, boolean } from "drizzle-orm/pg-core"
+import { pgTable, varchar, integer, unique, text, timestamp, foreignKey, primaryKey, boolean } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 
 
+export const thirtyeight = pgTable("thirtyeight", {
+	stdid: varchar({ length: 20 }).primaryKey().notNull(),
+	course: integer().notNull(),
+	nameth: varchar({ length: 255 }),
+	nameen: varchar({ length: 255 }).notNull(),
+	nickth: varchar({ length: 255 }),
+	nicken: varchar({ length: 255 }).notNull(),
+	phone: varchar({ length: 20 }).notNull(),
+	emailper: varchar({ length: 100 }),
+	emailuni: varchar({ length: 100 }),
+	emerphone: varchar({ length: 20 }),
+	emerrelation: varchar({ length: 50 }),
+	facebook: varchar({ length: 255 }),
+	lineid: varchar({ length: 100 }),
+	instagram: varchar({ length: 100 }),
+	discord: varchar({ length: 100 }),
+	img: varchar({ length: 20 }),
+});
+
 export const user = pgTable("user", {
 	id: text().primaryKey().notNull(),
 	name: text(),
-	email: text(),
+	email: text().notNull(),
 	emailVerified: timestamp({ mode: 'string' }),
 	image: text(),
 	role: varchar({ length: 100 }),
@@ -28,25 +47,6 @@ export const session = pgTable("session", {
 			name: "session_userId_user_id_fk"
 		}).onDelete("cascade"),
 	}
-});
-
-export const thirtyeight = pgTable("thirtyeight", {
-	stdid: varchar({ length: 20 }).primaryKey().notNull(),
-	course: integer().notNull(),
-	nameth: varchar({ length: 255 }),
-	nameen: varchar({ length: 255 }).notNull(),
-	nickth: varchar({ length: 255 }),
-	nicken: varchar({ length: 255 }).notNull(),
-	phone: varchar({ length: 20 }).notNull(),
-	emailper: varchar({ length: 100 }),
-	emailuni: varchar({ length: 100 }),
-	emerphone: varchar({ length: 20 }),
-	emerrelation: varchar({ length: 50 }),
-	facebook: varchar({ length: 255 }),
-	lineid: varchar({ length: 100 }),
-	instagram: varchar({ length: 100 }),
-	discord: varchar({ length: 100 }),
-	img: varchar({ length: 20 }),
 });
 
 export const verificationToken = pgTable("verificationToken", {
