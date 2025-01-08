@@ -1,5 +1,5 @@
 "use client"
-import { redirect } from "next/navigation"
+import { redirect, RedirectType } from "next/navigation"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useDebounce } from "use-debounce"
 import { CommandDialog, CommandEmpty, CommandInput, CommandList } from "./ui/command"
@@ -136,7 +136,7 @@ export function Spotlight() {
                         }}
                         onClick={() => {
                             setOpen(false)
-                            redirect(`/std/${r.stdid}`)
+                            redirect(`/std/${r.stdid}`, RedirectType.push)
                         }}
                         tabIndex={-1}
                     >
