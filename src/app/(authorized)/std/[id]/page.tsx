@@ -72,11 +72,11 @@ export default async function StudentProfilePage({ params }: Props){
                         </p>
                         <p className={`${promptReg.className} text-gray-700 text-xl`}>
                             <span className={`${promptMed.className}`}>Email: </span>
-                            <a href={`mailto:${data.emailuni}`} className="hover:underline hover:text-blue-500">{data.emailuni}</a>
+                            <a href={`mailto:${data.emailuni}`} className="hover:underline hover:text-blue-500">{data.emailuni?.toLowerCase()}</a>
                         </p>
                         <p className={`${promptReg.className} text-gray-700 text-xl`}>
                             <span className={`${promptMed.className}`}>Personal Email: </span>
-                            <a href={`mailto:${data.emailper}`} className="hover:underline hover:text-blue-500">{data.emailper}</a>
+                            <a href={`mailto:${data.emailper}`} className="hover:underline hover:text-blue-500">{data.emailper?.toLowerCase()}</a>
                         </p>
                         {(data.discord) ? (
                             <p className={`${promptReg.className} text-gray-700 text-xl`}>

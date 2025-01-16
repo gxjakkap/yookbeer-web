@@ -36,7 +36,7 @@ export default async function NoAccessPage() {
                         }}
                         className="flex flex-col"
                     >
-                        <Button type="submit" className="bg-white mx-auto">
+                        <Button type="submit" className="mx-auto">
                         <span>Sign out</span>
                         </Button>
                     </form>
