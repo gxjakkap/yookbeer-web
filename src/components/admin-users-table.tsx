@@ -26,7 +26,7 @@ import {
   DropdownMenuRadioItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu"
-import { Input } from "@/components/ui/input"
+//import { Input } from "@/components/ui/input"
 import {
   Table,
   TableBody,
@@ -367,14 +367,14 @@ export function AdminUserTable({ data }: YookbeerUserTableProps) {
     return (
         <div className="w-[95vw] mx-10">
             <div className="flex items-center py-4">
-                <Input
+                {/* <Input
                     placeholder="Search"
                     value={table.getState().globalFilter ?? ""}
                     onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
                         table.setGlobalFilter(event.target.value)
                     }
                     className="max-w-sm"
-                />
+                /> */}
                 <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                         <Button variant="outline" className="ml-auto">

@@ -28,6 +28,14 @@ export const thirtyeight = pgTable("thirtyeight", {
 	img: varchar({ length: 20 }),
 })
 
+export const apiKey = pgTable("api_key", {
+	id: integer().generatedAlwaysAsIdentity().notNull(),
+	name: varchar("name", { length: 50 }).notNull(),
+	key: varchar("key", { length: 255 }).notNull(),
+	expiresAt: timestamp("expiresAt"),
+	owner: text("owner").notNull().references(() => users.id, { onDelete: "cascade" })
+})
+
 export const users = pgTable("user", {
 	id: text("id")
 		.primaryKey()

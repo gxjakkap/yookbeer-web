@@ -42,7 +42,7 @@ export default async function AuthorizedLayout({
             {(session.user.role === "admin") && (
               <>
                 <NavigationMenuItem>
-                  <Link href='/admin/users'>ManageUsers</Link>
+                  <Link href='/admin'>Admin</Link>
                 </NavigationMenuItem>
               </>
             )}
