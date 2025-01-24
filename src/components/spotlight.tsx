@@ -79,7 +79,7 @@ export function Spotlight() {
             const selectedResult = results[focusIndex]
             if (selectedResult) {
                 setOpen(false)
-                redirect(`/std/${selectedResult.stdid}`)
+                redirect(`/std/${selectedResult.stdid}`, RedirectType.push)
             }
         }
 
