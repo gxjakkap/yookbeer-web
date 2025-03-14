@@ -1,5 +1,6 @@
 "use client"
 import { redirect, RedirectType } from "next/navigation"
+import { isMacOs } from "react-device-detect"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useDebounce } from "use-debounce"
 import { CommandDialog, CommandEmpty, CommandInput, CommandList } from "./ui/command"
@@ -22,7 +23,7 @@ export function Spotlight() {
 
     useEffect(() => {
         const down = (e: KeyboardEvent) => {
-            if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
+            if ((e.code === "KeyK") && (isMacOs ? e.metaKey : e.ctrlKey)) {
                 e.preventDefault()
                 setOpen((open) => !open)
             }
