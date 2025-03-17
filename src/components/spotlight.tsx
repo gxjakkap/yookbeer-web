@@ -7,7 +7,7 @@ import { CommandDialog, CommandEmpty, CommandInput, CommandList } from "./ui/com
 import { nSearch } from "@/app/(authorized)/actions"
 import { CommandLoading } from "cmdk"
 import { thirtyeight } from "@/db/schema"
-import { courseName } from "@/lib/const"
+import { COURSE_NAME } from "@/lib/const"
 
 type SearchResult = typeof thirtyeight.$inferSelect
 
@@ -142,7 +142,7 @@ export function Spotlight() {
                         tabIndex={-1}
                     >
                         <span className="font-medium">{r.nameen}</span>
-                        <span className="text-sm text-muted-foreground">{r.nicken}: {courseName[r.course]}</span>
+                        <span className="text-sm text-muted-foreground">{r.nicken}: {COURSE_NAME[r.course]}</span>
                     </div>
                 ))}
             </CommandList>

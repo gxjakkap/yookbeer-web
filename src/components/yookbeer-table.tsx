@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/table"
 import { ActionCell } from "./actioncell"
 import { redirect, RedirectType } from "next/navigation"
-import { courseName } from "@/lib/const"
+import { COURSE_NAME } from "@/lib/const"
 
 export interface YookbeerColumn {
     stdid: string,
@@ -96,7 +96,7 @@ export function YookbeerTable({ data, isAdmin }: YookbeerTableProps){
           accessorKey: "course",
           header: "Course",
           cell: ({ row }) => (
-              <div>{courseName[row.getValue("course") as number]}</div>
+              <div>{COURSE_NAME[row.getValue("course") as number]}</div>
           ),
       },
       {

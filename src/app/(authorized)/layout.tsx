@@ -9,6 +9,7 @@ import {
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Spotlight } from "@/components/spotlight"
+import { Navbar } from "@/components/navbar"
 
 export const metadata: Metadata = {
   title: "yookbeer",
@@ -32,32 +33,9 @@ export default async function AuthorizedLayout({
   return (
 
       <div
-        className={`antialiased flex flex-col bg-neutral-100 w-screen min-h-screen`}
+        className={`antialiased flex flex-col bg-neutral-100 w-screen min-h-screen gap-y-4`}
       >
-        <NavigationMenu className="max-h-[6rem] mt-5 ml-auto">
-          <NavigationMenuList className="flex gap-x-3 pr-12 text-xl">
-            <NavigationMenuItem>
-              <Link href='/'>List</Link>
-            </NavigationMenuItem>
-            {(session.user.role === "admin") && (
-              <>
-                <NavigationMenuItem>
-                  <Link href='/admin'>Admin</Link>
-                </NavigationMenuItem>
-              </>
-            )}
-            <NavigationMenuItem>
-              <form
-                action={async () => {
-                  "use server"
-                  await signOut()
-                }}
-              >
-                <button type="submit">Sign Out</button>
-              </form>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+        <Navbar session={session} role={session.user.role} />
         <div className="mt-12 flex flex-col lg:mt-0">
             {children} 
         </div>

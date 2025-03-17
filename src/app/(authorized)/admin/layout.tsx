@@ -3,6 +3,7 @@ import "../../globals.css"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { Toaster } from "@/components/ui/toaster"
+import { Roles } from "@/lib/const"
 
 
 export const metadata: Metadata = {
@@ -20,8 +21,8 @@ export default async function AdminLayout({
         redirect("/login")
     }
 
-    if (!(["admin"].includes(session.user.role || "unauthorized"))){
-        redirect("/noaccess")
+    if (!(["admin"].includes(session.user.role || ""))){
+        redirect("/")
     }
 
     return (
