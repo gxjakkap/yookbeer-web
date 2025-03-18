@@ -11,15 +11,14 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMediaQuery } from "usehooks-ts";
 
-import { MobileNav } from "@/components/mobile-nav";
+import { MobileNav } from "@/components/nav/mobile-nav";
 /* import { SignOutButton } from "@/components/sign-out-button"; */
 import { cn } from "@/lib/utils";
 
 /* import { ThemeToggle } from "./theme-toggle"; */
-import { Button } from "./ui/button";
+import { Button } from "@/components/ui/button";
 import { Roles } from "@/lib/const";
-import SignOutButton from "./signout-button";
-import UserMenu from "./user-menu";
+import UserMenu from "@/components/user-menu";
 import { Session } from "next-auth";
 
 interface NavbarProps {

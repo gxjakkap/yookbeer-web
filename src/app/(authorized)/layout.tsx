@@ -9,7 +9,7 @@ import {
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { Spotlight } from "@/components/spotlight"
-import { Navbar } from "@/components/navbar"
+import { Navbar } from "@/components/nav/navbar"
 
 export const metadata: Metadata = {
   title: "yookbeer",

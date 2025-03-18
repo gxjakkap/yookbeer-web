@@ -1,3 +1,4 @@
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 import "./globals.css"
 
 export default async function RootLayout({
@@ -15,7 +16,7 @@ export default async function RootLayout({
       <body
         className={`antialiased`}
       >
-        {children}
+        <NuqsAdapter>{children}</NuqsAdapter>
       </body>
     </html>
   )
