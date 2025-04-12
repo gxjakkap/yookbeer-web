@@ -109,7 +109,7 @@ const EditDialog = ({
                                 <DropdownMenuContent className="w-56">
                                     <DropdownMenuLabel>Select user&apos;s role</DropdownMenuLabel>
                                     <DropdownMenuSeparator />
-                                    <DropdownMenuRadioGroup value={data.role || 'NULL'} onValueChange={(val) => setFormData({ ...formData, role: val })}>
+                                    <DropdownMenuRadioGroup value={formData.role || 'NULL'} onValueChange={(val) => setFormData({ ...formData, role: val })}>
                                         <DropdownMenuRadioItem value="admin">Admin</DropdownMenuRadioItem>
                                         <DropdownMenuRadioItem value="user">User</DropdownMenuRadioItem>
                                         <DropdownMenuRadioItem value="unauthorized">No Access</DropdownMenuRadioItem>
