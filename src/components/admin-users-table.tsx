@@ -104,7 +104,7 @@ const EditDialog = ({
                             </Label>
                             <DropdownMenu>
                                 <DropdownMenuTrigger asChild>
-                                    <Button variant="outline">{data.role?.replace(/([A-Z])/g, ' $1').trim()}</Button>
+                                    <Button variant="outline" className="w-32">{formData.role?.replace(/([A-Z])/g, ' $1').trim()}</Button>
                                 </DropdownMenuTrigger>
                                 <DropdownMenuContent className="w-56">
                                     <DropdownMenuLabel>Select user&apos;s role</DropdownMenuLabel>
