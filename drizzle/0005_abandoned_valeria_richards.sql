@@ -1,0 +1,1 @@
+ALTER TABLE "invite" ADD CONSTRAINT "invite_code_unique" UNIQUE("code");

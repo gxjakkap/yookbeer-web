@@ -28,6 +28,16 @@ export const thirtyeight = pgTable("thirtyeight", {
 	img: varchar({ length: 20 }),
 })
 
+export const invite = pgTable("invite", {
+	id: integer().generatedAlwaysAsIdentity().notNull(),
+	code: text("code").notNull().unique(),
+	status: text("status").notNull().default("unused"),
+	usedBy: text("used_by").references(() => users.id),
+	createdBy: text("created_by").notNull().references(() => users.id, { onDelete: "cascade" }),
+	creationDate: timestamp("creation_date", { withTimezone: true }).defaultNow().notNull(),
+	claimDate: timestamp("claim_date", { withTimezone: true })
+})
+
 export const apiKey = pgTable("api_key", {
 	id: integer().generatedAlwaysAsIdentity().notNull(),
 	name: varchar("name", { length: 50 }).notNull(),

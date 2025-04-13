@@ -1,4 +1,5 @@
 import { NuqsAdapter } from 'nuqs/adapters/next/app'
+import { Toaster } from '@/components/ui/toaster'
 import "./globals.css"
 
 export default async function RootLayout({
@@ -17,6 +18,7 @@ export default async function RootLayout({
         className={`antialiased`}
       >
         <NuqsAdapter>{children}</NuqsAdapter>
+        <Toaster />
       </body>
     </html>
   )

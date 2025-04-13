@@ -2,7 +2,6 @@ import type { Metadata } from "next"
 import "../../globals.css"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import { Toaster } from "@/components/ui/toaster"
 import { Roles } from "@/lib/const"
 
 
@@ -28,7 +27,6 @@ export default async function AdminLayout({
     return (
         <>
             {children}
-            <Toaster />
         </>
     )
 }
