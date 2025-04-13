@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import Crypto from "node:crypto"
+import Crypto from "crypto"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
