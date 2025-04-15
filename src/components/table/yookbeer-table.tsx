@@ -31,7 +31,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { ActionCell } from "./actioncell"
+import { ActionCell } from "../actioncell"
 import { redirect, RedirectType } from "next/navigation"
 import { COURSE_NAME } from "@/lib/const"
 

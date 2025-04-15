@@ -1,8 +1,8 @@
 import localFont from "next/font/local"
 
 import { auth } from "@/auth"
-import { YookbeerTable } from "@/components/yookbeer-table"
-import { YookbeerTable as NewTable } from "@/components/yookbeer-table-new"
+import { YookbeerTable } from "@/components/table/yookbeer-table"
+import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
 import { db } from "@/db"
 import { thirtyeight } from "@/db/schema"
 import { Roles } from "@/lib/const"

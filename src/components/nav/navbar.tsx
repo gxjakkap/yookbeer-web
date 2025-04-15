@@ -12,14 +12,13 @@ import { usePathname } from "next/navigation";
 import { useMediaQuery } from "usehooks-ts";
 
 import { MobileNav } from "@/components/nav/mobile-nav";
-/* import { SignOutButton } from "@/components/sign-out-button"; */
 import { cn } from "@/lib/utils";
 
-/* import { ThemeToggle } from "./theme-toggle"; */
 import { Button } from "@/components/ui/button";
 import { Roles } from "@/lib/const";
 import UserMenu from "@/components/user-menu";
 import { Session } from "next-auth";
+import { ThemeSwitch } from "../theme-switch";
 
 interface NavbarProps {
   role?: string | null;
@@ -56,8 +55,8 @@ export function Navbar({ role, session }: NavbarProps) {
           </div>
 
           <div className="flex items-center gap-3">
+            <ThemeSwitch />
             <UserMenu email={session.user.email ?? ""} name={session.user.name ?? ""} role={session.user.role ?? Roles.USER} />
-            {/* <ThemeToggle /> */}
           </div>
         </nav>
       </div>

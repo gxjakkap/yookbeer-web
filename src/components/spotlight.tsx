@@ -130,7 +130,7 @@ export function Spotlight() {
                     <div
                         key={r.stdid}
                         className={`flex flex-col pl-10 p-2 rounded ${
-                            focusIndex === i ? "bg-gray-200" : ""
+                            focusIndex === i ? "bg-neutral-200 dark:bg-muted-foreground dark:text-background" : ""
                         }`}
                         ref={(el) => {
                             resultRefs.current[i] = el
@@ -142,7 +142,7 @@ export function Spotlight() {
                         tabIndex={-1}
                     >
                         <span className="font-medium">{r.nameen}</span>
-                        <span className="text-sm text-muted-foreground">{r.nicken}: {COURSE_NAME[r.course]}</span>
+                        <span className="text-sm">{r.nicken}: {COURSE_NAME[r.course]}</span>
                     </div>
                 ))}
             </CommandList>

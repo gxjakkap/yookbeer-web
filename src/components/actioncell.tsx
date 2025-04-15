@@ -1,5 +1,5 @@
 import { Row } from "@tanstack/react-table"
-import { YookbeerColumn } from "./yookbeer-table"
+import { YookbeerColumn } from "./table/yookbeer-table"
 import React from "react"
 import { getPresignedURLForYookbeerPic } from "@/app/(authorized)/actions"
 import { Button } from "./ui/button"

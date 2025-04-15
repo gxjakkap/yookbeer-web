@@ -1,15 +1,11 @@
 import type { Metadata } from "next"
-import "../globals.css"
-import { auth, signOut } from "@/auth"
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu"
+
+import { auth } from "@/auth"
 import { redirect } from "next/navigation"
-import Link from "next/link"
 import { Spotlight } from "@/components/spotlight"
 import { Navbar } from "@/components/nav/navbar"
+
+import "../globals.css"
 
 export const metadata: Metadata = {
   title: "yookbeer",
@@ -33,7 +29,7 @@ export default async function AuthorizedLayout({
   return (
 
       <div
-        className={`antialiased flex flex-col bg-neutral-100 w-screen min-h-screen gap-y-4`}
+        className={`antialiased flex flex-col bg-backgound w-screen min-h-screen gap-y-4`}
       >
         <Navbar session={session} role={session.user.role} />
         <div className="mt-12 flex flex-col lg:mt-0">

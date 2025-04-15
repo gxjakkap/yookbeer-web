@@ -17,7 +17,7 @@ export default function UserMenu(props: UserMenuProps){
     return (
         <DropdownMenu>
             <DropdownMenuTrigger>
-            <Avatar className="drop-shadow-xl">
+            <Avatar className="outline outline-1 outline-slate-300">
                 <AvatarFallback>{getInitials(props.name)}</AvatarFallback>
             </Avatar>
             </DropdownMenuTrigger>

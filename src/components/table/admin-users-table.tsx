@@ -381,7 +381,7 @@ export function AdminUserTable({ data }: YookbeerUserTableProps) {
                             Columns <ChevronDown className="ml-2 h-4 w-4" />
                         </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-neutral-100">
+                    <DropdownMenuContent align="end">
                         {table
                             .getAllColumns()
                             .filter((column) => column.getCanHide())
@@ -404,7 +404,7 @@ export function AdminUserTable({ data }: YookbeerUserTableProps) {
             </div>
             <div className="rounded-md border">
                 <Table>
-                    <TableHeader className="bg-neutral-100">
+                    <TableHeader className="bg-neutral-100 dark:bg-background">
                         {table.getHeaderGroups().map((headerGroup) => (
                             <TableRow key={headerGroup.id}>
                                 {headerGroup.headers.map((header) => {

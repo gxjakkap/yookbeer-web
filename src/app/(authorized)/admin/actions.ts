@@ -1,7 +1,7 @@
 "use server"
 
-import { YookbeerColumn } from "@/components/yookbeer-table"
-import { YookbeerUserColumn } from "@/components/admin-users-table"
+import { YookbeerColumn } from "@/components/table/yookbeer-table"
+import { YookbeerUserColumn } from "@/components/table/admin-users-table"
 import { apiKey, invite, thirtyeight, users } from "@/db/schema"
 import { db } from "@/db"
 import { eq } from "drizzle-orm"

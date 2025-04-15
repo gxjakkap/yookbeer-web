@@ -41,32 +41,37 @@ import {
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { editAPIKey, deleteAPIKey, addAPIKey } from "@/app/(authorized)/admin/actions"
-import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { editAPIKey, deleteAPIKey, addAPIKey, createInviteCode, deleteInviteCode } from "@/app/(authorized)/admin/actions"
+import { CreateInviteStatus } from "@/app/(authorized)/admin/types"
+import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
 import { cn } from "@/lib/utils"
 import { addDays, format } from "date-fns"
-import { Checkbox } from "./ui/checkbox"
-import { Calendar } from "./ui/calendar"
-import { Input } from "./ui/input"
+import { Checkbox } from "../ui/checkbox"
+import { Calendar } from "../ui/calendar"
+import { Input } from "../ui/input"
+import { InviteStatus } from "@/lib/const"
+import { Badge } from "../ui/badge"
 
 
-export interface YookbeerAPIKeyColumn {
+export interface YookbeerInviteColumn {
     id: number,
-    key: string,
-    name: string,
-    expiresAt: Date | null,
-    owner: string
+    code: string,
+    status: keyof typeof InviteStatus,
+    claimDate: Date | null,
+    createdBy: string,
+    usedBy: string | null,
+    creationDate: Date,
 }
 
-interface YookbeerAPIKeyTableProps {
-    data: YookbeerAPIKeyColumn[]
+interface YookbeerInviteTableProps {
+    data: YookbeerInviteColumn[]
 }
 
 interface AddDialogProps {
     isOpen: boolean
     onClose: () => void
-    onAdd: (data: Partial<YookbeerAPIKeyColumn>) => void
+    onAdd: (data: Partial<YookbeerInviteColumn>) => void
     isPending: boolean
 }
 
@@ -76,14 +81,7 @@ const AddDialog = ({
     onAdd,
     isPending 
 }: AddDialogProps) => {
-    const [formData, setFormData] = React.useState<Partial<YookbeerAPIKeyColumn>>({})
-    const [date, setDate] = React.useState<Date | undefined>(new Date())
-    const [noExpire, setNoExpire] = React.useState(true)
-
-    React.useEffect(() => {
-        setFormData({ ...formData, expiresAt: noExpire ? null : date })
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [date, noExpire])
+    const [formData, setFormData] = React.useState<Partial<YookbeerInviteColumn>>({})
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault()
@@ -94,67 +92,17 @@ const AddDialog = ({
         <Dialog open={isOpen} onOpenChange={onClose}>
             <DialogContent className="sm:max-w-md">
                 <DialogHeader>
-                    <DialogTitle>Create API Key</DialogTitle>
+                    <DialogTitle>Create Invite Code</DialogTitle>
                 </DialogHeader>
                 <form onSubmit={handleSubmit}>
                     <div className="flex flex-col gap-y-4">
-                        <div className="flex flex-col">
-                            <Label className="mb-2">Expiration Date</Label>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-full justify-start text-left font-normal",
-                                            !date && "text-muted-foreground",
-                                            noExpire && "cursor-not-allowed"
-                                        )}
-                                        
-                                    >
-                                        <CalendarIcon />
-                                        {date ? format(date, "PPP") : <span>Pick a date</span>}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                    align="start"
-                                    className="flex w-auto flex-col space-y-2 p-2"
-                                >
-                                    <Select
-                                        onValueChange={(value) =>
-                                            setDate(addDays(new Date(), parseInt(value)))
-                                        }
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Select" />
-                                        </SelectTrigger>
-                                        <SelectContent position="popper">
-                                            <SelectItem value="90">3 months</SelectItem>
-                                            <SelectItem value="180">6 months</SelectItem>
-                                            <SelectItem value="365">1 Year</SelectItem>
-                                        </SelectContent>
-                                    </Select>
-                                    <div className="rounded-md border">
-                                        <Calendar mode="single" selected={date} onSelect={setDate} disabled={noExpire} />
-                                    </div>
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-                        <div className="flex items-center space-x-2">
-                            <Checkbox 
-                                id="ned"
-                                checked={noExpire}
-                                onCheckedChange={() => setNoExpire(!noExpire)}
-                            />
-                            <Label htmlFor="ned" className="text-sm font-medium leading-none">
-                                No expiration date
-                            </Label>
-                        </div>
                         <div>
-                            <Label className="text-right capitalize" htmlFor="name">Name</Label>
+                            <Label className="text-right capitalize" htmlFor="name">Code</Label>
                             <Input 
-                                id="name" 
-                                value={formData.name} 
-                                onChange={(e) => setFormData({ ...formData, name: e.target.value })} 
+                                id="code" 
+                                value={formData.code}
+                                placeholder="Custom invite code (leave blank to autogenerate)"
+                                onChange={(e) => setFormData({ ...formData, code: e.target.value })} 
                                 className="mt-1" // Add margin for spacing
                             />
                         </div>
@@ -181,129 +129,11 @@ const AddDialog = ({
     )
 }
 
-interface EditDialogProps {
-    isOpen: boolean
-    onClose: () => void
-    data: YookbeerAPIKeyColumn
-    onUpdate: (data: Partial<YookbeerAPIKeyColumn>) => void
-    isPending: boolean
-}
-
-const EditDialog = ({ 
-    isOpen, 
-    onClose, 
-    data, 
-    onUpdate,
-    isPending 
-}: EditDialogProps) => {
-    const [formData, setFormData] = React.useState<Partial<YookbeerAPIKeyColumn>>({
-        id: data.id,
-        expiresAt: data.expiresAt
-    })
-
-    const [date, setDate] = React.useState<Date | undefined>(new Date())
-    const [noExpire, setNoExpire] = React.useState(!!data.expiresAt)
-
-    React.useEffect(() => {
-        setFormData({ ...formData, expiresAt: date})
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [date])
-
-    return (
-        <Dialog open={isOpen} onOpenChange={onClose}>
-            <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-                    <DialogTitle>Edit API Key Data</DialogTitle>
-                    <DialogDescription>
-                        {data.key} - Created by {data.owner}
-                    </DialogDescription>
-                </DialogHeader>
-                <form action={() => onUpdate(formData)}>
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label className="text-right capitalize">
-                                Expiration Date
-                            </Label>
-                            <Popover>
-                                <PopoverTrigger asChild>
-                                    <Button
-                                        variant={"outline"}
-                                        className={cn(
-                                            "w-[240px] justify-start text-left font-normal",
-                                            !date && "text-muted-foreground"
-                                        )}
-                                    >
-                                        <CalendarIcon />
-                                        {date ? format(date, "PPP") : <span>Pick a date</span>}
-                                    </Button>
-                                </PopoverTrigger>
-                                <PopoverContent
-                                    align="start"
-                                    className="flex w-auto flex-col space-y-2 p-2"
-                                >
-                                    <Select
-                                        onValueChange={(value) =>
-                                            setDate(addDays(new Date(), parseInt(value)))
-                                        }
-                                    >
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select" />
-                                    </SelectTrigger>
-                                    <SelectContent position="popper">
-                                        <SelectItem value="90">3 months</SelectItem>
-                                        <SelectItem value="180">6 months</SelectItem>
-                                        <SelectItem value="365">1 Year</SelectItem>
-                                    </SelectContent>
-                                    </Select>
-                                    <div className="rounded-md border">
-                                        <Calendar mode="single" selected={date} onSelect={setDate} disabled={noExpire} />
-                                    </div>
-                                </PopoverContent>
-                            </Popover>
-                        </div>
-                    </div>
-                    <div className="items-top flex space-x-2">
-                        <Checkbox 
-                            id="ned"
-                            checked={noExpire}
-                            onCheckedChange={() => setNoExpire(!noExpire)}
-                        />
-                        <div className="grid gap-1.5 leading-none">
-                            <label
-                                htmlFor="ned"
-                                className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                            >
-                                No expiration date
-                            </label>
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={onClose}
-                            disabled={isPending}
-                        >
-                            Cancel
-                        </Button>
-                        <Button 
-                            type="submit"
-                            disabled={isPending}
-                        >
-                            {isPending ? "Saving..." : "Save changes"}
-                        </Button>
-                    </DialogFooter>
-                </form>
-            </DialogContent>
-        </Dialog>
-    )
-}
-
 interface DeleteDialogProps {
     isOpen: boolean
     onClose: () => void
     onConfirm: () => Promise<void>
-    apiKey: string
+    code: string
     isPending: boolean
 }
 
@@ -311,7 +141,7 @@ const DeleteDialog = ({
     isOpen, 
     onClose, 
     onConfirm, 
-    apiKey,
+    code,
     isPending 
 }: DeleteDialogProps) => {
     return (
@@ -320,7 +150,7 @@ const DeleteDialog = ({
                 <DialogHeader>
                     <DialogTitle>Confirm Deletion</DialogTitle>
                     <DialogDescription>
-                        Are you sure you want to delete API key {apiKey}? 
+                        Are you sure you want to delete invite code <span className="font-bold">{code}</span>? 
                         This action cannot be undone.
                     </DialogDescription>
                 </DialogHeader>
@@ -347,39 +177,17 @@ const DeleteDialog = ({
     )
 }
 
-const ActionCell = (row: Row<YookbeerAPIKeyColumn>) => {
-    const [isEditOpen, setIsEditOpen] = React.useState(false)
+const ActionCell = (row: Row<YookbeerInviteColumn>) => {
     const [isDeleteOpen, setIsDeleteOpen] = React.useState(false)
     const [isPending, startTransition] = React.useTransition()
     const data = row.original
 
     const { toast } = useToast()
 
-    const handleUpdate = async (data: Partial<YookbeerAPIKeyColumn>) => {
-        console.log(data)
-        startTransition(async () => {
-            try {
-                if (!data.id) throw Error("No id")
-                await editAPIKey(data.id, data)
-                toast({
-                    title: "Record updated succesfully"
-                })
-                setIsEditOpen(false)
-                location.reload()
-            } 
-            catch (error) {
-                toast({
-                    title: "Failed to update record"
-                })
-                console.error(error)
-            }
-        })
-    }
-
     const handleDelete = async () => {
         startTransition(async () => {
             try {
-                await deleteAPIKey(data.id)
+                await deleteInviteCode(data.code)
                 toast({
                     title: "Record deleted succesfully"
                 })
@@ -400,15 +208,6 @@ const ActionCell = (row: Row<YookbeerAPIKeyColumn>) => {
             <Button 
                 variant="ghost" 
                 size="icon"
-                onClick={() => setIsEditOpen(true)}
-                className="h-8 w-8 p-0"
-                disabled={isPending}
-            >
-                <Pencil className="h-4 w-4" />
-            </Button>
-            <Button 
-                variant="ghost" 
-                size="icon"
                 onClick={() => setIsDeleteOpen(true)}
                 className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
                 disabled={isPending}
@@ -416,26 +215,18 @@ const ActionCell = (row: Row<YookbeerAPIKeyColumn>) => {
                 <Trash2 className="h-4 w-4" />
             </Button>
 
-            <EditDialog
-                isOpen={isEditOpen}
-                onClose={() => setIsEditOpen(false)}
-                data={data}
-                onUpdate={handleUpdate}
-                isPending={isPending}
-            />
-
             <DeleteDialog
                 isOpen={isDeleteOpen}
                 onClose={() => setIsDeleteOpen(false)}
                 onConfirm={handleDelete}
-                apiKey={data.key}
+                code={data.code}
                 isPending={isPending}
             />
         </div>
     )
 }
 
-const createColumns = (): ColumnDef<YookbeerAPIKeyColumn>[] => [
+const createColumns = (): ColumnDef<YookbeerInviteColumn>[] => [
     {
         accessorKey: "id",
         header: "ID",
@@ -445,31 +236,57 @@ const createColumns = (): ColumnDef<YookbeerAPIKeyColumn>[] => [
         },
     },
     {
-        accessorKey: "name",
-        header: "Name",
+        accessorKey: "code",
+        header: "Invite Code",
         cell: ({ row }) => (
-            <div>{row.getValue("name")}</div>
+            <div>{row.getValue("code")}</div>
         ),
     },
     {
-        accessorKey: "key",
-        header: "Key",
+        accessorKey: "status",
+        header: "Status",
         cell: ({ row }) => (
-            <div>{row.getValue("key")}</div>
-        ),
+            (row.getValue("status") === "unused") ? <Badge variant={"default"}>Unused</Badge> : <Badge variant={"secondary"}>Claimed</Badge>
+        )
     },
     {
-        accessorKey: "expiresAt",
-        header: "Expiration Date",
+        accessorKey: "creationDate",
+        header: "Creation Date",
         cell: ({ row }) => {
-            const dateValue = row.getValue("expiresAt");
+            const dateValue = row.getValue("creationDate");
             return (
                 <div>
-                    {dateValue ? format(dateValue as Date, "PPP") : "No expiration"}
+                    {dateValue ? format(dateValue as Date, "PPP") : ""}
                 </div>
             );
         },
-    },    
+    },
+    {
+        accessorKey: "createdBy",
+        header: "Creator",
+        cell: ({ row }) => (
+            <div>{row.getValue("createdBy")}</div>
+        ),
+    },
+    {
+        accessorKey: "usedBy",
+        header: "Used by",
+        cell: ({ row }) => (
+            (row.getValue("usedBy")) ? <div>{row.getValue("usedBy")}</div> : <></>
+        )
+    },
+    {
+        accessorKey: "claimDate",
+        header: "Used Date",
+        cell: ({ row }) => {
+            const dateValue = row.getValue("claimDate");
+            return (
+                <div>
+                    {dateValue ? format(dateValue as Date, "PPP") : ""}
+                </div>
+            );
+        },
+    },
     {
         accessorKey: "action",
         header: "Action",
@@ -477,12 +294,12 @@ const createColumns = (): ColumnDef<YookbeerAPIKeyColumn>[] => [
     },
 ]
 
-const filterKeys: Array<keyof YookbeerAPIKeyColumn> = [
+const filterKeys: Array<keyof YookbeerInviteColumn> = [
     "id",
-    "key",
+    "code",
 ]
 
-export function AdminAPIKeyTable({ data }: YookbeerAPIKeyTableProps) {
+export function AdminInviteTable({ data }: YookbeerInviteTableProps) {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [isAddOpen, setIsAddOpen] = React.useState(false)
     const [globalFilter, setGlobalFilter] = React.useState<string>("")
@@ -497,21 +314,37 @@ export function AdminAPIKeyTable({ data }: YookbeerAPIKeyTableProps) {
         []
     )
 
-    const handleCreate = async (data: Partial<YookbeerAPIKeyColumn>) => {
+    const handleCreate = async (data: Partial<YookbeerInviteColumn>) => {
         console.log(data)
         startCreateTransition(async () => {
             try {
-                if (!data.name || data.expiresAt === undefined) throw Error("Missing Data")
-                await addAPIKey(data.name, data.expiresAt)
-                toast({
-                    title: "API key created"
+                const res = await createInviteCode({ 
+                    code: data.code
                 })
+                if (res.status === CreateInviteStatus.OK){
+                    toast({
+                        title: `Invite code "${res.code}" created!`
+                    })
+                }
+                else if (res.status === CreateInviteStatus.DUPLICATE){
+                    toast({
+                        title: `Invite code "${res.code}" already existed!`,
+                        variant: "destructive"
+                    })
+                }
+                else {
+                    toast({
+                        title: "Failed to create invite code.",
+                        variant: "destructive"
+                    })
+                }
                 setIsAddOpen(false)
                 location.reload()
             } 
             catch (error) {
                 toast({
-                    title: "Failed to create API Key"
+                    title: "Failed to create invite code.",
+                    variant: "destructive"
                 })
                 console.error(error)
             }
@@ -562,7 +395,7 @@ export function AdminAPIKeyTable({ data }: YookbeerAPIKeyTableProps) {
                                 Columns <ChevronDown className="ml-2 h-4 w-4" />
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end" className="bg-neutral-100">
+                        <DropdownMenuContent align="end">
                             {table
                                 .getAllColumns()
                                 .filter((column) => column.getCanHide())
@@ -582,11 +415,11 @@ export function AdminAPIKeyTable({ data }: YookbeerAPIKeyTableProps) {
                                 })}
                         </DropdownMenuContent>
                     </DropdownMenu>
-                    <Button onClick={() => setIsAddOpen(true)}><PlusIcon /> New Key</Button>
+                    <Button onClick={() => setIsAddOpen(true)}><PlusIcon /> New Code</Button>
                 </div>
                 <div className="rounded-md border">
                     <Table>
-                        <TableHeader className="bg-neutral-100">
+                        <TableHeader className="bg-neutral-100 dark:bg-background">
                             {table.getHeaderGroups().map((headerGroup) => (
                                 <TableRow key={headerGroup.id}>
                                     {headerGroup.headers.map((header) => {

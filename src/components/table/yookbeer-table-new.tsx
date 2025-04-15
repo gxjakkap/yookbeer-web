@@ -4,8 +4,8 @@ import { COURSE_NAME, Courses } from "@/lib/const";
 import { DataTableFilterField, InitialStateTablePage, TableProps } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
-import { ActionCell } from "./actioncell";
-import { DataTable } from "./table/tablecomponents";
+import { ActionCell } from "../actioncell";
+import { DataTable } from "./tablecomponents";
 
 export interface YookbeerColumn {
     stdid: string,
