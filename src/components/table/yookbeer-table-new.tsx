@@ -1,6 +1,6 @@
 "use client"
 
-import { COURSE_NAME, Courses } from "@/lib/const";
+import { COURSE_SHORTHAND, Courses } from "@/lib/const";
 import { DataTableFilterField, InitialStateTablePage, TableProps } from "@/types";
 import { ColumnDef } from "@tanstack/react-table";
 import { useMemo } from "react";
@@ -87,7 +87,7 @@ export function YookbeerTable(props: YookbeerTableProps) {
               accessorKey: "course",
               header: "Course",
               cell: ({ row }) => (
-                  <div>{COURSE_NAME[row.getValue("course") as number]}</div>
+                  <div>{COURSE_SHORTHAND[row.getValue("course") as number]}</div>
               ),
           },
           {

@@ -1,4 +1,5 @@
-export const COURSE_NAME = ['REG', 'INT', 'HDS', 'RC']
+export const COURSE_SHORTHAND = ['REG', 'INT', 'HDS', 'RC']
+export const COURSE_PRETTYNAME = ['Regular Program', 'International Program', 'Health Data Science Program', 'Residential College']
 
 export enum Courses {
     REG = 0,

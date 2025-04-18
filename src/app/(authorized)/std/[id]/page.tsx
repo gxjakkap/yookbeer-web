@@ -10,6 +10,7 @@ import { getPresignedURLForYookbeerPic } from "../../actions"
 import { LineIcon } from "@/components/svg/socials/line"
 import { InstagramIcon } from "@/components/svg/socials/ig"
 import { FacebookIcon } from "@/components/svg/socials/fb"
+import { COURSE_PRETTYNAME } from "@/lib/const"
 
 
 interface Props {
@@ -30,8 +31,6 @@ const promptBold = Prompt({
     weight: '700',
     subsets: ['latin', 'thai']
 })
-
-const courseName = ['Regular Program', 'International Program', 'Health Data Science Program', 'Residential College']
 
 export default async function StudentProfilePage({ params }: Props){
     const { id } = await params
@@ -55,7 +54,7 @@ export default async function StudentProfilePage({ params }: Props){
                     <div className="flex flex-col">
                         <p className={`${promptReg.className} text-foreground text-xl`}>
                             <span className={`${promptMed.className}`}>Course: </span>
-                            {courseName[data.course]}
+                            {COURSE_PRETTYNAME[data.course]}
                         </p>
                         <p className={`${promptReg.className} text-foreground text-xl`}>
                             <span className={`${promptMed.className}`}>Thai name: </span>
