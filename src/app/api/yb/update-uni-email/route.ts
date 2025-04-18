@@ -5,7 +5,7 @@ import { db } from "@/db"
 import { apiKey, thirtyeight } from "@/db/schema"
 
 export async function POST(req: NextRequest) {
-    const key = req.headers.get("authorization")
+    const key = req.headers.get("Authorization")
     if (!key) {
         return new NextResponse(
             JSON.stringify({ status: 401, err: 'Missing API Key' }),

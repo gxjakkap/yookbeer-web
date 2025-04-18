@@ -52,6 +52,10 @@ import { Calendar } from "../ui/calendar"
 import { Input } from "../ui/input"
 import { InviteStatus } from "@/lib/const"
 import { Badge } from "../ui/badge"
+import { useForm } from "react-hook-form"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "../ui/form"
+import { z } from "zod"
+import { zodResolver } from "@hookform/resolvers/zod"
 
 
 export interface YookbeerInviteColumn {
@@ -81,12 +85,20 @@ const AddDialog = ({
     onAdd,
     isPending 
 }: AddDialogProps) => {
-    const [formData, setFormData] = React.useState<Partial<YookbeerInviteColumn>>({})
+    const addFormSchema = z.object({
+        code: z.string().min(4, { message: "Custom invite code must be at least 4 characters long" }).optional()
+    })
 
-    const handleSubmit = (e: React.FormEvent) => {
-        e.preventDefault()
-        onAdd(formData)
+    const handleSubmit = (val: z.infer<typeof addFormSchema>) => {
+        onAdd(val)
     }
+
+    const addForm = useForm<z.infer<typeof addFormSchema>>({
+        resolver: zodResolver(addFormSchema),
+        defaultValues: {
+            code: ""
+        }
+    })
 
     return (
         <Dialog open={isOpen} onOpenChange={onClose}>
@@ -94,36 +106,45 @@ const AddDialog = ({
                 <DialogHeader>
                     <DialogTitle>Create Invite Code</DialogTitle>
                 </DialogHeader>
-                <form onSubmit={handleSubmit}>
-                    <div className="flex flex-col gap-y-4">
-                        <div>
-                            <Label className="text-right capitalize" htmlFor="name">Code</Label>
-                            <Input 
-                                id="code" 
-                                value={formData.code}
-                                placeholder="Custom invite code (leave blank to autogenerate)"
-                                onChange={(e) => setFormData({ ...formData, code: e.target.value })} 
-                                className="mt-1" // Add margin for spacing
+                <Form {...addForm}>
+                    <form onSubmit={addForm.handleSubmit(handleSubmit)}>
+                        <div className="flex flex-col gap-y-4">
+                            <FormField
+                                control={addForm.control}
+                                name="code"
+                                render={({ field }) => (
+                                    <FormItem>
+                                        <FormLabel className="text-right capitalize">Code</FormLabel>
+                                        <FormControl>
+                                            <Input 
+                                                placeholder="Custom invite code (leave blank to autogenerate)"
+                                                className="mt-1"
+                                                {...field}
+                                            />
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
                             />
                         </div>
-                    </div>
-                    <DialogFooter className="flex justify-end space-x-2 mt-4">
-                        <Button 
-                            type="button" 
-                            variant="outline" 
-                            onClick={onClose}
-                            disabled={isPending}
-                        >
-                            Cancel
-                        </Button>
-                        <Button 
-                            type="submit"
-                            disabled={isPending}
-                        >
-                            {isPending ? "Processing..." : "Submit"}
-                        </Button>
-                    </DialogFooter>
-                </form>
+                        <DialogFooter className="flex justify-end space-x-2 mt-4">
+                            <Button 
+                                type="button" 
+                                variant="outline" 
+                                onClick={onClose}
+                                disabled={isPending}
+                            >
+                                Cancel
+                            </Button>
+                            <Button 
+                                type="submit"
+                                disabled={isPending}
+                            >
+                                {isPending ? "Processing..." : "Submit"}
+                            </Button>
+                        </DialogFooter>
+                    </form>    
+                </Form>
             </DialogContent>
         </Dialog>
     )
