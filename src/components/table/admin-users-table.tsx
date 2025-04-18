@@ -48,6 +48,7 @@ import { useToast } from "@/hooks/use-toast"
 import { deleteUser, updateUser } from "@/app/(authorized)/admin/actions"
 import { ColumnBaseConfig, ColumnDataType, SQL } from "drizzle-orm"
 import { PgColumn } from "drizzle-orm/pg-core"
+import { Roles } from "@/lib/const"
 
 
 export interface YookbeerUserColumn {
@@ -202,7 +203,13 @@ const ActionCell = (row: Row<YookbeerUserColumn>) => {
         console.log(data)
         startTransition(async () => {
             try {
-                await updateUser(data.id as string, data)
+                await updateUser({
+                    id: data.id as string,
+                    data: {
+                        ...data,
+                        role: data.role as Roles
+                    }
+                })
                 toast({
                     title: "Record updated succesfully"
                 })
@@ -220,7 +227,9 @@ const ActionCell = (row: Row<YookbeerUserColumn>) => {
     const handleDelete = async () => {
         startTransition(async () => {
             try {
-                await deleteUser(data.id)
+                await deleteUser({
+                    id: data.id
+                })
                 toast({
                     title: "Record deleted succesfully"
                 })

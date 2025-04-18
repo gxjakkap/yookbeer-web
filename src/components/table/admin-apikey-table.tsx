@@ -360,7 +360,10 @@ const ActionCell = (row: Row<YookbeerAPIKeyColumn>) => {
         startTransition(async () => {
             try {
                 if (!data.id) throw Error("No id")
-                await editAPIKey(data.id, data)
+                await editAPIKey({
+                    id: data.id, 
+                    data
+                })
                 toast({
                     title: "Record updated succesfully"
                 })
@@ -379,7 +382,9 @@ const ActionCell = (row: Row<YookbeerAPIKeyColumn>) => {
     const handleDelete = async () => {
         startTransition(async () => {
             try {
-                await deleteAPIKey(data.id)
+                await deleteAPIKey({
+                    id: data.id
+                })
                 toast({
                     title: "Record deleted succesfully"
                 })
@@ -502,7 +507,10 @@ export function AdminAPIKeyTable({ data }: YookbeerAPIKeyTableProps) {
         startCreateTransition(async () => {
             try {
                 if (!data.name || data.expiresAt === undefined) throw Error("Missing Data")
-                await addAPIKey(data.name, data.expiresAt)
+                await addAPIKey({
+                    name: data.name, 
+                    expiresAt: data.expiresAt
+                })
                 toast({
                     title: "API key created"
                 })

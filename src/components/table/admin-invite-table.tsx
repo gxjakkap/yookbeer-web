@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table"
-import { CalendarIcon, ChevronDown, Pencil, PlusIcon, Trash2 } from "lucide-react"
+import { ChevronDown, PlusIcon, Trash2 } from "lucide-react"
  
 import { Button } from "@/components/ui/button"
 import {
@@ -39,16 +39,10 @@ import {
     DialogFooter,
     DialogDescription,
 } from "@/components/ui/dialog"
-import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast"
-import { editAPIKey, deleteAPIKey, addAPIKey, createInviteCode, deleteInviteCode } from "@/app/(authorized)/admin/actions"
+import { createInviteCode, deleteInviteCode } from "@/app/(authorized)/admin/actions"
 import { CreateInviteStatus } from "@/app/(authorized)/admin/types"
-import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select"
-import { cn } from "@/lib/utils"
-import { addDays, format } from "date-fns"
-import { Checkbox } from "../ui/checkbox"
-import { Calendar } from "../ui/calendar"
+import { format } from "date-fns"
 import { Input } from "../ui/input"
 import { InviteStatus } from "@/lib/const"
 import { Badge } from "../ui/badge"
@@ -86,7 +80,7 @@ const AddDialog = ({
     isPending 
 }: AddDialogProps) => {
     const addFormSchema = z.object({
-        code: z.string().min(4, { message: "Custom invite code must be at least 4 characters long" }).optional()
+        code: z.string().length(0, { message: "Custom invite code must be at least 4 characters long" }).or(z.string().min(4, { message: "Custom invite code must be at least 4 characters long" })).optional()
     })
 
     const handleSubmit = (val: z.infer<typeof addFormSchema>) => {

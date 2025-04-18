@@ -191,7 +191,10 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
         console.log(data)
         startTransition(async () => {
             try {
-                await updateStudent(data.stdid as string, data)
+                await updateStudent({
+                    id: data.stdid as string,
+                    data: data
+                })
                 toast({
                     title: "Record updated succesfully"
                 })
@@ -209,7 +212,9 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
     const handleDelete = async () => {
         startTransition(async () => {
             try {
-                await deleteStudent(data.stdid)
+                await deleteStudent({
+                    id: data.stdid
+                })
                 toast({
                     title: "Record deleted succesfully"
                 })

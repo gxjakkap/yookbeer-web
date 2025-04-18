@@ -1,59 +1,87 @@
 "use server"
 
-import { YookbeerColumn } from "@/components/table/yookbeer-table"
-import { YookbeerUserColumn } from "@/components/table/admin-users-table"
-import { apiKey, invite, thirtyeight, users } from "@/db/schema"
-import { db } from "@/db"
 import { eq } from "drizzle-orm"
-import { auth } from "@/auth"
+import z from "zod"
+
+import { apiKey, invite, thirtyeight, users } from "@/db/schema"
 import { generateRandomString } from "@/lib/utils"
-import { APIKeyData, CreateInviteProps, CreateInviteRes, CreateInviteStatus, DeleteInviteStatus } from "./types"
+import { adminProcedure } from "@/lib/server-actions"
+import { auth } from "@/auth"
+import { db } from "@/db"
 
-export const updateStudent = async(id: string, data: Partial<YookbeerColumn>) => {
-    const session = await auth()
-    if (!session || session.user.role !== 'admin') return
-    await db.update(thirtyeight).set(data).where(eq(thirtyeight.stdid, id))
-}
+import { CreateInviteProps, CreateInviteRes, CreateInviteStatus, DeleteInviteStatus, zodAPIKeyColumn, zodYookbeerColumn, zodYookbeerUserColumn } from "@/app/(authorized)/admin/types"
+import { AuthenticationError } from "@/lib/errors"
 
-export const deleteStudent = async(id: string) => {
-    const session = await auth()
-    if (!session || session.user.role !== 'admin') return
-    await db.delete(thirtyeight).where(eq(thirtyeight.stdid, id))
-}
+export const updateStudent = adminProcedure
+    .createServerAction()
+    .input(z.object({
+        id: z.string(),
+        data: zodYookbeerColumn.partial()
+    }))
+    .handler(async({ input }) => {
+        await db.update(thirtyeight).set(input.data).where(eq(thirtyeight.stdid, input.id))
+    })
 
-export const updateUser = async(id: string, data: Partial<YookbeerUserColumn>) => {
-    const session = await auth()
-    if (!session || session.user.role !== 'admin') return
-    await db.update(users).set(data).where(eq(users.id, id))
-}
+export const deleteStudent = adminProcedure
+    .createServerAction()
+    .input(z.object({
+        id: z.string()
+    }))
+    .handler(async({ input }) => {
+        await db.delete(thirtyeight).where(eq(thirtyeight.stdid, input.id))
+    })
 
-export const deleteUser = async(id: string) => {
-    const session = await auth()
-    if (!session || session.user.role !== 'admin') return
-    await db.delete(users).where(eq(users.id, id))
-}
+export const updateUser = adminProcedure
+    .createServerAction()
+    .input(z.object({
+        id: z.string(),
+        data: zodYookbeerUserColumn.partial()
+    }))
+    .handler(async({ input }) => {
+        await db.update(users).set(input.data).where(eq(users.id, input.id))
+    })
 
-export const addAPIKey = async(name: string, expiresAt: Date | null) => {
-    const session = await auth()
-    if (!session || session.user.role !== 'admin' || !session.user.id) return
-    const key = crypto.randomUUID()
-    const data = { key: key, expiresAt: expiresAt, owner: session.user.id, name: name }
-    console.log(data)
-    await db.insert(apiKey).values(data)
-    return key
-}
+export const deleteUser = adminProcedure
+    .createServerAction()
+    .input(z.object({
+        id: z.string()
+    }))
+    .handler(async({ input }) => {
+        await db.delete(users).where(eq(users.id, input.id))
+    })
 
-export const deleteAPIKey = async(id: number) => {
-    const session = await auth()
-    if (!session || session.user.role !== 'admin' || !session.user.id) return
-    await db.delete(apiKey).where(eq(apiKey.id, id))
-}
+export const addAPIKey = adminProcedure
+    .createServerAction()
+    .input(z.object({
+        name: z.string(),
+        expiresAt: z.date().nullable()
+    }))
+    .handler(async({ input, ctx }) => {
+        if (!ctx.session.user.id) throw new AuthenticationError()
+        const key = crypto.randomUUID()
+        const data = { key: key, expiresAt: input.expiresAt, owner: ctx.session.user.id, name: input.name }
+        await db.insert(apiKey).values(data)
+        return key
+    })
 
-export const editAPIKey = async(id: number, data: Partial<APIKeyData>) => {
-    const session = await auth()
-    if (!session || session.user.role !== 'admin' || !session.user.id) return
-    await db.update(apiKey).set(data).where(eq(apiKey.id, id))
-}
+export const deleteAPIKey = adminProcedure
+    .createServerAction()
+    .input(z.object({
+        id: z.number()
+    }))
+    .handler(async({ input }) => {
+        await db.delete(apiKey).where(eq(apiKey.id, input.id))
+    })
+
+export const editAPIKey = adminProcedure
+    .createServerAction()
+    .input(z.object({
+        id: z.number(),
+        data: zodAPIKeyColumn.partial()
+    }))
+    .handler(async({ input }) => {
+        await db.update(apiKey).set(input.data).where(eq(apiKey.id, input.id))
+    })
 
 export const createInviteCode = async(props: CreateInviteProps) : Promise<CreateInviteRes> => {
     try {
