@@ -23,6 +23,7 @@ import {
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { cn } from "@/lib/utils";
 import { Roles } from "@/lib/const";
+import { signOut } from "next-auth/react";
 
 interface MobileNavProps {
   role?: string | null;
@@ -77,6 +78,16 @@ export function MobileNav({role }: MobileNavProps) {
                 แอดมิน
               </MobileLink>
             )}
+
+            <button
+              className="flex text-left rounded-md px-4 py-3 text-[1.1rem] transition-all duration-200 text-foreground/80 hover:bg-accent/50"
+              onClick={() => {
+                signOut()
+                setOpen(false)
+              }}
+            >
+              ออกจากระบบ
+            </button>
           </div>
         </div>
       </DrawerContent>

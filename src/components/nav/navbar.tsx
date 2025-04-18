@@ -19,6 +19,7 @@ import { Roles } from "@/lib/const";
 import UserMenu from "@/components/user-menu";
 import { Session } from "next-auth";
 import { ThemeSwitch } from "../theme-switch";
+import SignOutButton from "../signout-button";
 
 interface NavbarProps {
   role?: string | null;
@@ -66,10 +67,9 @@ export function Navbar({ role, session }: NavbarProps) {
     <div className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 flex border-b px-4 py-3 backdrop-blur">
       <nav className="flex w-full items-center justify-between">
         <MobileNav role={role} />
-        {/* <div className="flex items-center gap-2">
-          <SignOutButton />
-          <ThemeToggle />
-        </div> */}
+        <div className="flex items-center gap-2">
+          <ThemeSwitch />
+        </div>
       </nav>
     </div>
   );
