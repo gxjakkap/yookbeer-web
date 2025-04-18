@@ -1,11 +1,13 @@
-import { AdminUserTable } from "@/components/table/admin-users-table"
-import { apiKey, invite, users } from "@/db/schema"
-import { db } from "@/db"
 import localFont from "next/font/local"
+import { eq } from "drizzle-orm"
+
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { AdminAPIKeyTable } from "@/components/table/admin-apikey-table"
 import { AdminInviteTable } from "@/components/table/admin-invite-table"
-import { eq } from "drizzle-orm"
+import { AdminUserTable } from "@/components/table/admin-users-table"
+import { apiKey, invite, users } from "@/db/schema"
+import { auth } from "@/auth"
+import { db } from "@/db"
 
 const geistMono = localFont({
   src: "../../fonts/GeistMonoVF.woff",
@@ -14,8 +16,10 @@ const geistMono = localFont({
 })
 
 export default async function Admin() {
+    const session = await auth()
+
     const userData = await db.select().from(users)
-    const apiKeyData = await db.select().from(apiKey)
+    const apiKeyRes = await db.select().from(apiKey)
     const inviteCodeRes = await db.select().from(invite)
 
     const inviter = await db.select({ id: users.id, name: users.name }).from(users).leftJoin(invite, eq(users.id, invite.createdBy))
@@ -33,6 +37,16 @@ export default async function Admin() {
             creationDate: dat.creationDate,
             claimDate: dat.claimDate
 
+        }
+    })
+
+    const apiKeyData = apiKeyRes.map((dat) => {
+        return {
+            id: dat.id,
+            name: dat.name,
+            expiresAt: dat.expiresAt,
+            owner: dat.owner,
+            key: (dat.owner === session?.user.id) ? dat.key : "	********-****-****-****-************"
         }
     })
 
