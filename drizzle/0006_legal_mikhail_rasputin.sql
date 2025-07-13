@@ -1,0 +1,1 @@
+ALTER TABLE "thirtyeight" ADD COLUMN "status" text DEFAULT 'attending' NOT NULL;

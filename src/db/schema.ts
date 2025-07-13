@@ -3,6 +3,7 @@ import { pgTable, varchar, integer, text, timestamp, primaryKey, boolean } from 
 import postgres from "postgres"
 import { drizzle } from "drizzle-orm/postgres-js"
 import type { AdapterAccountType } from "next-auth/adapters"
+import { StudentStatus } from "@/lib/const"
  
 const connectionString = process.env.DATABASE_URL || ""
 const pool = postgres(connectionString, { max: 1 })
@@ -26,6 +27,7 @@ export const thirtyeight = pgTable("thirtyeight", {
 	instagram: varchar({ length: 100 }),
 	discord: varchar({ length: 100 }),
 	img: varchar({ length: 20 }),
+	status: text("status").notNull().default(StudentStatus.ATTENDING),
 })
 
 export const invite = pgTable("invite", {

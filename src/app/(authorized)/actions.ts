@@ -1,6 +1,7 @@
 'use server'
 
 import { auth } from "@/auth"
+import { StudentStatus } from "@/lib/const"
 import { searchThirtyeight } from "@/lib/search"
 import { S3Client, GetObjectCommand } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
@@ -29,5 +30,5 @@ export async function getPresignedURLForYookbeerPic(imgName: string) {
 export async function nSearch(q: string){
     if (!q.trim()) return []
     const results = await searchThirtyeight(q)
-    return results
+    return results.filter((v) => v.status === StudentStatus.ATTENDING)
 }

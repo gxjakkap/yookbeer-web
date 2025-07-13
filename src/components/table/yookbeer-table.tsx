@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/table"
 import { ActionCell } from "../actioncell"
 import { redirect, RedirectType } from "next/navigation"
-import { COURSE_SHORTHAND } from "@/lib/const"
+import { COURSE_SHORTHAND, StudentStatus } from "@/lib/const"
 
 export interface YookbeerColumn {
     stdid: string,
@@ -51,6 +51,7 @@ export interface YookbeerColumn {
     instagram: string | null,
     discord: string | null,
     img: string | null,
+    status: (typeof StudentStatus)[keyof typeof StudentStatus]
 }
 
 interface YookbeerTableProps {
