@@ -1,5 +1,5 @@
 import { apiKey } from "@/db/schema"
-import { Roles } from "@/lib/const"
+import { Roles, StudentStatus } from "@/lib/const"
 import z from "zod"
 
 export interface CreateInviteProps {
@@ -42,6 +42,7 @@ export const zodYookbeerColumn = z.object({
     instagram: z.string().nullable(),
     discord: z.string().nullable(),
     img: z.string().nullable(),
+    status: z.string().default(StudentStatus.ATTENDING).optional(),
 })
 
 export const zodYookbeerUserColumn = z.object({

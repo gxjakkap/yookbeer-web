@@ -1,27 +1,26 @@
 import localFont from "next/font/local"
 
 import { auth } from "@/auth"
-import { YookbeerTable } from "@/components/table/yookbeer-table"
 import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
 import { db } from "@/db"
 import { thirtyeight } from "@/db/schema"
 import { Roles, StudentStatus } from "@/lib/const"
 import { SearchParams } from "@/types"
 import { searchParamsCache } from "@/lib/validations";
-import { eq } from "drizzle-orm"
+import { ne } from "drizzle-orm"
 
 const geistMono = localFont({
-  src: "../fonts/GeistMonoVF.woff",
+  src: "../../fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
 })
 
-interface HomeProps {
+interface NotAttendingProps {
   s: Promise<SearchParams>;
 }
 
-export default async function Home({ s }: HomeProps) {
-  const data = await db.select().from(thirtyeight).where(eq(thirtyeight.status, StudentStatus.ATTENDING)).orderBy(thirtyeight.stdid)
+export default async function NotAttending({ s }: NotAttendingProps) {
+  const data = await db.select().from(thirtyeight).where(ne(thirtyeight.status, StudentStatus.ATTENDING)).orderBy(thirtyeight.stdid)
   const session = await auth()
   const isAdmin = (session?.user.role === Roles.ADMIN)
 

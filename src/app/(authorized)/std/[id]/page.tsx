@@ -10,7 +10,8 @@ import { getPresignedURLForYookbeerPic } from "../../actions"
 import { LineIcon } from "@/components/svg/socials/line"
 import { InstagramIcon } from "@/components/svg/socials/ig"
 import { FacebookIcon } from "@/components/svg/socials/fb"
-import { COURSE_PRETTYNAME } from "@/lib/const"
+import { COURSE_PRETTYNAME, StudentStatus } from "@/lib/const"
+import { Badge } from "@/components/ui/badge"
 
 
 interface Props {
@@ -40,11 +41,15 @@ export default async function StudentProfilePage({ params }: Props){
     }
     const data = dataArr[0]
     const imgUrl = await getPresignedURLForYookbeerPic(data.img || '')
+    const status = data.status
     return (
         <div className={`${promptReg.className} mx-auto flex flex-col gap-y-3 pb-14`}>
             <div className="flex flex-col lg:gap-y-1 text-center lg:text-left">
                 <h1 className={`${promptMed.className} text-[1.875rem] lg:text-4xl text-foreground`}>{data.nameen}</h1>
-                <p className="text-foreground/75 text-lg lg:text-xl">{data.stdid} - {data.nicken}</p>
+                <div className="flex flex-col lg:flex-row lg:gap-x-4">
+                    <p className="text-foreground/75 text-lg lg:text-xl"><span className={`${(status !== StudentStatus.ATTENDING) ? "line-through": ""}`}>{data.stdid}</span> - {data.nicken}</p>
+                    {(status === StudentStatus.RESIGNED) && (<Badge variant="destructive" >Resigned</Badge>)}
+                </div>
             </div>
             <div className="flex flex-col lg:flex-row gap-x-20">
                 <div className="mx-auto lg:mx-0">

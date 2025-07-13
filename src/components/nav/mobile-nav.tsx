@@ -59,24 +59,30 @@ export function MobileNav({role }: MobileNavProps) {
               onOpenChange={setOpen}
               isActive={pathname === "/"}
             >
-              หน้าหลัก
+              Home
             </MobileLink>
 
             {(!!role && role === Roles.ADMIN) && (
-              <MobileLink
-                href="/admin"/**
-                * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
-                * 
-                * Original author: 3raphat
-                * 
-                */
-                onOpenChange={setOpen}
-                isActive={
-                  pathname === "/admin" || pathname.startsWith("/admin/")
-                }
-              >
-                แอดมิน
-              </MobileLink>
+              <>
+                <MobileLink
+                  href="/not-attending"
+                  onOpenChange={setOpen}
+                  isActive={
+                    pathname === "/not-attending"
+                  }
+                >
+                  Not Attending
+                </MobileLink>
+                <MobileLink
+                  href="/admin"
+                  onOpenChange={setOpen}
+                  isActive={
+                    pathname === "/admin" || pathname.startsWith("/admin/")
+                  }
+                >
+                  Admin
+                </MobileLink>
+              </>
             )}
 
             <button

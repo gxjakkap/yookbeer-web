@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast"
 import { Pencil, Trash2 } from "lucide-react"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { StudentStatus } from "@/lib/const"
 
 const PersonIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" className="w-2 h-2 text-foreground" viewBox="0 0 16 16">
@@ -75,7 +77,8 @@ const EditDialog = ({
         lineid: data.lineid,
         instagram: data.instagram,
         discord: data.discord,
-        img: data.img
+        img: data.img,
+        status: data.status
     })
 
     return (
@@ -89,22 +92,46 @@ const EditDialog = ({
                 </DialogHeader>
                 <form action={() => onUpdate(formData)}>
                     <div className="grid gap-4 py-4">
-                        {Object.entries(formData).map(([key, value]) => (
-                            <div key={key} className="grid grid-cols-4 items-center gap-4">
-                                <Label htmlFor={key} className="text-right capitalize">
-                                    {key.replace(/([A-Z])/g, ' $1').trim()}
-                                </Label>
-                                <Input
-                                    id={key}
-                                    value={value || ''}
-                                    onChange={(e) => setFormData(prev => ({
-                                        ...prev,
-                                        [key]: e.target.value
-                                    }))}
-                                    className="col-span-3"
-                                />
-                            </div>
-                        ))}
+                        {Object.entries(formData).map(([key, value]) => {
+                            if (key === 'status') return
+                            else return (
+                                <div key={key} className="grid grid-cols-4 items-center gap-4">
+                                    <Label htmlFor={key} className="text-right capitalize">
+                                        {key.replace(/([A-Z])/g, ' $1').trim()}
+                                    </Label>
+                                    <Input
+                                        id={key}
+                                        value={value as any || ''}
+                                        onChange={(e) => setFormData(prev => ({
+                                            ...prev,
+                                            [key]: e.target.value
+                                        }))}
+                                        className="col-span-3"
+                                    />
+                                </div>
+                            )
+                        })}
+                        <div className="grid grid-cols-4 items-center gap-4">
+                            <Label htmlFor={"status"} className="text-right capitalize">
+                                Status
+                            </Label>
+                            <Select
+                                value={formData.status}
+                                onValueChange={(value) => setFormData(prev => ({
+                                    ...prev,
+                                    status: value as StudentStatus
+                                }))}
+                                defaultValue={formData.status || StudentStatus.ATTENDING}
+                            >
+                                <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder="Status" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={StudentStatus.ATTENDING}>Attending</SelectItem>
+                                    <SelectItem value={StudentStatus.RESIGNED}>Resigned</SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
                     </div>
                 <DialogFooter>
                     <Button 
@@ -186,6 +213,7 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
     const [isPending, startTransition] = React.useTransition()
     const { toast } = useToast()
     const data = row.original
+    
 
     const handleUpdate = async (data: Partial<YookbeerColumn>) => {
         console.log(data)

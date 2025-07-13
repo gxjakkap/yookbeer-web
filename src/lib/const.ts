@@ -18,3 +18,8 @@ export enum InviteStatus {
     UNUSED = "unused",
     CLAIMED = "claimed"
 }
+
+export enum StudentStatus {
+    ATTENDING = "attending",
+    RESIGNED = "resigned",
+}

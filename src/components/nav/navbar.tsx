@@ -44,14 +44,23 @@ export function Navbar({ role, session }: NavbarProps) {
             />
 
             {(!!role && role === Roles.ADMIN) && (
-                <NavbarChild
-                  href="/admin"
-                  text="Admin"
-                  isActive={
-                    pathname === "/admin" ||
-                    pathname.startsWith("/admin/")
-                  }
-                />
+                <>
+                  <NavbarChild
+                    href="/not-attending"
+                    text="Not Attending"
+                    isActive={
+                      pathname === "/not-attending"
+                    }
+                  />
+                  <NavbarChild
+                    href="/admin"
+                    text="Admin"
+                    isActive={
+                      pathname === "/admin" ||
+                      pathname.startsWith("/admin/")
+                    }
+                  />
+                </>
               )}
           </div>
 
