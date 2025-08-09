@@ -10,10 +10,10 @@ import { auth } from "@/auth"
 import { db } from "@/db"
 
 import { CreateInviteProps, CreateInviteRes, CreateInviteStatus, DeleteInviteStatus, zodAPIKeyColumn, zodYookbeerColumn, zodYookbeerUserColumn } from "@/app/(authorized)/admin/types"
-import { AuthenticationError } from "@/lib/errors"
+import { AuthenticationError, ForbiddenError } from "@/lib/errors"
 import { takeout } from "@/lib/takeout"
 import { TAKEOUT_EXPORTABLE } from "@/lib/const"
-import { isAdmin } from "@/lib/rba"
+import { isAdmin, isSuperAdmin } from "@/lib/rba"
 
 
 export const updateStudent = adminProcedure
@@ -41,7 +41,10 @@ export const updateUser = adminProcedure
         id: z.string(),
         data: zodYookbeerUserColumn.partial()
     }))
-    .handler(async({ input }) => {
+    .handler(async({ ctx, input }) => {
+        const [target] = await db.select().from(users).where(eq(users.id, input.id)).limit(1)
+        if (!target) throw new Error(`UPDATEUSR_ACT: Target of id ${input.id} not found.`)
+        if (isAdmin(target.role!) && !isSuperAdmin(ctx.session.user.role!)) throw new ForbiddenError()
         await db.update(users).set(input.data).where(eq(users.id, input.id))
     })
 
@@ -50,7 +53,10 @@ export const deleteUser = adminProcedure
     .input(z.object({
         id: z.string()
     }))
-    .handler(async({ input }) => {
+    .handler(async({ ctx, input }) => {
+        const [target] = await db.select().from(users).where(eq(users.id, input.id)).limit(1)
+        if (!target) throw new Error(`DELETEUSR_ACT: Target of id ${input.id} not found.`)
+        if (isAdmin(target.role!) && !isSuperAdmin(ctx.session.user.role!)) throw new ForbiddenError()
         await db.delete(users).where(eq(users.id, input.id))
     })
 
@@ -73,7 +79,10 @@ export const deleteAPIKey = adminProcedure
     .input(z.object({
         id: z.number()
     }))
-    .handler(async({ input }) => {
+    .handler(async({ ctx, input }) => {
+        const [targetKey] = await db.select().from(apiKey).where(eq(apiKey.id, input.id)).limit(1)
+        if (!targetKey) throw new Error(`DELETEPIKEY_ACT: Target API key with id ${input.id} not found.`)
+        if (targetKey.owner !== ctx.session.user.id && !isSuperAdmin(ctx.session.user.id!)) throw new ForbiddenError()
         await db.delete(apiKey).where(eq(apiKey.id, input.id))
     })
 
@@ -83,7 +92,10 @@ export const editAPIKey = adminProcedure
         id: z.number(),
         data: zodAPIKeyColumn.partial()
     }))
-    .handler(async({ input }) => {
+    .handler(async({ ctx, input }) => {
+        const [targetKey] = await db.select().from(apiKey).where(eq(apiKey.id, input.id)).limit(1)
+        if (!targetKey) throw new Error(`EDITAPIKEY_ACT: Target API key with id ${input.id} not found.`)
+        if (targetKey.owner !== ctx.session.user.id && !isSuperAdmin(ctx.session.user.id!)) throw new ForbiddenError()
         await db.update(apiKey).set(input.data).where(eq(apiKey.id, input.id))
     })
 
