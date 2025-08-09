@@ -23,3 +23,4 @@ export enum StudentStatus {
     ATTENDING = "attending",
     RESIGNED = "resigned",
 }
+export const TAKEOUT_EXPORTABLE = ["stdid", "course", "nameth", "nameen", "nickth", "nicken", "phone", "emailper", "emailuni", "facebook", "lineid", "instagram", "discord", "status"] as const;

@@ -125,3 +125,12 @@ export const authenticators = pgTable(
 		}),
 	})
 )
+
+export const logs = pgTable("log", {
+	id: integer("id").generatedAlwaysAsIdentity().primaryKey(),
+	action: text("action").notNull(),
+	actor: text("actor").notNull().references(() => users.id, { onDelete: "no action" }),
+	target: text("target"),
+	details: text("details"),
+	timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow().notNull(),
+})

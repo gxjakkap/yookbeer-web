@@ -1,13 +1,14 @@
 import localFont from "next/font/local"
 import { eq } from "drizzle-orm"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AdminAPIKeyTable } from "@/components/table/admin-apikey-table"
 import { AdminInviteTable } from "@/components/table/admin-invite-table"
 import { AdminUserTable } from "@/components/table/admin-users-table"
 import { apiKey, invite, users } from "@/db/schema"
 import { auth } from "@/auth"
 import { db } from "@/db"
+import TakeoutForm from "@/components/takeout-form"
 
 const geistMono = localFont({
   src: "../../fonts/GeistMonoVF.woff",
@@ -51,7 +52,7 @@ export default async function Admin() {
     })
 
     return (
-        <div className={`flex flex-col w-screen ${geistMono.className}`}>
+        <div className={`flex flex-col w-screen pb-20 ${geistMono.className}`}>
             <Card className="relative bg-transparent border-none shadow-none">
                 <CardHeader className="pb-0">
                     <CardTitle>User Management</CardTitle>
@@ -69,11 +70,21 @@ export default async function Admin() {
                 </CardContent>
             </Card>
             <Card className="relative bg-transparent border-none shadow-none">
-                <CardHeader>
+                <CardHeader className="pb-0">
                     <CardTitle>API Key</CardTitle>
+                    <CardDescription>To interact with YB API</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <AdminAPIKeyTable data={apiKeyData} />
+                </CardContent>
+            </Card>
+            <Card className="relative bg-transparent border-none shadow-none">
+                <CardHeader className="pb-0">
+                    <CardTitle>Takeout</CardTitle>
+                    <CardDescription>Export data to CSV/JSON</CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <TakeoutForm />
                 </CardContent>
             </Card>
         </div>
