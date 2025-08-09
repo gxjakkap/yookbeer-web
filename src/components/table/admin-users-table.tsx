@@ -48,7 +48,7 @@ import { useToast } from "@/hooks/use-toast"
 import { deleteUser, updateUser } from "@/app/(authorized)/admin/actions"
 import { ColumnBaseConfig, ColumnDataType, SQL } from "drizzle-orm"
 import { PgColumn } from "drizzle-orm/pg-core"
-import { Roles } from "@/lib/const"
+import { Roles } from "@/lib/rba"
 
 
 export interface YookbeerUserColumn {

@@ -1,7 +1,7 @@
 import { createServerActionProcedure } from "zsa"
 
 import { auth } from "@/auth"
-import { Roles } from "./const"
+import { isAdmin, Roles } from "./rba";
 import { AuthenticationError, ForbiddenError, PublicError } from "./errors";
 
 
@@ -45,9 +45,7 @@ export const authedProcedure = createServerActionProcedure()
 export const adminProcedure = createServerActionProcedure(authedProcedure)
     .experimental_shapeError(shapeErrors)
     .handler(async ({ ctx }) => {
-        const isAdmin = (ctx.session?.user.role === Roles.ADMIN)
-
-        if (!isAdmin) throw new ForbiddenError()
+        if (!ctx.session.user.role || !isAdmin(ctx.session.user.role)) throw new ForbiddenError()
 
         return {
             session: ctx.session

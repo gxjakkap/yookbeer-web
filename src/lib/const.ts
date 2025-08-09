@@ -8,12 +8,6 @@ export enum Courses {
     RC = 3
 }
 
-export enum Roles {
-    UNAUTHORIZED = "unauthorized",
-    USER = "user",
-    ADMIN = "admin"
-}
-
 export enum InviteStatus {
     UNUSED = "unused",
     CLAIMED = "claimed"

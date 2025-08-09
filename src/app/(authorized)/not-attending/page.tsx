@@ -4,7 +4,8 @@ import { auth } from "@/auth"
 import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
 import { db } from "@/db"
 import { thirtyeight } from "@/db/schema"
-import { Roles, StudentStatus } from "@/lib/const"
+import { StudentStatus } from "@/lib/const"
+import { isAdmin } from "@/lib/rba"
 import { SearchParams } from "@/types"
 import { searchParamsCache } from "@/lib/validations";
 import { ne } from "drizzle-orm"
@@ -22,7 +23,6 @@ interface NotAttendingProps {
 export default async function NotAttending({ s }: NotAttendingProps) {
   const data = await db.select().from(thirtyeight).where(ne(thirtyeight.status, StudentStatus.ATTENDING)).orderBy(thirtyeight.stdid)
   const session = await auth()
-  const isAdmin = (session?.user.role === Roles.ADMIN)
 
   const searchParams = await s;
   const search = searchParamsCache.parse(searchParams);
@@ -33,7 +33,7 @@ export default async function NotAttending({ s }: NotAttendingProps) {
       <div className="w-full max-w-[90vw] mx-auto">
         <NewTable
           data={data}
-          isAdmin={isAdmin}
+          isAdmin={isAdmin(session?.user.role || "")}
           initialState={{
             pagination: {
               pageIndex: search.page,

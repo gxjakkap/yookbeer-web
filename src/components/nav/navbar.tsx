@@ -15,7 +15,7 @@ import { MobileNav } from "@/components/nav/mobile-nav";
 import { cn } from "@/lib/utils";
 
 import { Button } from "@/components/ui/button";
-import { Roles } from "@/lib/const";
+import { isAdmin, Roles } from "@/lib/rba";
 import UserMenu from "@/components/user-menu";
 import { Session } from "next-auth";
 import { ThemeSwitch } from "../theme-switch";
@@ -43,7 +43,7 @@ export function Navbar({ role, session }: NavbarProps) {
               isActive={pathname === "/"}
             />
 
-            {(!!role && role === Roles.ADMIN) && (
+            {(!!role && isAdmin(role)) && (
                 <>
                   <NavbarChild
                     href="/not-attending"

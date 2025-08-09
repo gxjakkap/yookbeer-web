@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/drawer";
 import { VisuallyHidden } from "@/components/ui/visually-hidden";
 import { cn } from "@/lib/utils";
-import { Roles } from "@/lib/const";
+import { isAdmin } from "@/lib/rba";
 import { signOut } from "next-auth/react";
 
 interface MobileNavProps {
@@ -62,7 +62,7 @@ export function MobileNav({role }: MobileNavProps) {
               Home
             </MobileLink>
 
-            {(!!role && role === Roles.ADMIN) && (
+            {(!!role && isAdmin(role)) && (
               <>
                 <MobileLink
                   href="/not-attending"

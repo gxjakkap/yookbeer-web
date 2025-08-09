@@ -13,6 +13,7 @@ import { CreateInviteProps, CreateInviteRes, CreateInviteStatus, DeleteInviteSta
 import { AuthenticationError } from "@/lib/errors"
 import { takeout } from "@/lib/takeout"
 import { TAKEOUT_EXPORTABLE } from "@/lib/const"
+import { isAdmin } from "@/lib/rba"
 
 
 export const updateStudent = adminProcedure
@@ -92,7 +93,7 @@ export const createInviteCode = async(props: CreateInviteProps) : Promise<Create
         let randomGen = false
 
         const session = await auth()
-        if (!session || session.user.role !== 'admin' || !session.user.id){
+        if (!session || !isAdmin(session.user.role!) || !session.user.id){
             return {
                 status: CreateInviteStatus.FORBIDDEN,
                 code: null
@@ -133,7 +134,7 @@ export const createInviteCode = async(props: CreateInviteProps) : Promise<Create
 
 export const deleteInviteCode = async(code: string) => {
     const session = await auth()
-    if (!session || session.user.role !== 'admin' || !session.user.id){
+    if (!session || !isAdmin(session.user.role!) || !session.user.id){
         return {
             status: DeleteInviteStatus.FORBIDDEN
         }

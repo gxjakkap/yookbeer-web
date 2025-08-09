@@ -5,7 +5,8 @@ import { RedeemInviteCodeStatus } from "./types"
 import { db } from "@/db"
 import { invite, users } from "@/db/schema"
 import { eq, sql } from "drizzle-orm"
-import { InviteStatus, Roles } from "@/lib/const"
+import { InviteStatus } from "@/lib/const"
+import { Roles } from "@/lib/rba"
 
 export const redeemInviteCode = async(code: string) => {
     const session = await auth()

@@ -1,5 +1,6 @@
 import { apiKey } from "@/db/schema"
-import { Roles, StudentStatus } from "@/lib/const"
+import { StudentStatus } from "@/lib/const"
+import { Roles } from "@/lib/rba";
 import z from "zod"
 
 export interface CreateInviteProps {

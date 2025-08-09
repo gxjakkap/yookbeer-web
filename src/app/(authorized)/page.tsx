@@ -5,7 +5,8 @@ import { YookbeerTable } from "@/components/table/yookbeer-table"
 import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
 import { db } from "@/db"
 import { thirtyeight } from "@/db/schema"
-import { Roles, StudentStatus } from "@/lib/const"
+import { StudentStatus } from "@/lib/const"
+import { isAdmin, Roles } from "@/lib/rba"
 import { SearchParams } from "@/types"
 import { searchParamsCache } from "@/lib/validations";
 import { eq } from "drizzle-orm"
@@ -23,7 +24,6 @@ interface HomeProps {
 export default async function Home({ s }: HomeProps) {
   const data = await db.select().from(thirtyeight).where(eq(thirtyeight.status, StudentStatus.ATTENDING)).orderBy(thirtyeight.stdid)
   const session = await auth()
-  const isAdmin = (session?.user.role === Roles.ADMIN)
 
   const searchParams = await s;
   const search = searchParamsCache.parse(searchParams);
@@ -34,7 +34,7 @@ export default async function Home({ s }: HomeProps) {
       <div className="w-full max-w-[90vw] mx-auto">
         <NewTable
           data={data}
-          isAdmin={isAdmin}
+          isAdmin={isAdmin(session?.user.role || "")}
           initialState={{
             pagination: {
               pageIndex: search.page,
