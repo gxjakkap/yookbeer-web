@@ -1,5 +1,5 @@
 import localFont from "next/font/local"
-import { eq } from "drizzle-orm"
+import { eq, sql } from "drizzle-orm"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { AdminAPIKeyTable } from "@/components/table/admin-apikey-table"
@@ -19,7 +19,19 @@ const geistMono = localFont({
 export default async function Admin() {
     const session = await auth()
 
-    const userData = await db.select().from(users)
+    const userData = await db
+        .select()
+        .from(users)
+        .orderBy(
+            sql`
+                CASE ${users.role}
+                    WHEN 'superadmin' THEN 1
+                    WHEN 'admin' THEN 2
+                    WHEN 'user' THEN 3
+                    WHEN 'unauthorized' THEN 4
+                    ELSE 5
+                END
+            `)
     const apiKeyRes = await db.select().from(apiKey)
     const inviteCodeRes = await db.select().from(invite)
 
