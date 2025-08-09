@@ -13,8 +13,6 @@ import { CreateInviteProps, CreateInviteRes, CreateInviteStatus, DeleteInviteSta
 import { AuthenticationError } from "@/lib/errors"
 import { takeout } from "@/lib/takeout"
 import { TAKEOUT_EXPORTABLE } from "@/lib/const"
-import { S3Client, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3"
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
 
 
 export const updateStudent = adminProcedure

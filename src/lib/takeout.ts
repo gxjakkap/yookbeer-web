@@ -1,13 +1,13 @@
 "use server"
 
 import { sql, eq } from "drizzle-orm"
-import { StudentStatus } from "./const"
-import { db } from "@/db"
 import { stringify } from "csv-stringify/sync"
-import { TAKEOUT_EXPORTABLE } from "./const"
-import { user } from "../../drizzle/schema"
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
+
+import { db } from "@/db"
+import { users } from "@/db/schema"
+import { StudentStatus, TAKEOUT_EXPORTABLE } from "@/lib/const"
 
 interface TakeoutArgs {
     onlyAttending?: boolean;
@@ -47,7 +47,7 @@ const S3 = new S3Client({
 })
 
 export async function takeout({ onlyAttending = true, including, format = "csv", includedCourse = [0, 1, 2, 3], createdBy, mode }: TakeoutArgs): Promise<TakeoutResponse> {
-    const [u] = await db.select().from(user).where(eq(user.id, createdBy)).limit(1)
+    const [u] = await db.select().from(users).where(eq(users.id, createdBy)).limit(1)
     
     if (!u || u.id === null || u.name === null) {
         throw new Error("TAKEOUT: User not found of invalid user")
@@ -87,7 +87,7 @@ export async function takeout({ onlyAttending = true, including, format = "csv",
             Bucket: "yookbeer",
             Key: `takeout/${filename}`,
         }), { expiresIn: 3600 })
-        
+
         return {
             mode: "s3",
             url,
