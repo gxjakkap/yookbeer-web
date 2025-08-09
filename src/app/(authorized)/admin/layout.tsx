@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import "../../globals.css"
 import { auth } from "@/auth"
 import { redirect } from "next/navigation"
+import { isAdmin } from "@/lib/rba"
 
 
 export const metadata: Metadata = {
@@ -19,7 +20,7 @@ export default async function AdminLayout({
         redirect("/login")
     }
 
-    if (!(["admin"].includes(session.user.role || ""))){
+    if (!isAdmin(session.user.role!)){
         redirect("/")
     }
 
