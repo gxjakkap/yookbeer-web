@@ -4,6 +4,7 @@ import { auth } from "@/auth"
 import { redirect } from "next/navigation"
 import { Spotlight } from "@/components/spotlight"
 import { Navbar } from "@/components/nav/navbar"
+import { isAuthorized } from "@/lib/rba"
 
 import "../globals.css"
 
@@ -22,7 +23,7 @@ export default async function AuthorizedLayout({
     redirect("/login")
   }
 
-  if (!(["admin", "user"].includes(session.user.role || "unauthorized"))){
+  if (!isAuthorized(session.user.role!)){
     redirect("/noaccess")
   }
 
