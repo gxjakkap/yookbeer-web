@@ -170,11 +170,11 @@ export function YookbeerTable(props: YookbeerTableProps) {
                   )
               },
           }, */
-    {
+    /* {
       accessorKey: "action",
       header: "Action",
       cell: ({ row }) => ActionCell(row, props.isAdmin),
-    },
+    }, */
   ]
   return (
     <DataTable
