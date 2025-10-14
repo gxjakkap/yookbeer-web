@@ -64,6 +64,13 @@
       "when": 1754721100797,
       "tag": "0008_tired_hydra",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1760436985276,
+      "tag": "0009_bored_nemesis",
+      "breakpoints": true
     }
   ]
 }
