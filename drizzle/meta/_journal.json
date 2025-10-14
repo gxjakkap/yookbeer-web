@@ -71,6 +71,13 @@
       "when": 1760436985276,
       "tag": "0009_bored_nemesis",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1760439462877,
+      "tag": "0010_flimsy_moonstone",
+      "breakpoints": true
     }
   ]
 }
