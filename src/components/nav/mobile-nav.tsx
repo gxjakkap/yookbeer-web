@@ -56,6 +56,9 @@ export function MobileNav({ role }: MobileNavProps) {
             <MobileLink key="/" href="/" onOpenChange={setOpen} isActive={pathname === "/"}>
               Home
             </MobileLink>
+            <MobileLink key="/thirtynine" href="/thirtynine" onOpenChange={setOpen} isActive={pathname === "/" || pathname.startsWith("/std39/")}>
+              CPE39
+            </MobileLink>
 
             {!!role && isAdmin(role) && (
               <>

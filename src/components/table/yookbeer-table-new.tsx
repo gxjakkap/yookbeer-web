@@ -30,6 +30,7 @@ interface YookbeerTableProps {
   data: YookbeerColumn[]
   isAdmin: boolean
   initialState?: InitialStateTablePage
+  hrefPrefix?: string
 }
 
 const filterKeys: Array<keyof YookbeerColumn> = [
@@ -182,7 +183,7 @@ export function YookbeerTable(props: YookbeerTableProps) {
       filterFields={filterFields}
       initialState={props.initialState}
       rowClickable={true}
-      hrefPrefix="std/"
+      hrefPrefix={`${props.hrefPrefix || "std/"}`}
       hrefColumn={
         columns.find(
           (c): c is ColumnDef<YookbeerColumn> & { accessorKey: keyof YookbeerColumn } =>

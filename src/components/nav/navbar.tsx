@@ -42,6 +42,7 @@ export function Navbar({ role, session }: NavbarProps) {
         <nav className="flex w-full items-center justify-between">
           <div className="flex items-center">
             <NavbarChild key="/" href="/" text="หน้าหลัก" isActive={pathname === "/"} />
+            <NavbarChild key="/thirtynine" href="/thirtynine" text="CPE39" isActive={pathname === "/thirtynine" || pathname.startsWith("/std39/")} />
 
             {!!role && isAdmin(role) && (
               <>
