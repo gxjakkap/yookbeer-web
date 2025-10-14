@@ -1,38 +1,41 @@
-# syntax=docker.io/docker/dockerfile:1
+# syntax=docker/dockerfile:1
 
-FROM node:20-alpine AS base
-RUN apk update && apk add --no-cache curl
-# early, build was failing because corepack cannot find matching keyid
-# ref: https://github.com/nodejs/corepack/issues/612
-RUN npm i -g corepack@latest
-RUN corepack enable pnpm
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-
-FROM base AS deps
-RUN apk add --no-cache libc6-compat
+FROM oven/bun:latest AS base
 WORKDIR /app
-COPY package.json pnpm-lock.yaml* .npmrc* ./
-RUN pnpm i --frozen-lockfile
 
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-ENV NEXT_TELEMETRY_DISABLED=1
+RUN apt-get update -y && apt-get install -y --no-install-recommends \
+  libc6 libvips curl && \
+  rm -rf /var/lib/apt/lists/*
+
 ENV NODE_ENV=production
 ENV PORT=8080
-RUN pnpm run build
+ENV HOSTNAME="0.0.0.0"
 
-FROM base AS runner
+FROM base AS deps
+
+COPY bun.lock package.json ./
+
+RUN bun install --frozen-lockfile
+
+FROM deps AS builder
+
+COPY . .
+ENV NEXT_TELEMETRY_DISABLED=1
+RUN bun run build
+
+FROM oven/bun:latest AS runner
 WORKDIR /app
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
+
 COPY --from=builder /app/public ./public
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-USER nextjs
+COPY --from=builder /app/.next/standalone ./
+COPY --from=builder /app/.next/static ./.next/static
+
+RUN addgroup --system --gid 1001 bunuser \
+  && adduser --system --uid 1001 --ingroup bunuser bunuser
+USER bunuser
+
 EXPOSE 8080
 ENV PORT=8080
 ENV HOSTNAME="0.0.0.0"
-CMD ["node", "server.js"]
+
+CMD ["bun", "server.js"]
