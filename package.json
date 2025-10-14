@@ -59,6 +59,7 @@
     "zsa-react": "^0.2.3"
   },
   "devDependencies": {
+    "@trivago/prettier-plugin-sort-imports": "5.2.2",
     "@types/bcrypt": "^5.0.2",
     "@types/node": "^20.17.30",
     "@types/pg": "^8.11.13",
@@ -68,6 +69,8 @@
     "eslint": "^8.57.1",
     "eslint-config-next": "15.0.3",
     "postcss": "^8.5.3",
+    "prettier": "3.6.2",
+    "prettier-plugin-tailwindcss": "0.6.14",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.19.3",
     "typescript": "^5.8.3"

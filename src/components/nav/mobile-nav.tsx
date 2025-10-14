@@ -1,41 +1,41 @@
 /**
  * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- * 
+ *
  * Original author: 3raphat
- * 
+ *
  */
 
-"use client";
+"use client"
 
-import { useCallback, useState } from "react";
-import Link, { type LinkProps } from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Button } from "@/components/ui/button"
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
+import { VisuallyHidden } from "@/components/ui/visually-hidden"
+import { isAdmin } from "@/lib/rba"
+import { cn } from "@/lib/utils"
+import { Menu } from "lucide-react"
+import { signOut } from "next-auth/react"
+import Link, { type LinkProps } from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { useCallback, useState } from "react"
 
-import { Button } from "@/components/ui/button";
-import {
-  Drawer,
-  DrawerContent,
-  DrawerHeader,
-  DrawerTitle,
-  DrawerTrigger,
-} from "@/components/ui/drawer";
-import { VisuallyHidden } from "@/components/ui/visually-hidden";
-import { cn } from "@/lib/utils";
-import { isAdmin } from "@/lib/rba";
-import { signOut } from "next-auth/react";
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: 3raphat
+ *
+ */
 
 interface MobileNavProps {
-  role?: string | null;
+  role?: string | null
 }
 
-export function MobileNav({role }: MobileNavProps) {
-  const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+export function MobileNav({ role }: MobileNavProps) {
+  const pathname = usePathname()
+  const [open, setOpen] = useState(false)
 
   const onOpenChange = useCallback((open: boolean) => {
-    setOpen(open);
-  }, []);
+    setOpen(open)
+  }, [])
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
@@ -53,32 +53,23 @@ export function MobileNav({role }: MobileNavProps) {
         </VisuallyHidden>
         <div className="overflow-auto p-6">
           <div className="flex flex-col space-y-1">
-            <MobileLink
-              key="/"
-              href="/"
-              onOpenChange={setOpen}
-              isActive={pathname === "/"}
-            >
+            <MobileLink key="/" href="/" onOpenChange={setOpen} isActive={pathname === "/"}>
               Home
             </MobileLink>
 
-            {(!!role && isAdmin(role)) && (
+            {!!role && isAdmin(role) && (
               <>
                 <MobileLink
                   href="/not-attending"
                   onOpenChange={setOpen}
-                  isActive={
-                    pathname === "/not-attending"
-                  }
+                  isActive={pathname === "/not-attending"}
                 >
                   Not Attending
                 </MobileLink>
                 <MobileLink
                   href="/admin"
                   onOpenChange={setOpen}
-                  isActive={
-                    pathname === "/admin" || pathname.startsWith("/admin/")
-                  }
+                  isActive={pathname === "/admin" || pathname.startsWith("/admin/")}
                 >
                   Admin
                 </MobileLink>
@@ -86,7 +77,7 @@ export function MobileNav({role }: MobileNavProps) {
             )}
 
             <button
-              className="flex text-left rounded-md px-4 py-3 text-[1.1rem] transition-all duration-200 text-foreground/80 hover:bg-accent/50"
+              className="flex rounded-md px-4 py-3 text-left text-[1.1rem] text-foreground/80 transition-all duration-200 hover:bg-accent/50"
               onClick={() => {
                 signOut()
                 setOpen(false)
@@ -98,42 +89,35 @@ export function MobileNav({role }: MobileNavProps) {
         </div>
       </DrawerContent>
     </Drawer>
-  );
+  )
 }
 
 interface MobileLinkProps extends LinkProps {
-  onOpenChange?: (open: boolean) => void;
-  children: React.ReactNode;
-  className?: string;
-  isActive: boolean;
+  onOpenChange?: (open: boolean) => void
+  children: React.ReactNode
+  className?: string
+  isActive: boolean
 }
 
-function MobileLink({
-  href,
-  onOpenChange,
-  className,
-  children,
-  isActive,
-  ...props
-}: MobileLinkProps) {
-  const router = useRouter();
+function MobileLink({ href, onOpenChange, className, children, isActive, ...props }: MobileLinkProps) {
+  const router = useRouter()
   return (
     <Link
       href={href}
       onClick={() => {
-        router.push(href.toString());
-        onOpenChange?.(false);
+        router.push(href.toString())
+        onOpenChange?.(false)
       }}
       className={cn(
         "flex items-center rounded-md px-4 py-3 text-[1.1rem] transition-all duration-200",
         isActive
-          ? "text-primary bg-primary/10 border-primary border-l-4 font-semibold"
+          ? "border-l-4 border-primary bg-primary/10 font-semibold text-primary"
           : "text-foreground/80 hover:bg-accent/50",
-        className,
+        className
       )}
       {...props}
     >
       {children}
     </Link>
-  );
+  )
 }

@@ -1,7 +1,8 @@
+import { auth } from "@/auth"
 import type { Metadata } from "next"
+import { redirect } from "next/navigation"
+
 import "../globals.css"
-import { auth } from "@/auth";
-import { redirect } from "next/navigation";
 
 export const metadata: Metadata = {
   title: "yookbeer",
@@ -10,14 +11,12 @@ export const metadata: Metadata = {
 export default async function UnauthenticatedLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   const session = await auth()
 
-  if (session){
+  if (session) {
     redirect("/")
   }
-  return (
-    <>{children}</>
-  )
+  return <>{children}</>
 }

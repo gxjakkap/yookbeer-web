@@ -1,0 +1,22 @@
+module.exports = {
+  bracketSpacing: true,
+  bracketSameLine: false,
+  singleQuote: false,
+  jsxSingleQuote: false,
+  trailingComma: "es5",
+  semi: false,
+  printWidth: 110,
+  arrowParens: "always",
+  endOfLine: "auto",
+  importOrder: [
+    "<THIRD_PARTY_MODULES>",
+    "^@(calcom|ee)/(.*)$",
+    "^@lib/(.*)$",
+    "^@components/(.*)$",
+    "^@(server|trpc)/(.*)$",
+    "^~/(.*)$",
+    "^[./]",
+  ],
+  importOrderSeparation: true,
+  plugins: ["@trivago/prettier-plugin-sort-imports", "prettier-plugin-tailwindcss"],
+}

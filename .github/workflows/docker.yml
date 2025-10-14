@@ -2,12 +2,12 @@ name: build-docker-image
 on:
   push:
     paths:
-      - 'src/**/*'
-      - 'public/**/*'
-      - '*.config.*'
-      - 'Dockerfile'
-      - 'package.json'
-      - '.github/workflows/**/*'
+      - "src/**/*"
+      - "public/**/*"
+      - "*.config.*"
+      - "Dockerfile"
+      - "package.json"
+      - ".github/workflows/**/*"
 env:
   REGISTRY: ghcr.io
   IMAGE_NAME: ${{ github.repository }}
@@ -44,7 +44,7 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          
+
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:

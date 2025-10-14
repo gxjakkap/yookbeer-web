@@ -1,23 +1,16 @@
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table";
-import { cn } from "@/lib/utils";
+import { Skeleton } from "@/components/ui/skeleton"
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
+import { cn } from "@/lib/utils"
 
 interface DataTableSkeletonProps extends React.HTMLAttributes<HTMLDivElement> {
-  columnCount: number;
-  rowCount?: number;
-  searchableColumnCount?: number;
-  filterableColumnCount?: number;
-  showViewOptions?: boolean;
-  cellWidths?: string[];
-  withPagination?: boolean;
-  shrinkZero?: boolean;
+  columnCount: number
+  rowCount?: number
+  searchableColumnCount?: number
+  filterableColumnCount?: number
+  showViewOptions?: boolean
+  cellWidths?: string[]
+  withPagination?: boolean
+  shrinkZero?: boolean
 }
 
 export function DataTableSkeleton(props: DataTableSkeletonProps) {
@@ -32,13 +25,10 @@ export function DataTableSkeleton(props: DataTableSkeletonProps) {
     shrinkZero = false,
     className,
     ...skeletonProps
-  } = props;
+  } = props
 
   return (
-    <div
-      className={cn("w-full space-y-2.5 overflow-auto", className)}
-      {...skeletonProps}
-    >
+    <div className={cn("w-full space-y-2.5 overflow-auto", className)} {...skeletonProps}>
       <div className="flex w-full items-center justify-between space-x-2 overflow-auto p-1">
         <div className="flex flex-1 items-center space-x-2">
           {searchableColumnCount > 0
@@ -52,9 +42,7 @@ export function DataTableSkeleton(props: DataTableSkeletonProps) {
               ))
             : null}
         </div>
-        {showViewOptions ? (
-          <Skeleton className="ml-auto hidden h-7 w-[4.5rem] lg:flex" />
-        ) : null}
+        {showViewOptions ? <Skeleton className="ml-auto hidden h-7 w-[4.5rem] lg:flex" /> : null}
       </div>
       <div className="rounded-md border">
         <Table>
@@ -115,5 +103,5 @@ export function DataTableSkeleton(props: DataTableSkeletonProps) {
         </div>
       ) : null}
     </div>
-  );
+  )
 }
