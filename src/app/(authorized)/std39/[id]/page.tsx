@@ -5,13 +5,14 @@ import { Prompt } from "next/font/google"
 import { notFound } from "next/navigation"
 
 import { db } from "@/db"
-import { thirtyeight } from "@/db/schema"
+import { thirtynine } from "@/db/schema"
 import { getPresignedURLForYookbeerPic } from "../../actions"
 import { LineIcon } from "@/components/svg/socials/line"
 import { InstagramIcon } from "@/components/svg/socials/ig"
 import { FacebookIcon } from "@/components/svg/socials/fb"
 import { COURSE_PRETTYNAME, StudentStatus } from "@/lib/const"
 import { Badge } from "@/components/ui/badge"
+import { birthdayPrettifier } from "@/lib/bd"
 
 
 interface Props {
@@ -33,14 +34,14 @@ const promptBold = Prompt({
     subsets: ['latin', 'thai']
 })
 
-export default async function StudentProfilePage({ params }: Props){
+export default async function ThirtyNineStudentProfilePage({ params }: Props){
     const { id } = await params
-    const dataArr = (await db.select().from(thirtyeight).where(eq(thirtyeight.stdid, id)).limit(1))
+    const dataArr = (await db.select().from(thirtynine).where(eq(thirtynine.stdid, id)).limit(1))
     if (dataArr.length < 1){
         notFound()
     }
     const data = dataArr[0]
-    const imgUrl = await getPresignedURLForYookbeerPic(data.img || '')
+    const imgUrl = await getPresignedURLForYookbeerPic(`39/${data.img}` || '')
     const status = data.status
     return (
         <div className={`${promptReg.className} mx-auto flex flex-col gap-y-3 pb-14`}>
@@ -64,6 +65,10 @@ export default async function StudentProfilePage({ params }: Props){
                         <p className={`${promptReg.className} text-foreground text-xl`}>
                             <span className={`${promptMed.className}`}>Thai name: </span>
                             {data.nameth} ({data.nickth})
+                        </p>
+                        <p className={`${promptReg.className} text-foreground text-xl`}>
+                            <span className={`${promptMed.className}`}>Date of birth: </span>
+                            {birthdayPrettifier(data.birthDay, data.birthMonth)}
                         </p>
                     </div>
                     <div className="flex flex-col">

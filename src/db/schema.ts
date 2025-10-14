@@ -30,6 +30,26 @@ export const thirtyeight = pgTable("thirtyeight", {
 	status: text("status").notNull().default(StudentStatus.ATTENDING),
 })
 
+export const thirtynine = pgTable("thirtynine", {
+	stdid: varchar({ length: 20 }).primaryKey().notNull(),
+	course: integer().notNull(),
+	nameth: varchar({ length: 255 }),
+	nameen: varchar({ length: 255 }).notNull(),
+	nickth: varchar({ length: 255 }),
+	nicken: varchar({ length: 255 }).notNull(),
+	phone: varchar({ length: 20 }).notNull(),
+	emailper: varchar({ length: 100 }),
+	emailuni: varchar({ length: 100 }),
+	emerphone: varchar({ length: 20 }),
+	emerrelation: varchar({ length: 50 }),
+	facebook: varchar({ length: 255 }),
+	lineid: varchar({ length: 100 }),
+	instagram: varchar({ length: 100 }),
+	discord: varchar({ length: 100 }),
+	img: varchar({ length: 20 }),
+	status: text("status").notNull().default(StudentStatus.ATTENDING),
+})
+
 export const invite = pgTable("invite", {
 	id: integer().generatedAlwaysAsIdentity().notNull(),
 	code: text("code").notNull().unique(),
