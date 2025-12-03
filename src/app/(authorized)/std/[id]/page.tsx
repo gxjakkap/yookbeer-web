@@ -38,7 +38,7 @@ export default async function StudentProfilePage({ params }: Props) {
     notFound()
   }
   const data = dataArr[0]
-  const imgUrl = await getPresignedURLForYookbeerPic(data.img || "")
+  const imgUrl = await getPresignedURLForYookbeerPic(`38/${data.img}` || "")
   const status = data.status
   return (
     <div className={`${promptReg.className} mx-auto flex flex-col gap-y-3 pb-14`}>
