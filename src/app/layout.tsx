@@ -1,27 +1,32 @@
 import { ThemeProvider } from "@/components/provider/theme"
 import { Toaster } from "@/components/ui/toaster"
+import { Anuphan } from "next/font/google"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 
 import "./globals.css"
 
+const anuphan = Anuphan({
+	subsets: ["latin", "thai"],
+})
+
 export default async function RootLayout({
-  children,
+	children,
 }: Readonly<{
-  children: React.ReactNode
+	children: React.ReactNode
 }>) {
-  return (
-    <html lang="en" suppressHydrationWarning>
-      {process.env.NODE_ENV === "development" && process.env.YB_ENABLE_REACT_SCAN === "1" && (
-        <head>
-          <script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
-        </head>
-      )}
-      <body className={`antialiased`}>
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
-          <NuqsAdapter>{children}</NuqsAdapter>
-          <Toaster />
-        </ThemeProvider>
-      </body>
-    </html>
-  )
+	return (
+		<html lang="en" suppressHydrationWarning>
+			{process.env.NODE_ENV === "development" && process.env.YB_ENABLE_REACT_SCAN === "1" && (
+				<head>
+					<script src="https://unpkg.com/react-scan/dist/auto.global.js" async />
+				</head>
+			)}
+			<body className={`antialiased ${anuphan.className}`}>
+				<ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+					<NuqsAdapter>{children}</NuqsAdapter>
+					<Toaster />
+				</ThemeProvider>
+			</body>
+		</html>
+	)
 }
