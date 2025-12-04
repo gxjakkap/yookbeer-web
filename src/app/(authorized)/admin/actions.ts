@@ -202,6 +202,7 @@ export const takeoutAction = adminProcedure
       ),
       format: z.enum(["csv", "json"]).default("csv"),
       includedCourse: z.array(z.number()).optional().default([0, 1, 2, 3]),
+      includedGen: z.array(z.number()).default([38]),
     })
   )
   .handler(async ({ input, ctx }) => {
@@ -209,7 +210,7 @@ export const takeoutAction = adminProcedure
       throw new AuthenticationError()
     }
 
-    const { onlyAttending, including, format, includedCourse } = input
+    const { onlyAttending, including, format, includedCourse, includedGen } = input
 
     const inc = including.map((field) => {
       if (!TAKEOUT_EXPORTABLE.includes(field as (typeof TAKEOUT_EXPORTABLE)[number])) {
@@ -223,6 +224,7 @@ export const takeoutAction = adminProcedure
       including: inc,
       format,
       includedCourse,
+      includedGen,
       createdBy: ctx.session.user.id,
       mode: "s3",
     })

@@ -23,14 +23,14 @@ export default async function Admin() {
     .from(users)
     .orderBy(
       sql`
-                CASE ${users.role}
-                    WHEN 'superadmin' THEN 1
-                    WHEN 'admin' THEN 2
-                    WHEN 'user' THEN 3
-                    WHEN 'unauthorized' THEN 4
-                    ELSE 5
-                END
-            `
+          CASE ${users.role}
+              WHEN 'superadmin' THEN 1
+              WHEN 'admin' THEN 2
+              WHEN 'user' THEN 3
+              WHEN 'unauthorized' THEN 4
+              ELSE 5
+          END
+      `
     )
   const apiKeyRes = await db.select().from(apiKey)
   const inviteCodeRes = await db.select().from(invite)

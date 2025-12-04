@@ -13,6 +13,7 @@ interface TakeoutArgs {
   including: (typeof TAKEOUT_EXPORTABLE)[number][]
   format?: "csv" | "json"
   includedCourse?: number[]
+  includedGen: number[]
   createdBy: string
   mode: "plain" | "s3"
 }
@@ -51,17 +52,23 @@ export async function takeout({
   includedCourse = [0, 1, 2, 3],
   createdBy,
   mode,
+  includedGen,
 }: TakeoutArgs): Promise<TakeoutResponse> {
   const [u] = await db.select().from(users).where(eq(users.id, createdBy)).limit(1)
 
   if (!u || u.id === null || u.name === null) {
-    throw new Error("TAKEOUT: User not found of invalid user")
+    throw new Error("TAKEOUT: User not found or invalid user")
+  }
+
+  if (includedGen.length < 1) {
+    throw new Error("TAKEOUT: Less than 1 gen selected")
   }
 
   const q = sql`
         SELECT ${sql.raw(including.join(", "))}
-        FROM thirtyeight
-        WHERE course IN (${sql.join(includedCourse, sql.raw(", "))})
+        FROM students
+        WHERE gen IN (${sql.join(includedGen, sql.raw(", "))})
+        AND course IN (${sql.join(includedCourse, sql.raw(", "))})
         ${onlyAttending ? sql`AND status = ${StudentStatus.ATTENDING}` : sql``}
         ORDER BY stdid ASC
     `

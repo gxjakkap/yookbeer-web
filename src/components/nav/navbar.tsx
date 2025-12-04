@@ -10,6 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu"
 import UserMenu from "@/components/user-menu"
+import { AVAILABLE } from "@/config/available-yearbook"
 import { isAdmin, Roles } from "@/lib/rba"
 import { cn } from "@/lib/utils"
 import { ChevronDown } from "lucide-react"
@@ -123,10 +124,9 @@ export function Navbar({ role, session }: NavbarProps) {
                 text="Year"
                 isActive={pathname.startsWith("/gen/")}
                 currentPath={pathname}
-                items={[
-                  { text: "CPE38", link: "/gen/38" },
-                  { text: "CPE39", link: "/gen/39" },
-                ]}
+                items={AVAILABLE.map((x) => {
+                  return { text: x.label, link: x.home }
+                })}
               />
               {!!role && isAdmin(role) && (
                 <>
