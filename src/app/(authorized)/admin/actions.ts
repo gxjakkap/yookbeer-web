@@ -11,11 +11,11 @@ import {
 } from "@/app/(authorized)/admin/types"
 import { auth } from "@/auth"
 import { db } from "@/db"
-import { apiKey, invite, thirtyeight, users } from "@/db/schema"
+import { apiKey, invite, students, thirtyeight, users } from "@/db/schema"
 import { TAKEOUT_EXPORTABLE } from "@/lib/const"
 import { AuthenticationError, ForbiddenError } from "@/lib/errors"
 import { isAdmin, isSuperAdmin } from "@/lib/rba"
-import { adminProcedure } from "@/lib/server-actions"
+import { adminProcedure, superAdminProcedure } from "@/lib/server-actions"
 import { takeout } from "@/lib/takeout"
 import { generateRandomString } from "@/lib/utils"
 import { eq } from "drizzle-orm"
@@ -30,10 +30,10 @@ export const updateStudent = adminProcedure
     })
   )
   .handler(async ({ input }) => {
-    await db.update(thirtyeight).set(input.data).where(eq(thirtyeight.stdid, input.id))
+    await db.update(students).set(input.data).where(eq(students.stdid, input.id))
   })
 
-export const deleteStudent = adminProcedure
+export const deleteStudent = superAdminProcedure
   .createServerAction()
   .input(
     z.object({
@@ -41,7 +41,7 @@ export const deleteStudent = adminProcedure
     })
   )
   .handler(async ({ input }) => {
-    await db.delete(thirtyeight).where(eq(thirtyeight.stdid, input.id))
+    await db.delete(students).where(eq(students.stdid, input.id))
   })
 
 export const updateUser = adminProcedure

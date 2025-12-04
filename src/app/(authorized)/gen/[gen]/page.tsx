@@ -1,30 +1,42 @@
 import { auth } from "@/auth"
+import { YookbeerTable } from "@/components/table/yookbeer-table"
 import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
 import { db } from "@/db"
-import { thirtynine } from "@/db/schema"
+import { students, thirtyeight } from "@/db/schema"
 import { StudentStatus } from "@/lib/const"
-import { isAdmin } from "@/lib/rba"
+import { isAdmin, Roles } from "@/lib/rba"
 import { searchParamsCache } from "@/lib/validations"
 import { SearchParams } from "@/types"
-import { eq } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
 import localFont from "next/font/local"
+import { notFound } from "next/navigation"
 
 const geistMono = localFont({
-  src: "../../fonts/GeistMonoVF.woff",
+  src: "../../../fonts/GeistMonoVF.woff",
   variable: "--font-geist-mono",
   weight: "100 900",
 })
 
-interface HomeProps {
+interface GenPageProps {
   s: Promise<SearchParams>
+  params: Promise<{ gen: string }>
 }
 
-export default async function ThirtyNineHome({ s }: HomeProps) {
+export default async function GenPage({ s, params }: GenPageProps) {
+  const { gen } = await params
+  const gi = parseInt(gen)
+
+  console.log(gen)
+  console.log(typeof gi)
+
+  if (!gi) notFound()
+
   const data = await db
     .select()
-    .from(thirtynine)
-    .where(eq(thirtynine.status, StudentStatus.ATTENDING))
-    .orderBy(thirtynine.stdid)
+    .from(students)
+    .where(and(eq(students.gen, gi), eq(students.status, StudentStatus.ATTENDING)))
+    .orderBy(students.stdid)
+
   const session = await auth()
 
   const searchParams = await s
@@ -32,9 +44,10 @@ export default async function ThirtyNineHome({ s }: HomeProps) {
 
   return (
     <div className={`flex w-screen flex-col ${geistMono.className}`}>
+      {/* <YookbeerTable data={data} isAdmin={isAdmin} /> */}
       <div className="mx-auto w-full max-w-[90vw]">
         <NewTable
-          data={data}
+          data={data as any}
           isAdmin={isAdmin(session?.user.role || "")}
           initialState={{
             pagination: {
@@ -42,7 +55,6 @@ export default async function ThirtyNineHome({ s }: HomeProps) {
               pageSize: search.perPage,
             },
           }}
-          hrefPrefix="std39/"
         />
       </div>
     </div>

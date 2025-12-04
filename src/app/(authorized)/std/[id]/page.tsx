@@ -4,7 +4,8 @@ import { InstagramIcon } from "@/components/svg/socials/ig"
 import { LineIcon } from "@/components/svg/socials/line"
 import { Badge } from "@/components/ui/badge"
 import { db } from "@/db"
-import { thirtyeight } from "@/db/schema"
+import { students, thirtynine } from "@/db/schema"
+import { birthdayPrettifier } from "@/lib/bd"
 import { COURSE_PRETTYNAME, StudentStatus } from "@/lib/const"
 import { eq } from "drizzle-orm"
 import { Prompt } from "next/font/google"
@@ -33,13 +34,12 @@ const promptBold = Prompt({
 
 export default async function StudentProfilePage({ params }: Props) {
   const { id } = await params
-  const dataArr = await db.select().from(thirtyeight).where(eq(thirtyeight.stdid, id)).limit(1)
-  if (dataArr.length < 1) {
-    notFound()
-  }
-  const data = dataArr[0]
-  const imgUrl = await getPresignedURLForYookbeerPic(data.img || "")
+  const [data] = await db.select().from(students).where(eq(students.stdid, id)).limit(1)
+  if (!data) notFound()
+  const imgUrl = await getPresignedURLForYookbeerPic(`${data.gen}/${data.img}` || "")
   const status = data.status
+
+  console.log(data)
   return (
     <div className={`${promptReg.className} mx-auto flex flex-col gap-y-3 pb-14`}>
       <div className="flex flex-col text-center lg:gap-y-1 lg:text-left">
@@ -74,6 +74,12 @@ export default async function StudentProfilePage({ params }: Props) {
               <span className={`${promptMed.className}`}>Thai name: </span>
               {data.nameth} ({data.nickth})
             </p>
+            {data.birthDay && data.birthMonth && (
+              <p className={`${promptReg.className} text-xl text-foreground`}>
+                <span className={`${promptMed.className}`}>Date of birth: </span>
+                {birthdayPrettifier(data.birthDay, data.birthMonth)}
+              </p>
+            )}
           </div>
           <div className="flex flex-col">
             <p className={`${promptBold.className} text-xl text-foreground`}>Contact Info📱</p>

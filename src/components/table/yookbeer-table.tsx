@@ -162,12 +162,12 @@ export function YookbeerTable({ data, isAdmin }: YookbeerTableProps) {
         const x = (row.getValue("discord") || "-") as string
         return <div>{x}</div>
       },
-    },
+    } /* ,
     {
       accessorKey: "action",
       header: "Action",
       cell: ({ row }) => ActionCell(row, isAdmin),
-    },
+    }, */,
   ]
 
   const table = useReactTable({

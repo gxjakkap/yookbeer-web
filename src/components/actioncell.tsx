@@ -2,11 +2,15 @@ import { getPresignedURLForYookbeerPic } from "@/app/(authorized)/actions"
 import { deleteStudent, updateStudent } from "@/app/(authorized)/admin/actions"
 import { useToast } from "@/hooks/use-toast"
 import { StudentStatus } from "@/lib/const"
+import { cn } from "@/lib/utils"
 import { Row } from "@tanstack/react-table"
 import { Pencil, Trash2 } from "lucide-react"
+import Link from "next/link"
 import React from "react"
 
-import { YookbeerColumn } from "./table/yookbeer-table"
+import { InstagramIcon } from "./svg/socials/ig"
+import { LineIcon } from "./svg/socials/line"
+import { YookbeerColumn } from "./table/yookbeer-table-new"
 import { Button } from "./ui/button"
 import {
   Dialog,
@@ -27,7 +31,7 @@ const PersonIcon = () => (
   </svg>
 )
 
-const ImageDialog = ({
+/* const ImageDialog = ({
   isOpen,
   onClose,
   imageUrl,
@@ -59,7 +63,7 @@ const ImageDialog = ({
       </DialogContent>
     </Dialog>
   )
-}
+} */
 
 interface EditDialogProps {
   isOpen: boolean
@@ -86,7 +90,11 @@ const EditDialog = ({ isOpen, onClose, data, onUpdate, isPending }: EditDialogPr
     discord: data.discord,
     img: data.img,
     status: data.status,
+    birthMonth: data.birthMonth,
+    birthDay: data.birthDay,
   })
+
+  const inputMapExcludeList = ["status", "birthMonth"]
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -100,27 +108,64 @@ const EditDialog = ({ isOpen, onClose, data, onUpdate, isPending }: EditDialogPr
         <form action={() => onUpdate(formData)}>
           <div className="grid gap-4 py-4">
             {Object.entries(formData).map(([key, value]) => {
-              if (key === "status") return
-              else
-                return (
-                  <div key={key} className="grid grid-cols-4 items-center gap-4">
-                    <Label htmlFor={key} className="text-right capitalize">
-                      {key.replace(/([A-Z])/g, " $1").trim()}
-                    </Label>
-                    <Input
-                      id={key}
-                      value={(value as any) || ""}
-                      onChange={(e) =>
-                        setFormData((prev) => ({
-                          ...prev,
-                          [key]: e.target.value,
-                        }))
-                      }
-                      className="col-span-3"
-                    />
-                  </div>
-                )
+              if (inputMapExcludeList.includes(key)) return
+              return (
+                <div key={key} className="grid grid-cols-4 items-center gap-4">
+                  <Label htmlFor={key} className="text-right capitalize">
+                    {key.replace(/([A-Z])/g, " $1").trim()}
+                  </Label>
+                  <Input
+                    id={key}
+                    value={(value as any) || ""}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        [key]: e.target.value,
+                      }))
+                    }
+                    className="col-span-3"
+                  />
+                </div>
+              )
             })}
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor={"birthMonth"} className="text-right capitalize">
+                Birth Month
+              </Label>
+              <Select
+                value={formData.birthMonth ? String(formData.birthMonth) : ""}
+                onValueChange={(val) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    birthMonth: Number(val),
+                  }))
+                }
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Month" />
+                </SelectTrigger>
+                <SelectContent>
+                  {[
+                    "January",
+                    "February",
+                    "March",
+                    "April",
+                    "May",
+                    "June",
+                    "July",
+                    "August",
+                    "September",
+                    "October",
+                    "November",
+                    "December",
+                  ].map((month, i) => (
+                    <SelectItem key={i + 1} value={String(i + 1)}>
+                      {month}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor={"status"} className="text-right capitalize">
                 Status
@@ -191,10 +236,10 @@ const DeleteDialog = ({ isOpen, onClose, onConfirm, studentName, isPending }: De
 }
 
 export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
-  const imgName = row.original.img
+  /* const imgName = row.original.img */
   const studentName = row.original.nameen
   const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-  const [imageUrl, setImageUrl] = React.useState<string | null>(null)
+  /* const [imageUrl, setImageUrl] = React.useState<string | null>(null) */
   const [isEditOpen, setIsEditOpen] = React.useState(false)
   const [isDeleteOpen, setIsDeleteOpen] = React.useState(false)
   const [isPending, startTransition] = React.useTransition()
@@ -205,9 +250,19 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
     console.log(data)
     startTransition(async () => {
       try {
+        let bd: number | null = parseInt(data.birthDay?.toString() || "-1")
+        let bm: number | null = parseInt(data.birthMonth?.toString() || "-1")
+
+        if (bd === -1) bd = null
+        if (bm === -1) bm = null
+
         await updateStudent({
           id: data.stdid as string,
-          data: data,
+          data: {
+            ...data,
+            birthDay: bd,
+            birthMonth: bm,
+          },
         })
         toast({
           title: "Record updated succesfully",
@@ -241,7 +296,7 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
     })
   }
 
-  const handleViewImage = async () => {
+  /* const handleViewImage = async () => {
     if (imgName) {
       try {
         const url = await getPresignedURLForYookbeerPic(imgName)
@@ -256,13 +311,58 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
       setImageUrl(null)
       setIsDialogOpen(true)
     }
-  }
+  } */
 
   return (
     <div className="action-cell flex" data-column="action">
-      <Button variant="ghost" size="icon" onClick={handleViewImage} className="h-8 w-8 p-0">
+      {/* <Button variant="ghost" size="icon" onClick={handleViewImage} className="h-8 w-8 p-0">
         <PersonIcon />
+      </Button> */}
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className={cn(
+          "h-8 w-8 p-0",
+          row.original.instagram === null ? "cursor-not-allowed" : "cursor-pointer"
+        )}
+        disabled={row.original.instagram === null}
+      >
+        <Link
+          href={row.original.instagram !== null ? `https://instagram.com/${row.original.instagram}` : "#"}
+          target="_blank"
+          rel="noopener,noreferrer"
+          className={
+            row.original.instagram === null ? "pointer-events-none cursor-not-allowed" : "cursor-pointer"
+          }
+          aria-disabled={row.original.instagram === null}
+        >
+          <InstagramIcon />
+        </Link>
       </Button>
+
+      <Button
+        variant="ghost"
+        size="icon"
+        className={cn(
+          "h-8 w-8 p-0",
+          row.original.instagram === null ? "cursor-not-allowed" : "cursor-pointer"
+        )}
+        disabled={row.original.instagram === null}
+      >
+        <Link
+          href={row.original.lineid !== null ? `https://line.me/R/ti/p/~${row.original.lineid}` : "#"}
+          target="_blank"
+          rel="noopener,noreferrer"
+          className={
+            row.original.lineid === null ? "pointer-events-none cursor-not-allowed" : "cursor-pointer"
+          }
+          aria-disabled={row.original.lineid === null}
+        >
+          <LineIcon />
+        </Link>
+      </Button>
+
       {isAdmin ? (
         <>
           <Button
@@ -303,12 +403,12 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
       ) : (
         <></>
       )}
-      <ImageDialog
+      {/* <ImageDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
         imageUrl={imageUrl}
         studentName={studentName}
-      />
+      /> */}
       {isAdmin ? (
         <>
           <EditDialog

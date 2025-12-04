@@ -2,7 +2,12 @@
 
 import { MobileNav } from "@/components/nav/mobile-nav"
 import { Button } from "@/components/ui/button"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList } from "@/components/ui/navigation-menu"
 import UserMenu from "@/components/user-menu"
 import { isAdmin, Roles } from "@/lib/rba"
@@ -85,13 +90,19 @@ const NavbarList = ({
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-[200px] p-2">
         {items.map((x, i) => (
-          <NavbarChild
-            fullWidth
-            key={i}
-            href={x.link}
-            text={x.text}
-            isActive={currentPath.startsWith(x.link)}
-          />
+          <DropdownMenuItem key={i} asChild>
+            <Link
+              href={x.link}
+              className={cn(
+                "flex w-full cursor-pointer items-center justify-start rounded-sm px-4 py-2 text-sm font-medium transition-colors",
+                currentPath.startsWith(x.link)
+                  ? "bg-accent/50 font-bold text-primary"
+                  : "text-foreground/80 hover:bg-accent/50 hover:text-foreground"
+              )}
+            >
+              {x.text}
+            </Link>
+          </DropdownMenuItem>
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
