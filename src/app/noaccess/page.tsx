@@ -3,7 +3,6 @@ import AnimatedGridPattern from "@/components/ui/animated-grid-pattern"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Metadata } from "next"
-import localFont from "next/font/local"
 import Link from "next/link"
 import { redirect } from "next/navigation"
 

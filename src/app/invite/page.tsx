@@ -1,11 +1,8 @@
-import { auth, signOut } from "@/auth"
+import { auth } from "@/auth"
 import { RedeemForm } from "@/components/redeemform"
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { cn } from "@/lib/utils"
 import { Metadata } from "next"
-import localFont from "next/font/local"
 import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
