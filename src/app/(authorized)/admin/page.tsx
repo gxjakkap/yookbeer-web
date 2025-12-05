@@ -70,9 +70,9 @@ export default async function Admin() {
 				</CardHeader>
 				<CardContent>
 					<VersionInfo
-						sha={process.env.YB_SHA || "0"}
-						commitMsg={process.env.YB_COMMIT || "-"}
-						buildDate={new Date(process.env.YB_BUILD_DATE || 0).toISOString()}
+						sha={process.env.NEXT_PUBLIC_YB_SHA || "0"}
+						commitMsg={process.env.NEXT_PUBLIC_YB_COMMIT || "-"}
+						buildDate={new Date(process.env.NEXT_PUBLIC_YB_BUILD_DATE || 0).toISOString()}
 					/>
 				</CardContent>
 			</Card>
