@@ -19,9 +19,6 @@ export default async function GenPage({ s, params }: GenPageProps) {
 	const { gen } = await params
 	const gi = parseInt(gen)
 
-	console.log(gen)
-	console.log(typeof gi)
-
 	if (!gi) notFound()
 
 	const data = await db

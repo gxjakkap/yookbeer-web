@@ -43,7 +43,5 @@ export async function searchStudents(searchTerm: string) {
 
 	const results = await db.select().from(students).where(searchCondition).execute()
 
-	console.log(results)
-
 	return results
 }
