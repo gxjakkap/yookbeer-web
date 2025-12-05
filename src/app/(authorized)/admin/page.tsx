@@ -4,6 +4,7 @@ import { AdminInviteTable } from "@/components/table/admin-invite-table"
 import { AdminUserTable } from "@/components/table/admin-users-table"
 import TakeoutForm from "@/components/takeout-form"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { VersionInfo } from "@/components/version-info"
 import { db } from "@/db"
 import { apiKey, invite, users } from "@/db/schema"
 import { eq, sql } from "drizzle-orm"
@@ -63,6 +64,18 @@ export default async function Admin() {
 
 	return (
 		<div className={`flex w-screen flex-col pb-20`}>
+			<Card className="relative border-none bg-transparent shadow-none">
+				<CardHeader className="pb-0">
+					<CardTitle>Version Info</CardTitle>
+				</CardHeader>
+				<CardContent>
+					<VersionInfo
+						sha={process.env.YB_SHA || "0"}
+						commitMsg={process.env.YB_COMMIT || "-"}
+						buildDate={new Date(process.env.YB_BUILD_DATE || 0).toISOString()}
+					/>
+				</CardContent>
+			</Card>
 			<Card className="relative border-none bg-transparent shadow-none">
 				<CardHeader className="pb-0">
 					<CardTitle>User Management</CardTitle>
