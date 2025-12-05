@@ -1,53 +1,62 @@
 name: build-docker-image
 on:
-  push:
-    paths:
-      - "src/**/*"
-      - "public/**/*"
-      - "*.config.*"
-      - "Dockerfile"
-      - "package.json"
-      - ".github/workflows/**/*"
+    push:
+        paths:
+            - "src/**/*"
+            - "public/**/*"
+            - "*.config.*"
+            - "Dockerfile"
+            - "package.json"
+            - ".github/workflows/**/*"
 env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}
+    REGISTRY: ghcr.io
+    IMAGE_NAME: ${{ github.repository }}
 jobs:
-  publish-docker-images:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      attestations: write
-      id-token: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+    publish-docker-images:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            packages: write
+            attestations: write
+            id-token: write
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v4
 
-      - name: Log in to the Container registry
-        uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
-        with:
-          registry: ${{ env.REGISTRY }}
-          username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+            - name: Prepare Build Args
+              run: |
+                  echo "YB_COMMIT=$(git log -1 --format=%s)" >> $GITHUB_ENV
+                  echo "YB_DATE=$(date +%s)" >> $GITHUB_ENV
 
-      - name: Extract metadata (tags, labels) for Docker
-        id: meta
-        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
-        with:
-          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+            - name: Log in to the Container registry
+              uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+              with:
+                  registry: ${{ env.REGISTRY }}
+                  username: ${{ github.actor }}
+                  password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build and push Docker image
-        id: push
-        uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
-        with:
-          context: .
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
+            - name: Extract metadata (tags, labels) for Docker
+              id: meta
+              uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+              with:
+                  images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
 
-      - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
-        with:
-          subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
-          subject-digest: ${{ steps.push.outputs.digest }}
-          push-to-registry: true
+            - name: Build and push Docker image
+              id: push
+              uses: docker/build-push-action@f2a1d5e99d037542a71f64918e516c093c6f3fc4
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ steps.meta.outputs.tags }}
+                  labels: ${{ steps.meta.outputs.labels }}
+                  build-args: |
+                      YB_SHA=${{ github.sha }}
+                      YB_COMMIT="${{ env.YB_COMMIT }}"
+                      YB_BUILDDATE=${{ env.YB_DATE }}
+
+            - name: Generate artifact attestation
+              uses: actions/attest-build-provenance@v1
+              with:
+                  subject-name: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME}}
+                  subject-digest: ${{ steps.push.outputs.digest }}
+                  push-to-registry: true
