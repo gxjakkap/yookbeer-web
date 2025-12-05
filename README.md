@@ -6,7 +6,7 @@ A webapp version of [yookbeer](https://github.com/gxjakkap/yookbeer)
 
 ### Developing locally
 
-- Node v20 or later (or as referenced in .nvmrc)
+- Bun
 - Docker (or you can run postgres locally)
 
 ### Running on prod
@@ -18,10 +18,10 @@ A webapp version of [yookbeer](https://github.com/gxjakkap/yookbeer)
 ### Developing locally
 
 ```sh
-pnpm i
+bun install
 docker compose -f docker-compose-devdb.yml -d
-pnpm drizzle-kit push
-pnpm dev
+bun drizzle-kit push
+bun dev
 ```
 
 ### Running on prod
