@@ -72,7 +72,7 @@ export default async function Admin() {
 					<VersionInfo
 						sha={process.env.NEXT_PUBLIC_YB_SHA || "0"}
 						commitMsg={process.env.NEXT_PUBLIC_YB_COMMIT || "-"}
-						buildDate={new Date(Number(process.env.NEXT_PUBLIC_YB_BUILDDATE) || 0).toISOString()}
+						buildDate={new Date(Number(process.env.NEXT_PUBLIC_YB_BUILDDATE) * 1000 || 0).toISOString()}
 					/>
 				</CardContent>
 			</Card>
