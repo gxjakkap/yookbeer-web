@@ -1,6 +1,6 @@
 "use client"
 
-import { COURSE_SHORTHAND, Courses } from "@/lib/const"
+import { COURSE_SHORTHAND, Courses, StudentStatus } from "@/lib/const"
 import { DataTableFilterField, InitialStateTablePage, TableProps } from "@/types"
 import { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
@@ -24,6 +24,9 @@ export interface YookbeerColumn {
   instagram: string | null
   discord: string | null
   img: string | null
+  status: (typeof StudentStatus)[keyof typeof StudentStatus]
+  birthDay: number | null
+  birthMonth: number | null
 }
 
 interface YookbeerTableProps {
@@ -122,36 +125,11 @@ export function YookbeerTable(props: YookbeerTableProps) {
       header: "Phone",
       cell: ({ row }) => <div>{row.getValue("phone")}</div>,
     },
-    /* {
-              accessorKey: "emailper",
-              header: "Email (per)",
-              cell: ({ row }) => <div className="lowercase">{row.getValue("emailper")}</div>,
-          }, */
     {
       accessorKey: "emailuni",
       header: "Email (uni)",
       cell: ({ row }) => <div className="lowercase">{row.getValue("emailuni")}</div>,
     },
-    /* {
-              accessorKey: "facebook",
-              header: "FB",
-              cell: ({ row }) => {
-                  const x = (row.getValue("facebook") || "-") as string
-                  return (
-                      <div>{x}</div>
-                  )
-              },
-          }, */
-    /* {
-              accessorKey: "lineid",
-              header: "LINE",
-              cell: ({ row }) => {
-                  const x = (row.getValue("lineid") || "-") as string
-                  return (
-                      <div>{x}</div>
-                  )
-              },
-          }, */
     {
       accessorKey: "instagram",
       header: "IG",
@@ -160,21 +138,11 @@ export function YookbeerTable(props: YookbeerTableProps) {
         return <div>{x}</div>
       },
     },
-    /* {
-              accessorKey: "discord",
-              header: "Discord",
-              cell: ({ row }) => {
-                  const x = (row.getValue("discord") || "-") as string
-                  return (
-                      <div>{x}</div>
-                  )
-              },
-          }, */
-    /* {
+    {
       accessorKey: "action",
       header: "Action",
       cell: ({ row }) => ActionCell(row, props.isAdmin),
-    }, */
+    },
   ]
   return (
     <DataTable

@@ -43,6 +43,8 @@ export const zodYookbeerColumn = z.object({
   instagram: z.string().nullable(),
   discord: z.string().nullable(),
   img: z.string().nullable(),
+  birthDay: z.coerce.number().nullable(),
+  birthMonth: z.coerce.number().nullable(),
   status: z.string().default(StudentStatus.ATTENDING).optional(),
 })
 

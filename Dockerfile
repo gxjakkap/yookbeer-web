@@ -7,10 +7,6 @@ RUN apt-get update -y && apt-get install -y --no-install-recommends \
   libc6 libvips curl && \
   rm -rf /var/lib/apt/lists/*
 
-ENV NODE_ENV=production
-ENV PORT=8080
-ENV HOSTNAME="0.0.0.0"
-
 FROM base AS deps
 
 COPY bun.lock package.json ./
@@ -19,8 +15,15 @@ RUN bun install --frozen-lockfile
 
 FROM deps AS builder
 
-COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
+ARG YB_SHA
+ARG YB_COMMIT
+ARG YB_BUILDDATE
+ENV YB_SHA=${YB_SHA}
+ENV YB_COMMIT=${YB_COMMIT}
+ENV YB_BUILDDATE=${YB_BUILDDATE}}
+ENV NODE_ENV=production
+COPY . .
 RUN bun run build
 
 FROM oven/bun:latest AS runner

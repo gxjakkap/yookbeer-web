@@ -1,4 +1,5 @@
 import { auth } from "@/auth"
+/* import { YookbeerTable } from "@/components/table/yookbeer-table" */
 import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
 import { db } from "@/db"
 import { students } from "@/db/schema"
@@ -6,18 +7,29 @@ import { StudentStatus } from "@/lib/const"
 import { isAdmin } from "@/lib/rba"
 import { searchParamsCache } from "@/lib/validations"
 import { SearchParams } from "@/types"
-import { ne } from "drizzle-orm"
+import { and, eq } from "drizzle-orm"
+import { notFound } from "next/navigation"
 
-interface NotAttendingProps {
+interface GenPageProps {
 	s: Promise<SearchParams>
+	params: Promise<{ gen: string }>
 }
 
-export default async function NotAttending({ s }: NotAttendingProps) {
+export default async function GenPage({ s, params }: GenPageProps) {
+	const { gen } = await params
+	const gi = parseInt(gen)
+
+	console.log(gen)
+	console.log(typeof gi)
+
+	if (!gi) notFound()
+
 	const data = await db
 		.select()
 		.from(students)
-		.where(ne(students.status, StudentStatus.ATTENDING))
+		.where(and(eq(students.gen, gi), eq(students.status, StudentStatus.ATTENDING)))
 		.orderBy(students.stdid)
+
 	const session = await auth()
 
 	const searchParams = await s
@@ -25,6 +37,7 @@ export default async function NotAttending({ s }: NotAttendingProps) {
 
 	return (
 		<div className={`flex w-screen flex-col`}>
+			{/* <YookbeerTable data={data} isAdmin={isAdmin} /> */}
 			<div className="mx-auto w-full max-w-[90vw]">
 				<NewTable
 					data={data as any}

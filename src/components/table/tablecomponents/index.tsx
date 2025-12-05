@@ -49,6 +49,132 @@ import { DataTableToolbar } from "./toolbar"
  *
  */
 
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
+/**
+ * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
+ *
+ * Original author: beambeambeam
+ *
+ */
+
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
@@ -235,7 +361,7 @@ export function DataTable<TData, TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className="first:pl-4 last:pr-4"
+                      className="bg-gray-50 text-foreground first:pl-4 last:pr-4 dark:bg-zinc-900"
                       style={{ width: `${header.getSize()}px` }}
                     >
                       {header.isPlaceholder

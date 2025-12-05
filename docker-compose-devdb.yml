@@ -5,7 +5,7 @@ services:
     user: postgres
     env_file: ".env"
     volumes:
-      - db-data:/var/lib/postgresql/data
+      - db-data:/var/lib/postgresql
     environment:
       - POSTGRES_LOG_STATEMENT=all
       - POSTGRES_LOG_CONNECTIONS=true

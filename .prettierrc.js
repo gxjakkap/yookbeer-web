@@ -6,6 +6,8 @@ module.exports = {
   trailingComma: "es5",
   semi: false,
   printWidth: 110,
+  tabWidth: 4,
+  useTabs: true,
   arrowParens: "always",
   endOfLine: "auto",
   importOrder: [

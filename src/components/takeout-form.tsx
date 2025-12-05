@@ -3,14 +3,17 @@
 import { takeoutAction } from "@/app/(authorized)/admin/actions"
 import { Card, CardContent } from "@/components/ui/card"
 import { toast } from "@/hooks/use-toast"
+import { AVAILABLE } from "@/config/available-yearbook"
 import { TAKEOUT_EXPORTABLE } from "@/lib/const"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
 import { Button } from "./ui/button"
+import { Checkbox } from "./ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { SelectGroup } from "./ui/select"
 
 const INCLUDABLE = [
   {
@@ -90,6 +93,7 @@ const formSchema = z.object({
   includedCourse: z
     .array(z.enum(AVAILABLE_COURSES.map((c) => String(c.id)) as [string, ...string[]]))
     .min(1, "Select at least one course"),
+  includedGen: z.array(z.number()).min(1, "Select at least one gen"),
 })
 
 export default function TakeoutForm() {
@@ -100,6 +104,7 @@ export default function TakeoutForm() {
       including: ["stdid", "course", "nameth", "nameen", "nickth", "nicken"],
       format: "csv",
       includedCourse: ["0", "1", "2", "3"],
+      includedGen: [38],
     },
   })
 
@@ -146,7 +151,7 @@ export default function TakeoutForm() {
                   control={form.control}
                   name="onlyAttending"
                   render={({ field }) => (
-                    <FormItem className="">
+                    <FormItem>
                       <FormLabel className="text-lg">Only include attending students</FormLabel>
                       <FormControl>
                         <RadioGroup
@@ -197,6 +202,38 @@ export default function TakeoutForm() {
                             <FormLabel className="text-sm">JSON</FormLabel>
                           </FormItem>
                         </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="includedGen"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-lg">Included Gen</FormLabel>
+                      <FormControl>
+                        <div className="flex flex-col space-y-2">
+                          {AVAILABLE.map((gen) => (
+                            <FormItem
+                              key={gen.gen}
+                              className="flex flex-row items-start space-x-3 space-y-0"
+                            >
+                              <FormControl>
+                                <Checkbox
+                                  checked={field.value.includes(gen.gen)}
+                                  onCheckedChange={(checked) => {
+                                    return checked
+                                      ? field.onChange([...field.value, gen.gen])
+                                      : field.onChange(field.value.filter((value) => value !== gen.gen))
+                                  }}
+                                />
+                              </FormControl>
+                              <FormLabel className="font-normal">{gen.label}</FormLabel>
+                            </FormItem>
+                          ))}
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>

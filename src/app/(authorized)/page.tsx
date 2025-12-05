@@ -1,51 +1,34 @@
-import { auth } from "@/auth"
-import { YookbeerTable } from "@/components/table/yookbeer-table"
-import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
-import { db } from "@/db"
-import { thirtyeight } from "@/db/schema"
-import { StudentStatus } from "@/lib/const"
-import { isAdmin, Roles } from "@/lib/rba"
-import { searchParamsCache } from "@/lib/validations"
-import { SearchParams } from "@/types"
-import { eq } from "drizzle-orm"
-import localFont from "next/font/local"
+import { Button } from "@/components/ui/button"
+import Link from "next/link"
 
-const geistMono = localFont({
-  src: "../fonts/GeistMonoVF.woff",
-  variable: "--font-geist-mono",
-  weight: "100 900",
-})
+export default async function Home() {
+	return (
+		<div className={`flex min-h-[90dvh] w-screen items-center justify-center`}>
+			<div className="mx-4 w-full max-w-sm rounded-sm border p-6 sm:p-8">
+				<header className="mb-8">
+					<h1 className="text-center text-3xl font-bold text-foreground">Select Yearbook</h1>
+				</header>
 
-interface HomeProps {
-  s: Promise<SearchParams>
-}
+				<div className="space-y-4">
+					<Link href={"/gen/38"} passHref legacyBehavior>
+						<Button
+							className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
+							variant="default"
+						>
+							CPE 38
+						</Button>
+					</Link>
 
-export default async function Home({ s }: HomeProps) {
-  const data = await db
-    .select()
-    .from(thirtyeight)
-    .where(eq(thirtyeight.status, StudentStatus.ATTENDING))
-    .orderBy(thirtyeight.stdid)
-  const session = await auth()
-
-  const searchParams = await s
-  const search = searchParamsCache.parse(searchParams)
-
-  return (
-    <div className={`flex w-screen flex-col ${geistMono.className}`}>
-      {/* <YookbeerTable data={data} isAdmin={isAdmin} /> */}
-      <div className="mx-auto w-full max-w-[90vw]">
-        <NewTable
-          data={data}
-          isAdmin={isAdmin(session?.user.role || "")}
-          initialState={{
-            pagination: {
-              pageIndex: search.page,
-              pageSize: search.perPage,
-            },
-          }}
-        />
-      </div>
-    </div>
-  )
+					<Link href={"/gen/39"} passHref legacyBehavior>
+						<Button
+							className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
+							variant="default"
+						>
+							CPE 39
+						</Button>
+					</Link>
+				</div>
+			</div>
+		</div>
+	)
 }
