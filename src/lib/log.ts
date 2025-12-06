@@ -1,6 +1,7 @@
 import { db } from "@/db"
 import { logs } from "@/db/schema"
-import pino from "pino"
+import { VectorTransport } from "./vector-transport"
+import { pino } from "pino"
 
 export enum LogAction {
 	CREATE_NEW_STD = "create_new_std",
@@ -26,12 +27,14 @@ interface LogArgs {
 	timestamp?: Date
 }
 
-export const logger = pino({
-	level: "info",
-	transport: {
-		target: "./vector-transport.js",
+const transport = new VectorTransport()
+
+export const logger = pino(
+	{
+		level: "info",
 	},
-})
+	transport
+)
 
 export async function actionLog(args: LogArgs) {
 	const { action, actor, target, details, timestamp = new Date() } = args
