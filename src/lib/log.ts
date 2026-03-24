@@ -49,9 +49,6 @@ export async function actionLog(args: LogArgs) {
 			details: details || null,
 			timestamp,
 		})
-		.onConflictDoNothing({
-			target: logs.action,
-		})
 		.returning()
 		.catch((err) => {
 			console.error("Log Error:", err)

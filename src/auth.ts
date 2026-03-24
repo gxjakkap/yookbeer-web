@@ -1,12 +1,18 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import NextAuth, { type DefaultSession } from "next-auth"
+import { type DefaultJWT } from "next-auth/jwt"
 import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id"
 
+import { authConfig } from "./auth.config"
 import { db } from "./db"
 import { accounts, sessions, users, verificationTokens } from "./db/schema"
 import { actionLog, LogAction } from "./lib/log"
 
-//import { user } from "../drizzle/schema"
+declare module "next-auth/jwt" {
+	interface JWT {
+		role?: string
+	}
+}
 
 declare module "next-auth" {
 	interface Session {
@@ -19,22 +25,8 @@ declare module "next-auth" {
 	}
 }
 
-const Entra = MicrosoftEntraID({
-	clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
-	clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
-	issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
-	profile(profile) {
-		return {
-			id: profile.oid,
-			name: profile.name,
-			email: profile.upn || profile.unique_name, // Using UPN (User Principal Name) as email
-			emailVerified: null,
-			image: null,
-		}
-	},
-})
-
 export const { handlers, signIn, signOut, auth } = NextAuth({
+	...authConfig,
 	adapter: DrizzleAdapter(
 		db as never,
 		{
@@ -44,10 +36,24 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			verificationTokensTable: verificationTokens,
 		} as never
 	),
-	providers: [Entra],
+	providers: [
+		MicrosoftEntraID({
+			clientId: process.env.AUTH_MICROSOFT_ENTRA_ID_ID,
+			clientSecret: process.env.AUTH_MICROSOFT_ENTRA_ID_SECRET,
+			issuer: process.env.AUTH_MICROSOFT_ENTRA_ID_ISSUER,
+			profile(profile) {
+				return {
+					id: profile.oid,
+					name: profile.name,
+					email: profile.upn || profile.unique_name,
+					emailVerified: null,
+					image: null,
+				}
+			},
+		}),
+	],
 	callbacks: {
 		signIn: async ({ user }) => {
-			// If it's a new user, set default role
 			if (!user.role) {
 				user.role = "unauthorized"
 			}
@@ -57,18 +63,21 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			})
 			return true
 		},
-		session: async ({ session, user }) => {
+		jwt: async ({ token, user }) => {
+			if (user) {
+				token.role = user.role
+			}
+			return token
+		},
+		session: async ({ session, user, token }) => {
 			return {
 				...session,
 				user: {
 					...session.user,
-					role: user.role,
+					role: user?.role ?? (token?.role as string | undefined),
 				},
 			}
 		},
-	},
-	pages: {
-		signIn: "/login",
 	},
 	debug: process.env.NODE_ENV === "development",
 })
