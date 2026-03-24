@@ -1,7 +1,8 @@
 import { db } from "@/db"
 import { logs } from "@/db/schema"
-import { VectorTransport } from "./vector-transport"
-import { pino } from "pino"
+
+// import { VectorTransport } from "./vector-transport"
+// import { pino } from "pino"
 
 export enum LogAction {
 	CREATE_NEW_STD = "create_new_std",
@@ -27,14 +28,14 @@ interface LogArgs {
 	timestamp?: Date
 }
 
-const transport = new VectorTransport()
+// const transport = new VectorTransport()
 
-export const logger = pino(
+/** export const logger = pino(
 	{
 		level: "info",
 	},
 	transport
-)
+) **/
 
 export async function actionLog(args: LogArgs) {
 	const { action, actor, target, details, timestamp = new Date() } = args
@@ -57,7 +58,7 @@ export async function actionLog(args: LogArgs) {
 			throw new Error("Failed to log action")
 		})
 
-	logger.info(
+	/** logger.info(
 		`[${action}] [${timestamp.toISOString()}] Actor: ${actor}${target ? `, Target: ${target}` : ""}${details ? `, Details: ${details}` : ""}`
-	)
+		) **/
 }
