@@ -205,7 +205,7 @@ export function DataTable<TData, TValue>({
       shallow: true,
       throttleMs: 50,
       debounceMs: 300,
-      clearOnDefault: false,
+      clearOnDefault: true,
     }
   }, [])
 
@@ -219,6 +219,8 @@ export function DataTable<TData, TValue>({
     "perPage",
     parseAsInteger.withOptions(queryStateOptions).withDefault(initialState?.pagination?.pageSize ?? 10)
   )
+
+  const [search, setSearch] = useQueryState("q", parseAsString.withOptions(queryStateOptions).withDefault(""))
 
   const filterParsers = useMemo(() => {
     return (filterFields ?? []).reduce<Record<string, Parser<string> | Parser<string[]>>>((acc, field) => {
@@ -237,20 +239,6 @@ export function DataTable<TData, TValue>({
     void setFilterValues(values)
   }, 300)
 
-  const initialColumnFilters: ColumnFiltersState = useMemo(() => {
-    return Object.entries(filterValues).reduce<ColumnFiltersState>((filters, [key, value]) => {
-      if (value !== null) {
-        filters.push({
-          id: key,
-          value: Array.isArray(value) ? value : [value],
-        })
-      }
-      return filters
-    }, [])
-  }, [filterValues])
-
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(initialColumnFilters)
-
   // Memoize computation of searchableColumns and filterableColumns
   const { searchableColumns, filterableColumns } = useMemo(() => {
     const fields = filterFields ?? []
@@ -259,6 +247,21 @@ export function DataTable<TData, TValue>({
       filterableColumns: fields.filter((field) => field.options),
     }
   }, [filterFields])
+
+  const initialColumnFilters: ColumnFiltersState = useMemo(() => {
+    return Object.entries(filterValues).reduce<ColumnFiltersState>((filters, [key, value]) => {
+      if (value !== null) {
+        const isFaceted = filterableColumns.some((col) => col.id === key)
+        filters.push({
+          id: key,
+          value: isFaceted ? (Array.isArray(value) ? value : [value]) : value,
+        })
+      }
+      return filters
+    }, [])
+  }, [filterValues, filterableColumns])
+
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(initialColumnFilters)
 
   const onColumnFiltersChange = useCallback(
     (updaterOrValue: Updater<ColumnFiltersState>) => {
@@ -316,6 +319,12 @@ export function DataTable<TData, TValue>({
       columnVisibility,
       columnFilters,
       pagination,
+      globalFilter: search,
+    },
+    onGlobalFilterChange: (updaterOrValue) => {
+      const next = typeof updaterOrValue === "function" ? updaterOrValue(search) : updaterOrValue
+      void setSearch(next)
+      void setPage(1)
     },
     onColumnFiltersChange,
     onPaginationChange,
@@ -342,7 +351,7 @@ export function DataTable<TData, TValue>({
       <div className="flex gap-x-5">
         <Input
           placeholder="Search"
-          value={table.getState().globalFilter ?? ""}
+          value={search}
           onChange={(event: React.ChangeEvent<HTMLInputElement>) => table.setGlobalFilter(event.target.value)}
           className="max-w-[10rem] lg:max-w-sm"
         />
