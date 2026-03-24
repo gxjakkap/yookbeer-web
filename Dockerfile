@@ -33,11 +33,12 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
-RUN addgroup --system --gid 1001 bunuser \
-  && adduser --system --uid 1001 --ingroup bunuser bunuser
+RUN groupadd --system --gid 1001 bunuser \
+  && useradd --system --uid 1001 --gid bunuser bunuser
 USER bunuser
 
 EXPOSE 8080
+ENV NODE_ENV=production
 ENV PORT=8080
 ENV HOSTNAME="0.0.0.0"
 
