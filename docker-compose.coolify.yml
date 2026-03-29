@@ -6,7 +6,7 @@ services:
         networks:
             - yookbeer
         ports:
-            - "8080:8080"
+            - "6767:8080"
 
     db:
         image: postgres
