@@ -1,0 +1,36 @@
+services:
+    web:
+        image: ghcr.io/gxjakkap/yookbeer-web:main
+        env_file: ".env"
+        restart: always
+        networks:
+            - yookbeer
+        depends_on:
+            db:
+                condition: service_healthy
+
+    db:
+        image: postgres
+        restart: always
+        user: postgres
+        env_file: ".env"
+        networks:
+            - yookbeer
+        volumes:
+            - db-data:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_LOG_STATEMENT=all
+            - POSTGRES_LOG_CONNECTIONS=true
+        ports:
+            - "5432:5432"
+        healthcheck:
+            test: ["CMD", "pg_isready"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
+volumes:
+    db-data:
+
+networks:
+    yookbeer:
+        driver: bridge
