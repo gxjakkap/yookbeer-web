@@ -33,6 +33,11 @@ COPY --from=builder /app/public ./public
 COPY --from=builder /app/.next/standalone ./
 COPY --from=builder /app/.next/static ./.next/static
 
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=builder /app/drizzle ./drizzle
+COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
+COPY --from=builder /app/src/db ./src/db
+
 RUN groupadd --system --gid 1001 bunuser \
   && useradd --system --uid 1001 --gid bunuser bunuser
 USER bunuser
@@ -42,4 +47,4 @@ ENV NODE_ENV=production
 ENV PORT=8080
 ENV HOSTNAME="0.0.0.0"
 
-CMD ["bun", "server.js"]
+CMD ["sh", "-c", "bunx drizzle-kit migrate && bun server.js"]
