@@ -5,9 +5,6 @@ services:
         restart: always
         networks:
             - yookbeer
-        depends_on:
-            db:
-                condition: service_healthy
 
     db:
         image: postgres
