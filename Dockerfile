@@ -39,7 +39,7 @@ COPY --from=builder /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=builder /app/src/db ./src/db
 
 RUN groupadd --system --gid 1001 bunuser \
-  && useradd --system --uid 1001 --gid bunuser bunuser
+  && useradd --system --uid 1001 --gid bunuser --create-home bunuser
 USER bunuser
 
 EXPOSE 8080
