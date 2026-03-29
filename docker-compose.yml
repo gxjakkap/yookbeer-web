@@ -14,6 +14,7 @@ services:
         command:
             - "--providers.docker"
             - "--providers.docker.exposedbydefault=false"
+            - "--providers.docker.constraints=Label(`traefik.stack`,`yookbeer`)"
             - "--ping=true"
             - "--ping.entryPoint=ping"
             - "--entryPoints.ping.address=:8082"
@@ -32,6 +33,7 @@ services:
         image: ghcr.io/gxjakkap/yookbeer-web:main
         labels:
             - "traefik.enable=true"
+            - "traefik.stack=yookbeer"
             - "traefik.http.routers.web.rule=Host(`yb.guntxjakka.me`)"
             - "traefik.http.services.web.loadbalancer.server.port=8080"
             - "com.centurylinklabs.watchtower.enable=true"
