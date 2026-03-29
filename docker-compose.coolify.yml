@@ -1,6 +1,7 @@
 services:
     web:
         image: ghcr.io/gxjakkap/yookbeer-web:main
+        pull_policy: always
         env_file: ".env"
         restart: always
         networks:
