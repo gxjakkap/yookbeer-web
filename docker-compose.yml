@@ -1,73 +1,73 @@
 services:
-  watchtower:
-    image: containrrr/watchtower
-    command:
-      - "--label-enable"
-      - "--interval"
-      - "30"
-      - "--rolling-restart"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    watchtower:
+        image: containrrr/watchtower
+        command:
+            - "--label-enable"
+            - "--interval"
+            - "30"
+            - "--rolling-restart"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
 
-  reverse-proxy:
-    image: traefik:v3.1
-    command:
-      - "--providers.docker"
-      - "--providers.docker.exposedbydefault=false"
-      - "--ping=true"
-      - "--ping.entryPoint=ping"
-      - "--entryPoints.ping.address=:8082"
-      - "--entrypoints.web.address=:80"
-    ports:
-      - "8080:80"
-      - "8082:8082"
-    depends_on:
-      - web
-    networks:
-      - yookbeer
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    reverse-proxy:
+        image: traefik:v3.1
+        command:
+            - "--providers.docker"
+            - "--providers.docker.exposedbydefault=false"
+            - "--ping=true"
+            - "--ping.entryPoint=ping"
+            - "--entryPoints.ping.address=:8082"
+            - "--entrypoints.web.address=:80"
+        ports:
+            - "8080:80"
+            - "8082:8082"
+        depends_on:
+            - web
+        networks:
+            - yookbeer
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
 
-  web:
-    image: ghcr.io/gxjakkap/yookbeer-web:main
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.web.rule=Host(`yb.guntxjakka.me`)"
-      - "traefik.http.services.web.loadbalancer.server.port=8080"
-      - "com.centurylinklabs.watchtower.enable=true"
-    env_file: ".env"
-    deploy:
-      mode: replicated
-      replicas: 2
-    restart: always
-    networks:
-      - yookbeer
-    depends_on:
-      db:
-        condition: service_healthy
+    web:
+        image: ghcr.io/gxjakkap/yookbeer-web:main
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.web.rule=Host(`yb.guntxjakka.me`)"
+            - "traefik.http.services.web.loadbalancer.server.port=8080"
+            - "com.centurylinklabs.watchtower.enable=true"
+        env_file: ".env"
+        deploy:
+            mode: replicated
+            replicas: 2
+        restart: always
+        networks:
+            - yookbeer
+        depends_on:
+            db:
+                condition: service_healthy
 
-  db:
-    image: postgres
-    restart: always
-    user: postgres
-    env_file: ".env"
-    networks:
-      - yookbeer
-    volumes:
-      - db-data:/var/lib/postgresql/data
-    environment:
-      - POSTGRES_LOG_STATEMENT=all
-      - POSTGRES_LOG_CONNECTIONS=true
-    ports:
-      - "5432:5432"
-    healthcheck:
-      test: ["CMD", "pg_isready"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    db:
+        image: postgres:17
+        restart: always
+        user: postgres
+        env_file: ".env"
+        networks:
+            - yookbeer
+        volumes:
+            - db-data:/var/lib/postgresql/data
+        environment:
+            - POSTGRES_LOG_STATEMENT=all
+            - POSTGRES_LOG_CONNECTIONS=true
+        ports:
+            - "5432:5432"
+        healthcheck:
+            test: ["CMD", "pg_isready"]
+            interval: 10s
+            timeout: 5s
+            retries: 5
 volumes:
-  db-data:
+    db-data:
 
 networks:
-  yookbeer:
-    driver: bridge
+    yookbeer:
+        driver: bridge
