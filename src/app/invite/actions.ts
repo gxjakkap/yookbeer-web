@@ -22,6 +22,18 @@ export const redeemInviteCode = async (code: string) => {
 	const [res] = await db.select().from(invite).where(eq(invite.code, code)).limit(1)
 
 	if (!res) {
+		void actionLog({
+			action: LogAction.CLAIM_INVITE_FAILED,
+			actor: session.user.id,
+			details: JSON.stringify({
+				code: code,
+				valid: false,
+				status: "invalid invite code",
+				usedBy: session.user.id,
+				claimedDate: new Date(),
+			}),
+		})
+
 		return {
 			status: RedeemInviteCodeStatus.INVALID,
 			code: code,
@@ -29,6 +41,18 @@ export const redeemInviteCode = async (code: string) => {
 	}
 
 	if (res.status === InviteStatus.CLAIMED) {
+		void actionLog({
+			action: LogAction.CLAIM_INVITE_FAILED,
+			actor: session.user.id,
+			details: JSON.stringify({
+				code: code,
+				valid: false,
+				status: "invite code already used",
+				usedBy: session.user.id,
+				claimedDate: new Date(),
+			}),
+		})
+
 		return {
 			status: RedeemInviteCodeStatus.USED,
 			code: code,
@@ -54,11 +78,13 @@ export const redeemInviteCode = async (code: string) => {
 		.set({ status: InviteStatus.CLAIMED, usedBy: uRes.id, claimDate: sql`NOW()` })
 		.where(eq(invite.id, res.id))
 
-	actionLog({
+	void actionLog({
 		action: LogAction.CLAIM_INVITE,
 		actor: uRes.id,
 		details: JSON.stringify({
 			code: code,
+			valid: true,
+			status: "success",
 			usedBy: uRes.id,
 			claimedDate: new Date(),
 		}),

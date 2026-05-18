@@ -18,6 +18,7 @@ export enum LogAction {
 	EDIT_API_KEY = "edit_api_key",
 	TAKEOUT = "takeout",
 	LOGIN = "login",
+	CLAIM_INVITE_FAILED = "claim_invite_failed",
 }
 
 interface LogArgs {
