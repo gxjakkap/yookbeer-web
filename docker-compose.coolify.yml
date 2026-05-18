@@ -6,6 +6,8 @@ services:
         restart: always
         networks:
             - yookbeer
+        ports:
+            - "5432:5432"
 
     db:
         image: postgres:16

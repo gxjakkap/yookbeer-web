@@ -2,7 +2,6 @@ import { auth } from "@/auth"
 import { createServerActionProcedure } from "zsa"
 
 import { AuthenticationError, ForbiddenError, PublicError } from "./errors"
-import { logger } from "./log"
 import { isAdmin, isSuperAdmin, Roles } from "./rba"
 
 /**
@@ -16,9 +15,9 @@ export function shapeErrors({ err }: any) {
 	const isDev = process.env.NODE_ENV === "development"
 	if (isAllowedError || isDev) {
 		if (err instanceof Error) {
-			logger.error({ err })
+			console.error({ err })
 		} else {
-			logger.error({ err: String(err) })
+			console.error({ err: String(err) })
 		}
 		return {
 			code: err.code ?? "ERROR",

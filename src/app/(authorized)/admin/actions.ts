@@ -14,7 +14,7 @@ import { db } from "@/db"
 import { apiKey, invite, students, thirtyeight, users } from "@/db/schema"
 import { TAKEOUT_EXPORTABLE } from "@/lib/const"
 import { AuthenticationError, ForbiddenError } from "@/lib/errors"
-import { actionLog, LogAction, logger } from "@/lib/log"
+import { actionLog, LogAction } from "@/lib/log"
 import { isAdmin, isSuperAdmin } from "@/lib/rba"
 import { adminProcedure, superAdminProcedure } from "@/lib/server-actions"
 import { takeout } from "@/lib/takeout"
@@ -205,7 +205,7 @@ export const createInviteCode = async (props: CreateInviteProps): Promise<Create
 			code: code,
 		}
 	} catch (err) {
-		logger.error(err)
+		console.error(err)
 		return {
 			status: CreateInviteStatus.FAILED,
 			code: null,
