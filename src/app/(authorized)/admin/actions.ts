@@ -195,7 +195,7 @@ export const createInviteCode = async (props: CreateInviteProps): Promise<Create
 		}
 
 		void actionLog({
-			action: LogAction.EDIT_STD,
+			action: LogAction.CREATE_NEW_INVITE,
 			actor: session.user.id || "",
 			details: `created invite ${res[0].code}`,
 		})
@@ -228,6 +228,12 @@ export const deleteInviteCode = async (code: string) => {
 			status: DeleteInviteStatus.FAILED,
 		}
 	}
+
+	void actionLog({
+		action: LogAction.DELETE_INVITE,
+		actor: session.user.id || "",
+		details: `removed invite ${code}`,
+	})
 
 	return {
 		status: DeleteInviteStatus.OK,
