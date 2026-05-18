@@ -34,7 +34,7 @@ export const updateStudent = adminProcedure
 		await db.update(students).set(input.data).where(eq(students.stdid, input.id))
 		void actionLog({
 			action: LogAction.EDIT_STD,
-			actor: ctx.session.user.email || "",
+			actor: ctx.session.user.id || "",
 			target: input.id,
 			details: `new data: ${JSON.stringify(input)}`,
 		})
@@ -51,7 +51,7 @@ export const deleteStudent = superAdminProcedure
 		await db.delete(students).where(eq(students.stdid, input.id))
 		void actionLog({
 			action: LogAction.DELETE_STD,
-			actor: ctx.session.user.email || "",
+			actor: ctx.session.user.id || "",
 			target: input.id,
 		})
 	})
@@ -71,7 +71,7 @@ export const updateUser = adminProcedure
 		await db.update(users).set(input.data).where(eq(users.id, input.id))
 		void actionLog({
 			action: LogAction.EDIT_USER,
-			actor: ctx.session.user.email || "",
+			actor: ctx.session.user.id || "",
 			target: target.email,
 			details: `existing data: ${JSON.stringify(target)}, new data: ${JSON.stringify(input)}`,
 		})
@@ -91,7 +91,7 @@ export const deleteUser = adminProcedure
 		await db.delete(users).where(eq(users.id, input.id))
 		void actionLog({
 			action: LogAction.DELETE_USER,
-			actor: ctx.session.user.email || "",
+			actor: ctx.session.user.id || "",
 			target: target.email,
 		})
 	})
@@ -111,7 +111,7 @@ export const addAPIKey = adminProcedure
 		await db.insert(apiKey).values(data)
 		void actionLog({
 			action: LogAction.CREATE_API_KEY,
-			actor: ctx.session.user.email || "",
+			actor: ctx.session.user.id || "",
 			details: `key: ${key}`,
 		})
 		return key
@@ -132,7 +132,7 @@ export const deleteAPIKey = adminProcedure
 		await db.delete(apiKey).where(eq(apiKey.id, input.id))
 		void actionLog({
 			action: LogAction.DELETE_API_KEY,
-			actor: ctx.session.user.email || "",
+			actor: ctx.session.user.id || "",
 			target: targetKey.key,
 			details: `deleted key ${targetKey.key} owned by ${targetKey.owner}`,
 		})
@@ -154,7 +154,7 @@ export const editAPIKey = adminProcedure
 		await db.update(apiKey).set(input.data).where(eq(apiKey.id, input.id))
 		void actionLog({
 			action: LogAction.EDIT_API_KEY,
-			actor: ctx.session.user.email || "",
+			actor: ctx.session.user.id || "",
 			target: targetKey.key,
 			details: `new data: ${JSON.stringify(input)}`,
 		})
@@ -196,7 +196,7 @@ export const createInviteCode = async (props: CreateInviteProps): Promise<Create
 
 		void actionLog({
 			action: LogAction.EDIT_STD,
-			actor: session.user.email || "",
+			actor: session.user.id || "",
 			details: `created invite ${res[0].code}`,
 		})
 
@@ -215,7 +215,7 @@ export const createInviteCode = async (props: CreateInviteProps): Promise<Create
 
 export const deleteInviteCode = async (code: string) => {
 	const session = await auth()
-	if (!session || !isAdmin(session.user.role!) || !session.user.id) {
+	if (!session || !isAdmin(session.user.role || "user") || !session.user.id) {
 		return {
 			status: DeleteInviteStatus.FORBIDDEN,
 		}
@@ -281,7 +281,7 @@ export const takeoutAction = adminProcedure
 
 		actionLog({
 			action: LogAction.TAKEOUT,
-			actor: ctx.session.user.email || "",
+			actor: ctx.session.user.id || "",
 			details: JSON.stringify({
 				onlyAttending,
 				including,

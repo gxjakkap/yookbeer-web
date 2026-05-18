@@ -55,7 +55,7 @@ export async function actionLog(args: LogArgs) {
 			throw new Error("Failed to log action")
 		})
 
-	/** logger.info(
+	console.info(
 		`[${action}] [${timestamp.toISOString()}] Actor: ${actor}${target ? `, Target: ${target}` : ""}${details ? `, Details: ${details}` : ""}`
-		) **/
+	)
 }

@@ -56,7 +56,7 @@ export const redeemInviteCode = async (code: string) => {
 
 	actionLog({
 		action: LogAction.CLAIM_INVITE,
-		actor: uRes.email,
+		actor: uRes.id,
 		details: JSON.stringify({
 			code: code,
 			usedBy: uRes.id,

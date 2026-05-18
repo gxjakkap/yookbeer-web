@@ -59,7 +59,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 			}
 			actionLog({
 				action: LogAction.LOGIN,
-				actor: user.email || "",
+				actor: user.id || "",
 			})
 			return true
 		},
