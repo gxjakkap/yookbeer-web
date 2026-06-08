@@ -16,6 +16,7 @@ import { cn } from "@/lib/utils"
 import { ChevronDown } from "lucide-react"
 import { Session } from "next-auth"
 import Link from "next/link"
+import { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 import { useMediaQuery } from "usehooks-ts"
 
@@ -113,6 +114,25 @@ const NavbarList = ({
 export function Navbar({ role, session }: NavbarProps) {
 	const pathname = usePathname()
 	const isDesktop = useMediaQuery("(min-width: 768px)")
+	const [isMounted, setIsMounted] = useState(false)
+
+	useEffect(() => {
+		setIsMounted(true)
+	}, [])
+
+	if (!isMounted) {
+		return (
+			<div className="sticky top-0 z-50 flex border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+				<nav className="flex w-full items-center justify-between">
+					<MobileNav role={role} />
+					<div className="flex items-center gap-2">
+						<ThemeSwitch />
+					</div>
+				</nav>
+			</div>
+		)
+	}
+
 	if (isDesktop) {
 		return (
 			<div className="sticky top-0 z-50 flex border-b bg-background/95 px-6 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">

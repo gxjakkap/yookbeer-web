@@ -1,4 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
+import { auth } from "@/auth"
+import { StudentEditButton } from "@/components/student-edit-button"
 import { FacebookIcon } from "@/components/svg/socials/fb"
 import { InstagramIcon } from "@/components/svg/socials/ig"
 import { LineIcon } from "@/components/svg/socials/line"
@@ -8,6 +10,7 @@ import { students } from "@/db/schema"
 import { birthdayPrettifier } from "@/lib/bd"
 import { COURSE_PRETTYNAME, StudentStatus } from "@/lib/const"
 import { cn } from "@/lib/utils"
+import { isAdmin } from "@/lib/rba"
 import { eq } from "drizzle-orm"
 import { Noto_Sans_Thai_Looped } from "next/font/google"
 import { notFound } from "next/navigation"
@@ -29,11 +32,16 @@ export default async function StudentProfilePage({ params }: Props) {
 	if (!data) notFound()
 	const imgUrl = await getPresignedURLForYookbeerPic(`${data.gen}/${data.img}` || "")
 	const status = data.status
+	const session = await auth()
+	const userIsAdmin = isAdmin(session?.user.role || "")
 
 	return (
 		<div className={`mx-auto flex flex-col gap-y-3 pb-14`}>
 			<div className="flex flex-col text-center lg:gap-y-1 lg:text-left">
-				<h1 className={`text-[1.875rem] font-medium text-foreground lg:text-4xl`}>{data.nameen}</h1>
+				<div className="flex items-center justify-center gap-3 lg:justify-start">
+					<h1 className={`text-[1.875rem] font-medium text-foreground lg:text-4xl`}>{data.nameen}</h1>
+					{userIsAdmin && <StudentEditButton data={data as any} />}
+				</div>
 				<div className="flex flex-col lg:flex-row lg:gap-x-4">
 					<p className="text-lg text-foreground/75 lg:text-xl">
 						<span
