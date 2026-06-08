@@ -19,8 +19,21 @@ import { isAdmin, isSuperAdmin } from "@/lib/rba"
 import { adminProcedure, superAdminProcedure } from "@/lib/server-actions"
 import { takeout } from "@/lib/takeout"
 import { generateRandomString } from "@/lib/utils"
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { eq } from "drizzle-orm"
 import z from "zod"
+
+const ALLOWED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "webp", "png"] as const
+const R2_BUCKET = "yookbeer"
+
+const imageS3 = new S3Client({
+	region: "auto",
+	endpoint: `https://${process.env.R2_ACCOUNTID}.r2.cloudflarestorage.com`,
+	credentials: {
+		accessKeyId: process.env.R2_ACCESSKEYID || "",
+		secretAccessKey: process.env.R2_SECRET || "",
+	},
+})
 
 export const updateStudent = adminProcedure
 	.createServerAction()
@@ -38,6 +51,84 @@ export const updateStudent = adminProcedure
 			target: input.id,
 			details: `new data: ${JSON.stringify(input)}`,
 		})
+	})
+
+// replace student image on r2
+export const updateStudentImage = adminProcedure
+	.createServerAction()
+	.input(
+		z.object({
+			stdid: z.string(),
+			gen: z.number(),
+			currentImg: z.string().nullable(),
+			newExtension: z.enum(["jpg", "jpeg", "webp", "png"]),
+			fileBytes: z.instanceof(Uint8Array),
+		})
+	)
+	.handler(async ({ input, ctx }) => {
+		const { stdid, gen, currentImg, newExtension, fileBytes } = input
+
+		// validate extension
+		if (!ALLOWED_IMAGE_EXTENSIONS.includes(newExtension as (typeof ALLOWED_IMAGE_EXTENSIONS)[number])) {
+			throw new Error(
+				`UPDATESTDIMG: Unsupported image extension "${newExtension}". Allowed: jpg, jpeg, webp, png.`
+			)
+		}
+
+		const newFilename = `${stdid}.${newExtension}`
+		const newKey = `${gen}/${newFilename}`
+		const contentTypeMap: Record<string, string> = {
+			jpg: "image/jpeg",
+			jpeg: "image/jpeg",
+			webp: "image/webp",
+			png: "image/png",
+		}
+		const contentType = contentTypeMap[newExtension]
+
+		// upload new image
+		const putRes = await imageS3.send(
+			new PutObjectCommand({
+				Bucket: R2_BUCKET,
+				Key: newKey,
+				Body: fileBytes,
+				ContentType: contentType,
+			})
+		)
+
+		if (putRes.$metadata.httpStatusCode !== 200) {
+			throw new Error(
+				`UPDATESTDIMG: Failed to upload new image to R2 (HTTP ${putRes.$metadata.httpStatusCode})`
+			)
+		}
+
+		// delete old image from r2 if it exists and differs from the new key
+		if (currentImg && currentImg !== newFilename) {
+			const oldKey = `${gen}/${currentImg}`
+			await imageS3
+				.send(
+					new DeleteObjectCommand({
+						Bucket: R2_BUCKET,
+						Key: oldKey,
+					})
+				)
+				.catch((err) => {
+					console.warn(`UPDATESTDIMG: Could not delete old image "${oldKey}":`, err)
+				})
+		}
+
+		// update DB only if the filename value changed
+		if (currentImg !== newFilename) {
+			await db.update(students).set({ img: newFilename }).where(eq(students.stdid, stdid))
+		}
+
+		void actionLog({
+			action: LogAction.EDIT_STD,
+			actor: ctx.session.user.id || "",
+			target: stdid,
+			details: `image updated: ${currentImg ?? "(none)"} → ${newFilename}`,
+		})
+
+		return newFilename
 	})
 
 export const deleteStudent = superAdminProcedure

@@ -9,8 +9,8 @@ import { db } from "@/db"
 import { students } from "@/db/schema"
 import { birthdayPrettifier } from "@/lib/bd"
 import { COURSE_PRETTYNAME, StudentStatus } from "@/lib/const"
-import { cn } from "@/lib/utils"
 import { isAdmin } from "@/lib/rba"
+import { cn } from "@/lib/utils"
 import { eq } from "drizzle-orm"
 import { Noto_Sans_Thai_Looped } from "next/font/google"
 import { notFound } from "next/navigation"
@@ -39,7 +39,9 @@ export default async function StudentProfilePage({ params }: Props) {
 		<div className={`mx-auto flex flex-col gap-y-3 pb-14`}>
 			<div className="flex flex-col text-center lg:gap-y-1 lg:text-left">
 				<div className="flex items-center justify-center gap-3 lg:justify-start">
-					<h1 className={`text-[1.875rem] font-medium text-foreground lg:text-4xl`}>{data.nameen}</h1>
+					<h1 className={`text-[1.875rem] font-medium text-foreground lg:text-4xl`}>
+						{data.nameen}
+					</h1>
 					{userIsAdmin && <StudentEditButton data={data as any} />}
 				</div>
 				<div className="flex flex-col lg:flex-row lg:gap-x-4">

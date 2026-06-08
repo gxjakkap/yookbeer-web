@@ -10,6 +10,7 @@ import { DataTable } from "./tablecomponents"
 
 export interface YookbeerColumn {
   stdid: string
+  gen: number
   course: number
   nameth: string | null
   nameen: string
