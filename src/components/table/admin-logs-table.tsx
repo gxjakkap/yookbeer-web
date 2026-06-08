@@ -1,5 +1,7 @@
 "use client"
 
+import { useRouter } from "next/navigation"
+
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -95,6 +97,7 @@ const columns: ColumnDef<LogEntry>[] = [
 const filterKeys: Array<keyof LogEntry> = ["action", "actorName", "target", "details"]
 
 export function AdminLogsTable({ data }: AdminLogsTableProps) {
+  const router = useRouter()
   const [sorting, setSorting] = React.useState<SortingState>([{ id: "timestamp", desc: true }])
   const [globalFilter, setGlobalFilter] = React.useState<string>("")
   const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -185,7 +188,11 @@ export function AdminLogsTable({ data }: AdminLogsTableProps) {
           <TableBody>
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
-                <TableRow key={row.id}>
+                <TableRow
+                  key={row.id}
+                  className="cursor-pointer hover:bg-muted/60"
+                  onClick={() => router.push(`/admin/logs/${row.original.id}`)}
+                >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}
