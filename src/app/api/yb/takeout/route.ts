@@ -1,7 +1,7 @@
 import { db } from "@/db"
 import { apiKey } from "@/db/schema"
 import { TAKEOUT_EXPORTABLE } from "@/lib/const"
-import { actionLog, LogAction, logger } from "@/lib/log"
+import { actionLog, LogAction } from "@/lib/log"
 import { takeout } from "@/lib/takeout"
 import { eq } from "drizzle-orm"
 import { createZodRoute } from "next-zod-route"
@@ -74,9 +74,9 @@ export const POST = createZodRoute()
 			}
 		} catch (err: unknown) {
 			if (err instanceof Error) {
-				logger.error({ err }, "Export error")
+				console.error("Export error", err)
 			} else {
-				logger.error({ err: String(err) }, "Export error")
+				console.error("Export error", String(err))
 			}
 			return new NextResponse(JSON.stringify({ status: 500, err: "Internal Server Error" }), {
 				status: 500,

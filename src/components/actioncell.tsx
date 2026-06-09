@@ -1,7 +1,5 @@
-import { getPresignedURLForYookbeerPic } from "@/app/(authorized)/actions"
-import { deleteStudent, updateStudent } from "@/app/(authorized)/admin/actions"
+import { deleteStudent } from "@/app/(authorized)/admin/actions"
 import { useToast } from "@/hooks/use-toast"
-import { StudentStatus } from "@/lib/const"
 import { cn } from "@/lib/utils"
 import { Row } from "@tanstack/react-table"
 import { Pencil, Trash2 } from "lucide-react"
@@ -10,6 +8,7 @@ import React from "react"
 
 import { InstagramIcon } from "./svg/socials/ig"
 import { LineIcon } from "./svg/socials/line"
+import { StudentEditDialog } from "./student-edit-dialog"
 import { YookbeerColumn } from "./table/yookbeer-table-new"
 import { Button } from "./ui/button"
 import {
@@ -20,9 +19,7 @@ import {
 	DialogHeader,
 	DialogTitle,
 } from "./ui/dialog"
-import { Input } from "./ui/input"
-import { Label } from "./ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select"
+import { useStudentUpdate } from "./use-student-update"
 
 const PersonIcon = () => (
 	<svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-foreground" viewBox="0 0 16 16">
@@ -65,145 +62,6 @@ const PersonIcon = () => (
   )
 } */
 
-interface EditDialogProps {
-	isOpen: boolean
-	onClose: () => void
-	data: YookbeerColumn
-	onUpdate: (data: Partial<YookbeerColumn>) => void
-	isPending: boolean
-}
-
-const EditDialog = ({ isOpen, onClose, data, onUpdate, isPending }: EditDialogProps) => {
-	const [formData, setFormData] = React.useState<Partial<YookbeerColumn>>({
-		stdid: data.stdid,
-		nameth: data.nameth,
-		nameen: data.nameen,
-		nickth: data.nickth,
-		nicken: data.nicken,
-		phone: data.phone,
-		emailper: data.emailper,
-		emailuni: data.emailuni,
-		emerphone: data.emerphone,
-		facebook: data.facebook,
-		lineid: data.lineid,
-		instagram: data.instagram,
-		discord: data.discord,
-		img: data.img,
-		status: data.status,
-		birthMonth: data.birthMonth,
-		birthDay: data.birthDay,
-	})
-
-	const inputMapExcludeList = ["status", "birthMonth"]
-
-	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent className="max-h-[90vh] overflow-y-scroll sm:max-w-md">
-				<DialogHeader>
-					<DialogTitle>Edit Student Information</DialogTitle>
-					<DialogDescription>
-						{data.nameen} ({data.nicken}) - {data.stdid}
-					</DialogDescription>
-				</DialogHeader>
-				<form action={() => onUpdate(formData)}>
-					<div className="grid gap-4 py-4">
-						{Object.entries(formData).map(([key, value]) => {
-							if (inputMapExcludeList.includes(key)) return
-							return (
-								<div key={key} className="grid grid-cols-4 items-center gap-4">
-									<Label htmlFor={key} className="text-right capitalize">
-										{key.replace(/([A-Z])/g, " $1").trim()}
-									</Label>
-									<Input
-										id={key}
-										value={(value as any) || ""}
-										onChange={(e) =>
-											setFormData((prev) => ({
-												...prev,
-												[key]: e.target.value,
-											}))
-										}
-										className="col-span-3"
-									/>
-								</div>
-							)
-						})}
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor={"birthMonth"} className="text-right capitalize">
-								Birth Month
-							</Label>
-							<Select
-								value={formData.birthMonth ? String(formData.birthMonth) : ""}
-								onValueChange={(val) =>
-									setFormData((prev) => ({
-										...prev,
-										birthMonth: Number(val),
-									}))
-								}
-							>
-								<SelectTrigger className="col-span-3">
-									<SelectValue placeholder="Month" />
-								</SelectTrigger>
-								<SelectContent>
-									{[
-										"January",
-										"February",
-										"March",
-										"April",
-										"May",
-										"June",
-										"July",
-										"August",
-										"September",
-										"October",
-										"November",
-										"December",
-									].map((month, i) => (
-										<SelectItem key={i + 1} value={String(i + 1)}>
-											{month}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor={"status"} className="text-right capitalize">
-								Status
-							</Label>
-							<Select
-								value={formData.status}
-								onValueChange={(value) =>
-									setFormData((prev) => ({
-										...prev,
-										status: value as StudentStatus,
-									}))
-								}
-								defaultValue={formData.status || StudentStatus.ATTENDING}
-							>
-								<SelectTrigger className="w-[180px]">
-									<SelectValue placeholder="Status" />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value={StudentStatus.ATTENDING}>Attending</SelectItem>
-									<SelectItem value={StudentStatus.RESIGNED}>Resigned</SelectItem>
-								</SelectContent>
-							</Select>
-						</div>
-					</div>
-					<DialogFooter>
-						<Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
-							Cancel
-						</Button>
-						<Button type="submit" disabled={isPending}>
-							{isPending ? "Saving..." : "Save changes"}
-						</Button>
-					</DialogFooter>
-				</form>
-			</DialogContent>
-		</Dialog>
-	)
-}
-
 interface DeleteDialogProps {
 	isOpen: boolean
 	onClose: () => void
@@ -237,49 +95,14 @@ const DeleteDialog = ({ isOpen, onClose, onConfirm, studentName, isPending }: De
 }
 
 export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
-	/* const imgName = row.original.img */
-	const studentName = row.original.nameen
-	const [isDialogOpen, setIsDialogOpen] = React.useState(false)
-	/* const [imageUrl, setImageUrl] = React.useState<string | null>(null) */
-	const [isEditOpen, setIsEditOpen] = React.useState(false)
-	const [isDeleteOpen, setIsDeleteOpen] = React.useState(false)
-	const [isPending, startTransition] = React.useTransition()
-	const { toast } = useToast()
 	const data = row.original
-
-	const handleUpdate = async (data: Partial<YookbeerColumn>) => {
-		console.log(data)
-		startTransition(async () => {
-			try {
-				let bd: number | null = parseInt(data.birthDay?.toString() || "-1")
-				let bm: number | null = parseInt(data.birthMonth?.toString() || "-1")
-
-				if (bd === -1) bd = null
-				if (bm === -1) bm = null
-
-				await updateStudent({
-					id: data.stdid as string,
-					data: {
-						...data,
-						birthDay: bd,
-						birthMonth: bm,
-					},
-				})
-				toast({
-					title: "Record updated succesfully",
-				})
-				setIsEditOpen(false)
-			} catch (error) {
-				toast({
-					title: "Failed to update record",
-				})
-				console.error(error)
-			}
-		})
-	}
+	const { handleUpdate, isPending, isEditOpen, setIsEditOpen } = useStudentUpdate(data)
+	const [isDeleteOpen, setIsDeleteOpen] = React.useState(false)
+	const [isDeletePending, startDeleteTransition] = React.useTransition()
+	const { toast } = useToast()
 
 	const handleDelete = async () => {
-		startTransition(async () => {
+		startDeleteTransition(async () => {
 			try {
 				await deleteStudent({
 					id: data.stdid,
@@ -390,12 +213,12 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
 						size="icon"
 						onClick={() => setIsDeleteOpen(true)}
 						className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
-						disabled={isPending}
+						disabled={isDeletePending}
 					>
 						<Trash2 className="h-4 w-4" />
 					</Button>
 
-					<EditDialog
+					<StudentEditDialog
 						isOpen={isEditOpen}
 						onClose={() => setIsEditOpen(false)}
 						data={data}
@@ -408,34 +231,7 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
 						onClose={() => setIsDeleteOpen(false)}
 						onConfirm={handleDelete}
 						studentName={`${data.nameen} (${data.nicken})`}
-						isPending={isPending}
-					/>
-				</>
-			) : (
-				<></>
-			)}
-			{/* <ImageDialog
-        isOpen={isDialogOpen}
-        onClose={() => setIsDialogOpen(false)}
-        imageUrl={imageUrl}
-        studentName={studentName}
-      /> */}
-			{isAdmin ? (
-				<>
-					<EditDialog
-						isOpen={isEditOpen}
-						onClose={() => setIsEditOpen(false)}
-						data={data}
-						onUpdate={handleUpdate}
-						isPending={isPending}
-					/>
-
-					<DeleteDialog
-						isOpen={isDeleteOpen}
-						onClose={() => setIsDeleteOpen(false)}
-						onConfirm={handleDelete}
-						studentName={`${data.nameen} (${data.nicken})`}
-						isPending={isPending}
+						isPending={isDeletePending}
 					/>
 				</>
 			) : (

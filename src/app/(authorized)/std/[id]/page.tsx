@@ -1,6 +1,6 @@
-/* eslint-disable @next/next/no-img-element */
 import { auth } from "@/auth"
 import { StudentEditButton } from "@/components/student-edit-button"
+import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
 import { FacebookIcon } from "@/components/svg/socials/fb"
 import { InstagramIcon } from "@/components/svg/socials/ig"
 import { LineIcon } from "@/components/svg/socials/line"
@@ -12,6 +12,7 @@ import { COURSE_PRETTYNAME, StudentStatus } from "@/lib/const"
 import { isAdmin } from "@/lib/rba"
 import { cn } from "@/lib/utils"
 import { eq } from "drizzle-orm"
+import Image from "next/image"
 import { Noto_Sans_Thai_Looped } from "next/font/google"
 import { notFound } from "next/navigation"
 
@@ -42,7 +43,7 @@ export default async function StudentProfilePage({ params }: Props) {
 					<h1 className={`text-[1.875rem] font-medium text-foreground lg:text-4xl`}>
 						{data.nameen}
 					</h1>
-					{userIsAdmin && <StudentEditButton data={data as any} />}
+					{userIsAdmin && <StudentEditButton data={data as YookbeerColumn} />}
 				</div>
 				<div className="flex flex-col lg:flex-row lg:gap-x-4">
 					<p className="text-lg text-foreground/75 lg:text-xl">
@@ -61,10 +62,13 @@ export default async function StudentProfilePage({ params }: Props) {
 			</div>
 			<div className="flex flex-col gap-x-20 lg:flex-row">
 				<div className="mx-auto lg:mx-0">
-					<img
+					<Image
 						className="max-h-[450px] max-w-[500px] rounded-md"
 						src={imgUrl}
 						alt={`${data.nicken}'s portrait`}
+						width={500}
+						height={450}
+						sizes="(min-width: 1024px) 500px, 90vw"
 					/>
 				</div>
 				<div className="mt-4 flex flex-col gap-y-8 text-center lg:mt-0 lg:text-left">

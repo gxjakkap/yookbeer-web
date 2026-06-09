@@ -42,6 +42,8 @@ import { PgColumn } from "drizzle-orm/pg-core"
 import { ChevronDown, Pencil, Trash2 } from "lucide-react"
 import * as React from "react"
 
+type EditableRole = Roles.UNAUTHORIZED | Roles.USER | Roles.ADMIN
+
 export interface YookbeerUserColumn {
   id: string
   name: string | null
@@ -173,7 +175,7 @@ const ActionCell = (row: Row<YookbeerUserColumn>) => {
           id: data.id as string,
           data: {
             ...data,
-            role: data.role as Roles,
+            role: data.role as EditableRole,
           },
         })
         toast({

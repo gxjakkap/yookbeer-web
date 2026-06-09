@@ -24,7 +24,9 @@ export const metadata: Metadata = {
 	title: "log in | yookbeer",
 }
 
-export default async function SignInPage(props: { searchParams: { callbackUrl: string | undefined } }) {
+export default async function SignInPage(props: {
+	searchParams: Promise<{ callbackUrl?: string }>
+}) {
 	const spr = await props.searchParams
 	return (
 		<div className="flex min-h-screen w-screen flex-col bg-neutral-100">

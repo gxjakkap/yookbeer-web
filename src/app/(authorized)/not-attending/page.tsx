@@ -1,5 +1,6 @@
 import { auth } from "@/auth"
 import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
+import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
 import { db } from "@/db"
 import { students } from "@/db/schema"
 import { StudentStatus } from "@/lib/const"
@@ -9,10 +10,10 @@ import { SearchParams } from "@/types"
 import { ne } from "drizzle-orm"
 
 interface NotAttendingProps {
-	s: Promise<SearchParams>
+	searchParams: Promise<SearchParams>
 }
 
-export default async function NotAttending({ s }: NotAttendingProps) {
+export default async function NotAttending({ searchParams: searchParamsPromise }: NotAttendingProps) {
 	const data = await db
 		.select()
 		.from(students)
@@ -20,14 +21,14 @@ export default async function NotAttending({ s }: NotAttendingProps) {
 		.orderBy(students.stdid)
 	const session = await auth()
 
-	const searchParams = await s
+	const searchParams = await searchParamsPromise
 	const search = searchParamsCache.parse(searchParams)
 
 	return (
 		<div className={`flex w-screen flex-col`}>
 			<div className="mx-auto w-full max-w-[90vw]">
 				<NewTable
-					data={data as any}
+					data={data as YookbeerColumn[]}
 					isAdmin={isAdmin(session?.user.role || "")}
 					initialState={{
 						pagination: {
