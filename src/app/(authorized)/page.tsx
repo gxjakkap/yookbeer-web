@@ -1,5 +1,7 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Search } from "lucide-react"
 
 export default async function Home() {
 	return (
@@ -9,26 +11,34 @@ export default async function Home() {
 					<h1 className="text-center text-3xl font-bold text-foreground">Select Yearbook</h1>
 				</header>
 
-				<div className="space-y-4">
-					<Link href={"/gen/38"}>
-						{/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */}
-						<Button
-							className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
-							variant="default"
-						>
-							CPE 38
-						</Button>
-					</Link>
+				<form action="/search" method="get" className="mb-6">
+					<div className="relative">
+						<Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+						<Input
+							type="search"
+							name="q"
+							placeholder="Search people..."
+							className="pl-9"
+						/>
+					</div>
+				</form>
 
-					<Link href={"/gen/39"}>
-						{/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */}
-						<Button
-							className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
-							variant="default"
-						>
-							CPE 39
-						</Button>
-					</Link>
+				<div className="space-y-4">
+					<Button
+						asChild
+						className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
+						variant="default"
+					>
+						<Link href="/gen/38">CPE 38</Link>
+					</Button>
+
+					<Button
+						asChild
+						className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
+						variant="default"
+					>
+						<Link href="/gen/39">CPE 39</Link>
+					</Button>
 				</div>
 			</div>
 		</div>
