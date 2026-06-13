@@ -81,6 +81,14 @@ export function MobileNav({ role }: MobileNavProps) {
 							</CollapsibleContent>
 						</Collapsible>
 
+						<MobileLink
+							href="/search"
+							onOpenChange={setOpen}
+							isActive={pathname.startsWith("/search")}
+						>
+							Search
+						</MobileLink>
+
 						{!!role && isAdmin(role) && (
 							<>
 								<MobileLink

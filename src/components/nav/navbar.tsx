@@ -148,6 +148,11 @@ export function Navbar({ role, session }: NavbarProps) {
 									return { text: x.label, link: x.home }
 								})}
 							/>
+							<NavbarChild
+								href="/search"
+								text="Search"
+								isActive={pathname.startsWith("/search")}
+							/>
 							{!!role && isAdmin(role) && (
 								<>
 									<NavbarChild

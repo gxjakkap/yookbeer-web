@@ -63,12 +63,13 @@ export default async function StudentProfilePage({ params }: Props) {
 			<div className="flex flex-col gap-x-20 lg:flex-row">
 				<div className="mx-auto lg:mx-0">
 					<Image
-						className="max-h-[450px] max-w-[500px] rounded-md"
+						className="rounded-md"
 						src={imgUrl}
 						alt={`${data.nicken}'s portrait`}
-						width={500}
-						height={450}
+						width={0}
+						height={0}
 						sizes="(min-width: 1024px) 500px, 90vw"
+						style={{ width: "auto", height: "auto", maxWidth: "500px", maxHeight: "450px" }}
 					/>
 				</div>
 				<div className="mt-4 flex flex-col gap-y-8 text-center lg:mt-0 lg:text-left">
