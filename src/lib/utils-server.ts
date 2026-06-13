@@ -1,5 +1,3 @@
-"use server"
-
 import { getRandomValues } from "node:crypto"
 
 export function generateRandomString(length: number) {
