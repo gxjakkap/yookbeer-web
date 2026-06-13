@@ -4,7 +4,7 @@ import { createZodRoute } from "next-zod-route"
 import { z } from "zod"
 import { db } from "@/db"
 import { apiKey, invite } from "@/db/schema"
-import { generateRandomString } from "@/lib/utils"
+import { generateRandomString } from "@/lib/utils-server"
 
 const bodySchema = z.object({
 	code: z.string().min(4).optional(),

@@ -23,7 +23,7 @@ import { actionLog, LogAction } from "@/lib/log"
 import { isAdmin, isSuperAdmin, Roles } from "@/lib/rba"
 import { adminProcedure, superAdminProcedure } from "@/lib/server-actions"
 import { takeout } from "@/lib/takeout"
-import { generateRandomString } from "@/lib/utils"
+import { generateRandomString } from "@/lib/utils-server"
 
 const ALLOWED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "webp", "png"] as const
 const R2_BUCKET = "yookbeer"
