@@ -1,6 +1,7 @@
 import { DrizzleAdapter } from "@auth/drizzle-adapter"
 import NextAuth, { type DefaultSession } from "next-auth"
-import { type DefaultJWT } from "next-auth/jwt"
+// biome-ignore lint/correctness/noUnusedImports: <used in delcare module below>
+import type { DefaultJWT } from "next-auth/jwt"
 import MicrosoftEntraID from "next-auth/providers/microsoft-entra-id"
 
 import { authConfig } from "./auth.config"
@@ -75,7 +76,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 				user: {
 					...session.user,
 					role: user?.role ?? (token?.role as string | undefined),
-				id: user?.id ?? token?.sub,
+					id: user?.id ?? token?.sub,
 				},
 			}
 		},

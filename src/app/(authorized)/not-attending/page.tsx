@@ -1,13 +1,13 @@
+import { ne } from "drizzle-orm"
 import { auth } from "@/auth"
-import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
 import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
+import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
 import { db } from "@/db"
 import { students } from "@/db/schema"
 import { StudentStatus } from "@/lib/const"
 import { isAdmin } from "@/lib/rba"
 import { searchParamsCache } from "@/lib/validations"
-import { SearchParams } from "@/types"
-import { ne } from "drizzle-orm"
+import type { SearchParams } from "@/types"
 
 interface NotAttendingProps {
 	searchParams: Promise<SearchParams>

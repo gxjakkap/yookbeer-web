@@ -1,14 +1,12 @@
+import { eq, sql } from "drizzle-orm"
+import { ArrowLeft } from "lucide-react"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft } from "lucide-react"
-
-import { db } from "@/db"
-import { logs, users } from "@/db/schema"
-import { eq, sql } from "drizzle-orm"
-
+import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Separator } from "@/components/ui/separator"
-import { Button } from "@/components/ui/button"
+import { db } from "@/db"
+import { logs, users } from "@/db/schema"
 
 export const dynamic = "force-dynamic"
 
@@ -36,7 +34,7 @@ export default async function LogDetailPage({ params }: LogDetailPageProps) {
 	const { id } = await params
 
 	const parsedId = parseInt(id, 10)
-	if (isNaN(parsedId)) {
+	if (Number.isNaN(parsedId)) {
 		notFound()
 	}
 

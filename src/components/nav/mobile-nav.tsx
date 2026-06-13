@@ -1,19 +1,20 @@
 "use client"
 
+import { ChevronDown, Menu } from "lucide-react"
+import Link, { type LinkProps } from "next/link"
+import { usePathname, useRouter } from "next/navigation"
+import { signOut } from "next-auth/react"
+import { useCallback, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
 import { VisuallyHidden } from "@/components/ui/visually-hidden"
 import { AVAILABLE } from "@/config/available-yearbook"
 import { isAdmin } from "@/lib/rba"
 import { cn } from "@/lib/utils"
-import { ChevronDown, Menu } from "lucide-react"
-import { signOut } from "next-auth/react"
-import Link, { type LinkProps } from "next/link"
-import { usePathname, useRouter } from "next/navigation"
-import { useCallback, useState } from "react"
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu"
+
+// import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu"
 
 /**
  * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
@@ -114,6 +115,7 @@ export function MobileNav({ role }: MobileNavProps) {
 								signOut()
 								setOpen(false)
 							}}
+							type="button"
 						>
 							ออกจากระบบ
 						</button>

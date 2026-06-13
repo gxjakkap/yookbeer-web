@@ -1,11 +1,11 @@
 "use client"
 
-import { StudentStatus } from "@/lib/const"
 import { Upload, X } from "lucide-react"
 import Image from "next/image"
 import React from "react"
+import { StudentStatus } from "@/lib/const"
 
-import { YookbeerColumn } from "./table/yookbeer-table-new"
+import type { YookbeerColumn } from "./table/yookbeer-table-new"
 import { Button } from "./ui/button"
 import {
 	Dialog,
@@ -101,6 +101,7 @@ export const ImageDropzone = ({ currentImg, onFileSelected, selectedFile }: Imag
 
 	return (
 		<div className="col-span-3">
+			{/** biome-ignore lint/a11y/useSemanticElements: <> */}
 			<div
 				role="button"
 				tabIndex={0}
@@ -118,6 +119,7 @@ export const ImageDropzone = ({ currentImg, onFileSelected, selectedFile }: Imag
 				].join(" ")}
 				style={{ minHeight: "110px" }}
 			>
+				{/** biome-ignore lint/a11y/noAriaHiddenOnFocusable: <> */}
 				<input
 					ref={inputRef}
 					type="file"
@@ -210,6 +212,7 @@ export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }
 				</DialogHeader>
 				<form action={() => onUpdate(formData, selectedImageFile)}>
 					<div className="grid gap-4 py-4">
+						{/** biome-ignore lint/suspicious/useIterableCallbackReturn: <> */}
 						{Object.entries(formData).map(([key, value]) => {
 							if (inputMapExcludeList.includes(key)) return
 							return (
@@ -262,6 +265,7 @@ export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }
 										"November",
 										"December",
 									].map((month, i) => (
+										// biome-ignore lint/suspicious/noArrayIndexKey: <>
 										<SelectItem key={i + 1} value={String(i + 1)}>
 											{month}
 										</SelectItem>

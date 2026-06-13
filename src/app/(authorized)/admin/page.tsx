@@ -1,3 +1,4 @@
+import { eq, sql } from "drizzle-orm"
 import { auth } from "@/auth"
 import { AdminAPIKeyTable } from "@/components/table/admin-apikey-table"
 import { AdminInviteTable } from "@/components/table/admin-invite-table"
@@ -7,7 +8,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { VersionInfo } from "@/components/version-info"
 import { db } from "@/db"
 import { apiKey, invite, users } from "@/db/schema"
-import { eq, sql } from "drizzle-orm"
 
 export default async function Admin() {
 	const session = await auth()
@@ -72,7 +72,9 @@ export default async function Admin() {
 					<VersionInfo
 						sha={process.env.NEXT_PUBLIC_YB_SHA || "0"}
 						commitMsg={process.env.NEXT_PUBLIC_YB_COMMIT || "-"}
-						buildDate={new Date(Number(process.env.NEXT_PUBLIC_YB_BUILDDATE) * 1000 || 0).toISOString()}
+						buildDate={new Date(
+							Number(process.env.NEXT_PUBLIC_YB_BUILDDATE) * 1000 || 0
+						).toISOString()}
 					/>
 				</CardContent>
 			</Card>

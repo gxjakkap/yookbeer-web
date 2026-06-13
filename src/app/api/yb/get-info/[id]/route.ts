@@ -1,10 +1,10 @@
+import { eq } from "drizzle-orm"
+import { NextResponse } from "next/server"
+import { createZodRoute } from "next-zod-route"
+import { z } from "zod"
 import { getPresignedURLForYookbeerPic } from "@/app/(authorized)/actions"
 import { db } from "@/db"
 import { apiKey, students } from "@/db/schema"
-import { eq } from "drizzle-orm"
-import { createZodRoute } from "next-zod-route"
-import { NextResponse } from "next/server"
-import { z } from "zod"
 
 const paramsSchema = z.object({
 	id: z.string(),

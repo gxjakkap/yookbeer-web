@@ -1,6 +1,6 @@
+import { sql } from "drizzle-orm"
 import { db } from "@/db"
 import { students, thirtyeight } from "@/db/schema"
-import { sql } from "drizzle-orm"
 
 export async function searchThirtyeight(searchTerm: string) {
 	const columns = [

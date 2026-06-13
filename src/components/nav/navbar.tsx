@@ -1,5 +1,11 @@
 "use client"
 
+import { ChevronDown } from "lucide-react"
+import Link from "next/link"
+import { usePathname } from "next/navigation"
+import type { Session } from "next-auth"
+import { useEffect, useState } from "react"
+import { useMediaQuery } from "usehooks-ts"
 import { MobileNav } from "@/components/nav/mobile-nav"
 import { Button } from "@/components/ui/button"
 import {
@@ -13,12 +19,6 @@ import UserMenu from "@/components/user-menu"
 import { AVAILABLE } from "@/config/available-yearbook"
 import { isAdmin, Roles } from "@/lib/rba"
 import { cn } from "@/lib/utils"
-import { ChevronDown } from "lucide-react"
-import { Session } from "next-auth"
-import Link from "next/link"
-import { useEffect, useState } from "react"
-import { usePathname } from "next/navigation"
-import { useMediaQuery } from "usehooks-ts"
 
 import { ThemeSwitch } from "../theme-switch"
 
@@ -92,6 +92,7 @@ const NavbarList = ({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="start" className="w-[200px] p-2">
 				{items.map((x, i) => (
+					// biome-ignore lint/suspicious/noArrayIndexKey: <>
 					<DropdownMenuItem key={i} asChild>
 						<Link
 							href={x.link}

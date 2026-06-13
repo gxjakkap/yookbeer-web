@@ -1,15 +1,20 @@
 "use client"
 
+import React from "react"
 import {
 	finalizeStudentImage,
 	getImageUploadPresignedUrl,
 	updateStudent,
 } from "@/app/(authorized)/admin/actions"
 import { useToast } from "@/hooks/use-toast"
-import React from "react"
 
-import { ALLOWED_EXTENSIONS, AllowedExtension, getExtension, mimeToExtension } from "./student-edit-dialog"
-import { YookbeerColumn } from "./table/yookbeer-table-new"
+import {
+	ALLOWED_EXTENSIONS,
+	type AllowedExtension,
+	getExtension,
+	mimeToExtension,
+} from "./student-edit-dialog"
+import type { YookbeerColumn } from "./table/yookbeer-table-new"
 
 /**
  * Shared hook encapsulating the full student update flow:
@@ -85,8 +90,8 @@ export function useStudentUpdate(data: YookbeerColumn) {
 					}
 				}
 
-				let bd: number | null = parseInt(updateData.birthDay?.toString() || "-1")
-				let bm: number | null = parseInt(updateData.birthMonth?.toString() || "-1")
+				let bd: number | null = parseInt(updateData.birthDay?.toString() || "-1", 10)
+				let bm: number | null = parseInt(updateData.birthMonth?.toString() || "-1", 10)
 
 				if (bd === -1) bd = null
 				if (bm === -1) bm = null
@@ -105,7 +110,11 @@ export function useStudentUpdate(data: YookbeerColumn) {
 				})
 
 				if (updateErr) {
-					toast({ title: "Failed to update record", description: updateErr.message, variant: "destructive" })
+					toast({
+						title: "Failed to update record",
+						description: updateErr.message,
+						variant: "destructive",
+					})
 					return
 				}
 

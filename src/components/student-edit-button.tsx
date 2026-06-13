@@ -3,7 +3,7 @@
 import { Pencil } from "lucide-react"
 
 import { StudentEditDialog } from "./student-edit-dialog"
-import { YookbeerColumn } from "./table/yookbeer-table-new"
+import type { YookbeerColumn } from "./table/yookbeer-table-new"
 import { Button } from "./ui/button"
 import { useStudentUpdate } from "./use-student-update"
 

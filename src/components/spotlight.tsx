@@ -1,13 +1,15 @@
+/** biome-ignore-all lint/a11y/noStaticElementInteractions: <> */
+/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <> */
 "use client"
 
-import { nSearch } from "@/app/(authorized)/actions"
-import { students } from "@/db/schema"
-import { COURSE_SHORTHAND } from "@/lib/const"
 import { CommandLoading } from "cmdk"
-import { redirect, RedirectType } from "next/navigation"
+import { RedirectType, redirect } from "next/navigation"
 import { useCallback, useEffect, useRef, useState } from "react"
 import { isMacOs } from "react-device-detect"
 import { useDebounce } from "use-debounce"
+import { nSearch } from "@/app/(authorized)/actions"
+import type { students } from "@/db/schema"
+import { COURSE_SHORTHAND } from "@/lib/const"
 
 import { CommandDialog, CommandEmpty, CommandInput, CommandList } from "./ui/command"
 

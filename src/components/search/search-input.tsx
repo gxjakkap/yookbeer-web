@@ -1,9 +1,9 @@
 "use client"
 
-import { Input } from "@/components/ui/input"
 import { Search, X } from "lucide-react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useCallback, useTransition } from "react"
+import { Input } from "@/components/ui/input"
 
 interface SearchInputProps {
 	defaultValue?: string
@@ -26,7 +26,7 @@ export function SearchInput({ defaultValue }: SearchInputProps) {
 				router.push(`/search?${params.toString()}`)
 			})
 		},
-		[router, searchParams],
+		[router, searchParams]
 	)
 
 	const clearSearch = useCallback(() => {
@@ -61,7 +61,7 @@ export function SearchInput({ defaultValue }: SearchInputProps) {
 				</button>
 			)}
 			{isPending && (
-				<div className="absolute right-10 top-1/2 -translate-y-1/2" aria-live="polite" aria-label="Searching…">
+				<div className="absolute right-10 top-1/2 -translate-y-1/2" aria-live="polite">
 					<div className="h-4 w-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
 				</div>
 			)}

@@ -1,9 +1,9 @@
+import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 import { auth } from "@/auth"
 import { Navbar } from "@/components/nav/navbar"
 import { Spotlight } from "@/components/spotlight"
-import { isAuthorized } from "@/lib/rba"
-import type { Metadata } from "next"
-import { redirect } from "next/navigation"
+import { isAuthorized, Roles } from "@/lib/rba"
 
 import "../globals.css"
 
@@ -22,7 +22,7 @@ export default async function AuthorizedLayout({
 		redirect("/login")
 	}
 
-	if (!isAuthorized(session.user.role!)) {
+	if (!isAuthorized(session.user.role || Roles.UNAUTHORIZED)) {
 		redirect("/noaccess")
 	}
 

@@ -1,15 +1,15 @@
+import { and, eq } from "drizzle-orm"
+import { notFound } from "next/navigation"
 import { auth } from "@/auth"
+import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
 /* import { YookbeerTable } from "@/components/table/yookbeer-table" */
 import { YookbeerTable as NewTable } from "@/components/table/yookbeer-table-new"
-import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
 import { db } from "@/db"
 import { students } from "@/db/schema"
 import { StudentStatus } from "@/lib/const"
 import { isAdmin } from "@/lib/rba"
 import { searchParamsCache } from "@/lib/validations"
-import { SearchParams } from "@/types"
-import { and, eq } from "drizzle-orm"
-import { notFound } from "next/navigation"
+import type { SearchParams } from "@/types"
 
 interface GenPageProps {
 	searchParams: Promise<SearchParams>
@@ -18,7 +18,7 @@ interface GenPageProps {
 
 export default async function GenPage({ searchParams: searchParamsPromise, params }: GenPageProps) {
 	const { gen } = await params
-	const gi = parseInt(gen)
+	const gi = parseInt(gen, 10)
 
 	if (!gi) notFound()
 

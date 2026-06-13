@@ -1,12 +1,12 @@
+import { eq } from "drizzle-orm"
+import { NextResponse } from "next/server"
+import { createZodRoute } from "next-zod-route"
+import { z } from "zod"
 import { db } from "@/db"
 import { apiKey } from "@/db/schema"
 import { TAKEOUT_EXPORTABLE } from "@/lib/const"
 import { actionLog, LogAction } from "@/lib/log"
 import { takeout } from "@/lib/takeout"
-import { eq } from "drizzle-orm"
-import { createZodRoute } from "next-zod-route"
-import { NextResponse } from "next/server"
-import { z } from "zod"
 
 const bodySchema = z.object({
 	onlyAttending: z.boolean().optional().default(true),

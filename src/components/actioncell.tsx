@@ -1,15 +1,14 @@
-import { deleteStudent } from "@/app/(authorized)/admin/actions"
-import { useToast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils"
-import { Row } from "@tanstack/react-table"
+import type { Row } from "@tanstack/react-table"
 import { Pencil, Trash2 } from "lucide-react"
 import Link from "next/link"
 import React from "react"
-
+import { deleteStudent } from "@/app/(authorized)/admin/actions"
+import { useToast } from "@/hooks/use-toast"
+import { cn } from "@/lib/utils"
+import { StudentEditDialog } from "./student-edit-dialog"
 import { InstagramIcon } from "./svg/socials/ig"
 import { LineIcon } from "./svg/socials/line"
-import { StudentEditDialog } from "./student-edit-dialog"
-import { YookbeerColumn } from "./table/yookbeer-table-new"
+import type { YookbeerColumn } from "./table/yookbeer-table-new"
 import { Button } from "./ui/button"
 import {
 	Dialog,
@@ -20,13 +19,6 @@ import {
 	DialogTitle,
 } from "./ui/dialog"
 import { useStudentUpdate } from "./use-student-update"
-
-const PersonIcon = () => (
-	<svg xmlns="http://www.w3.org/2000/svg" className="h-2 w-2 text-foreground" viewBox="0 0 16 16">
-		<path d="M11 8a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-		<path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2M9.5 3A1.5 1.5 0 0 0 11 4.5h2v9.255S12 12 8 12s-5 1.755-5 1.755V2a1 1 0 0 1 1-1h5.5z" />
-	</svg>
-)
 
 /* const ImageDialog = ({
   isOpen,
@@ -197,7 +189,7 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
 				</Link>
 			</Button>
 
-			{isAdmin ? (
+			{isAdmin && (
 				<>
 					<Button
 						variant="ghost"
@@ -234,8 +226,6 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
 						isPending={isDeletePending}
 					/>
 				</>
-			) : (
-				<></>
 			)}
 		</div>
 	)

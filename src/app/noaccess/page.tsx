@@ -1,10 +1,10 @@
+import type { Metadata } from "next"
+import Link from "next/link"
+import { redirect } from "next/navigation"
 import { auth, signOut } from "@/auth"
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Metadata } from "next"
-import Link from "next/link"
-import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
 	title: "no access | yookbeer",

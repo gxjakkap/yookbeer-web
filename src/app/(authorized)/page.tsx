@@ -1,38 +1,36 @@
-import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { Button } from "@/components/ui/button"
 
 export default async function Home() {
 	return (
-        <div className={`flex min-h-[90dvh] w-screen items-center justify-center`}>
-            <div className="mx-4 w-full max-w-sm rounded-sm border p-6 sm:p-8">
+		<div className={`flex min-h-[90dvh] w-screen items-center justify-center`}>
+			<div className="mx-4 w-full max-w-sm rounded-sm border p-6 sm:p-8">
 				<header className="mb-8">
 					<h1 className="text-center text-3xl font-bold text-foreground">Select Yearbook</h1>
 				</header>
 
 				<div className="space-y-4">
 					<Link href={"/gen/38"}>
-                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
-                        }
-                        <Button
+						{/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */}
+						<Button
 							className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
 							variant="default"
 						>
 							CPE 38
 						</Button>
-                    </Link>
+					</Link>
 
 					<Link href={"/gen/39"}>
-                        {/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */
-                        }
-                        <Button
+						{/* @next-codemod-error This Link previously used the now removed `legacyBehavior` prop, and has a child that might not be an anchor. The codemod bailed out of lifting the child props to the Link. Check that the child component does not render an anchor, and potentially move the props manually to Link. */}
+						<Button
 							className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
 							variant="default"
 						>
 							CPE 39
 						</Button>
-                    </Link>
+					</Link>
 				</div>
 			</div>
-        </div>
-    );
+		</div>
+	)
 }

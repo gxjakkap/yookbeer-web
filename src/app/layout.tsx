@@ -1,7 +1,7 @@
-import { ThemeProvider } from "@/components/provider/theme"
-import { Toaster } from "@/components/ui/toaster"
 import { Anuphan } from "next/font/google"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
+import { ThemeProvider } from "@/components/provider/theme"
+import { Toaster } from "@/components/ui/toaster"
 
 import "./globals.css"
 

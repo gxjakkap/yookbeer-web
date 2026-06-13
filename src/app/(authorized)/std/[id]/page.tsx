@@ -1,9 +1,13 @@
+import { eq } from "drizzle-orm"
+import { Noto_Sans_Thai_Looped } from "next/font/google"
+import Image from "next/image"
+import { notFound } from "next/navigation"
 import { auth } from "@/auth"
 import { StudentEditButton } from "@/components/student-edit-button"
-import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
 import { FacebookIcon } from "@/components/svg/socials/fb"
 import { InstagramIcon } from "@/components/svg/socials/ig"
 import { LineIcon } from "@/components/svg/socials/line"
+import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
 import { Badge } from "@/components/ui/badge"
 import { db } from "@/db"
 import { students } from "@/db/schema"
@@ -11,10 +15,6 @@ import { birthdayPrettifier } from "@/lib/bd"
 import { COURSE_PRETTYNAME, StudentStatus } from "@/lib/const"
 import { isAdmin } from "@/lib/rba"
 import { cn } from "@/lib/utils"
-import { eq } from "drizzle-orm"
-import Image from "next/image"
-import { Noto_Sans_Thai_Looped } from "next/font/google"
-import { notFound } from "next/navigation"
 
 import { getPresignedURLForYookbeerPic } from "../../actions"
 
@@ -115,19 +115,17 @@ export default async function StudentProfilePage({ params }: Props) {
 								{data.emailper?.toLowerCase()}
 							</a>
 						</p>
-						{data.discord ? (
+						{data.discord && (
 							<p className={`text-xl font-normal text-foreground`}>
 								<span className={`font-medium`}>Discord: </span>
 								{data.discord}
 							</p>
-						) : (
-							<></>
 						)}
 					</div>
 					<div className="mx-auto flex flex-col lg:mx-0">
 						<p className={`text-xl font-bold text-foreground`}>Socials</p>
 						<div className="mt-3 flex gap-x-6">
-							{data.lineid ? (
+							{data.lineid && (
 								<a
 									href={`https://line.me/R/ti/p/~${data.lineid}`}
 									className="h-10 w-10 text-neutral-400 hover:text-[#06c755] dark:text-foreground dark:hover:text-[#06c755]"
@@ -136,10 +134,8 @@ export default async function StudentProfilePage({ params }: Props) {
 								>
 									<LineIcon className="h-12 w-12" />
 								</a>
-							) : (
-								<></>
 							)}
-							{data.instagram ? (
+							{data.instagram && (
 								<a
 									href={`https://instagram.com/${data.instagram}`}
 									className="h-10 w-10 text-neutral-400 hover:text-[#d80055] dark:text-foreground dark:hover:text-[#d80055]"
@@ -148,10 +144,8 @@ export default async function StudentProfilePage({ params }: Props) {
 								>
 									<InstagramIcon className="h-12 w-12" />
 								</a>
-							) : (
-								<></>
 							)}
-							{data.facebook ? (
+							{data.facebook && (
 								<a
 									href={`https://www.facebook.com/search/top/?q=${encodeURIComponent(data.facebook)}`}
 									className="h-10 w-10 text-neutral-400 hover:text-[#0865fe] dark:text-foreground dark:hover:text-[#0865fe]"
@@ -160,8 +154,6 @@ export default async function StudentProfilePage({ params }: Props) {
 								>
 									<FacebookIcon className="h-12 w-12" />
 								</a>
-							) : (
-								<></>
 							)}
 						</div>
 					</div>

@@ -1,11 +1,10 @@
 "use client"
 
-import { COURSE_SHORTHAND } from "@/lib/const"
-import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent } from "@/components/ui/card"
 import { Users } from "lucide-react"
 import Link from "next/link"
+import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
+import { Badge } from "@/components/ui/badge"
+import { COURSE_SHORTHAND } from "@/lib/const"
 
 interface SearchResultsProps {
 	results: YookbeerColumn[]
@@ -67,7 +66,8 @@ export function SearchResults({ results, query }: SearchResultsProps) {
 				<Users className="mb-4 h-12 w-12 opacity-30" aria-hidden="true" />
 				<p className="text-lg font-medium">No results found</p>
 				<p className="mt-1 text-sm">
-					No students matched &ldquo;<span className="font-medium text-foreground">{query}</span>&rdquo;
+					No students matched &ldquo;<span className="font-medium text-foreground">{query}</span>
+					&rdquo;
 				</p>
 			</div>
 		)
@@ -115,6 +115,7 @@ export function SearchResults({ results, query }: SearchResultsProps) {
 // Re-export the lucide icon used in the empty state so this module is self-contained
 function Search(props: React.SVGProps<SVGSVGElement>) {
 	return (
+		// biome-ignore lint/a11y/noSvgWithoutTitle: <>
 		<svg
 			xmlns="http://www.w3.org/2000/svg"
 			viewBox="0 0 24 24"

@@ -1,15 +1,16 @@
-import { auth } from "@/auth"
 import { createServerActionProcedure } from "zsa"
+import { auth } from "@/auth"
 
 import { AuthenticationError, ForbiddenError, PublicError } from "./errors"
-import { isAdmin, isSuperAdmin, Roles } from "./rba"
+import { isAdmin, isSuperAdmin } from "./rba"
 
 /**
  * Shamelessly borrowed from gxjakkap/cc36staffapp
  *
  * Original author: beambeambeam
  */
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
+
+// biome-ignore lint/suspicious/noExplicitAny: <>
 export function shapeErrors({ err }: any) {
 	const isAllowedError = err instanceof PublicError
 	const isDev = process.env.NODE_ENV === "development"

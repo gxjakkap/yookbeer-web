@@ -1,10 +1,10 @@
+import type { Metadata } from "next"
+import { redirect } from "next/navigation"
+import { AuthError } from "next-auth"
 import { signIn } from "@/auth"
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
-import { Metadata } from "next"
-import { AuthError } from "next-auth"
-import { redirect } from "next/navigation"
 
 const MsftIcons = () => {
 	return (
@@ -15,6 +15,7 @@ const MsftIcons = () => {
 			fill="currentColor"
 			viewBox="0 0 16 16"
 		>
+			<title>Microsoft</title>
 			<path d="M7.462 0H0v7.19h7.462zM16 0H8.538v7.19H16zM7.462 8.211H0V16h7.462zm8.538 0H8.538V16H16z" />
 		</svg>
 	)
@@ -24,9 +25,7 @@ export const metadata: Metadata = {
 	title: "log in | yookbeer",
 }
 
-export default async function SignInPage(props: {
-	searchParams: Promise<{ callbackUrl?: string }>
-}) {
+export default async function SignInPage(props: { searchParams: Promise<{ callbackUrl?: string }> }) {
 	const spr = await props.searchParams
 	return (
 		<div className="flex min-h-screen w-screen flex-col bg-neutral-100">

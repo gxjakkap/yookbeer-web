@@ -1,8 +1,13 @@
 "use server"
 
+import { DeleteObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3"
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { eq } from "drizzle-orm"
+import { revalidatePath } from "next/cache"
+import z from "zod"
 import {
-	CreateInviteProps,
-	CreateInviteRes,
+	type CreateInviteProps,
+	type CreateInviteRes,
 	CreateInviteStatus,
 	DeleteInviteStatus,
 	zodAPIKeyColumn,
@@ -11,20 +16,14 @@ import {
 } from "@/app/(authorized)/admin/types"
 import { auth } from "@/auth"
 import { db } from "@/db"
-import { apiKey, invite, students, thirtyeight, users } from "@/db/schema"
+import { apiKey, invite, students, users } from "@/db/schema"
 import { TAKEOUT_EXPORTABLE } from "@/lib/const"
 import { AuthenticationError, ForbiddenError } from "@/lib/errors"
 import { actionLog, LogAction } from "@/lib/log"
-import { isAdmin, isSuperAdmin } from "@/lib/rba"
+import { isAdmin, isSuperAdmin, Roles } from "@/lib/rba"
 import { adminProcedure, superAdminProcedure } from "@/lib/server-actions"
 import { takeout } from "@/lib/takeout"
 import { generateRandomString } from "@/lib/utils"
-import { DeleteObjectCommand, S3Client } from "@aws-sdk/client-s3"
-import { PutObjectCommand } from "@aws-sdk/client-s3"
-import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
-import { eq } from "drizzle-orm"
-import { revalidatePath } from "next/cache"
-import z from "zod"
 
 const ALLOWED_IMAGE_EXTENSIONS = ["jpg", "jpeg", "webp", "png"] as const
 const R2_BUCKET = "yookbeer"
@@ -168,7 +167,8 @@ export const updateUser = adminProcedure
 	.handler(async ({ ctx, input }) => {
 		const [target] = await db.select().from(users).where(eq(users.id, input.id)).limit(1)
 		if (!target) throw new Error(`UPDATEUSR_ACT: Target of id ${input.id} not found.`)
-		if (isAdmin(target.role!) && !isSuperAdmin(ctx.session.user.role!)) throw new ForbiddenError()
+		if (isAdmin(target.role || Roles.USER) && !isSuperAdmin(ctx.session.user.role || Roles.USER))
+			throw new ForbiddenError()
 		await db.update(users).set(input.data).where(eq(users.id, input.id))
 		void actionLog({
 			action: LogAction.EDIT_USER,
@@ -188,7 +188,8 @@ export const deleteUser = adminProcedure
 	.handler(async ({ ctx, input }) => {
 		const [target] = await db.select().from(users).where(eq(users.id, input.id)).limit(1)
 		if (!target) throw new Error(`DELETEUSR_ACT: Target of id ${input.id} not found.`)
-		if (isAdmin(target.role!) && !isSuperAdmin(ctx.session.user.role!)) throw new ForbiddenError()
+		if (isAdmin(target.role || Roles.USER) && !isSuperAdmin(ctx.session.user.role || Roles.USER))
+			throw new ForbiddenError()
 		await db.delete(users).where(eq(users.id, input.id))
 		void actionLog({
 			action: LogAction.DELETE_USER,
@@ -228,7 +229,7 @@ export const deleteAPIKey = adminProcedure
 	.handler(async ({ ctx, input }) => {
 		const [targetKey] = await db.select().from(apiKey).where(eq(apiKey.id, input.id)).limit(1)
 		if (!targetKey) throw new Error(`DELETEPIKEY_ACT: Target API key with id ${input.id} not found.`)
-		if (targetKey.owner !== ctx.session.user.id && !isSuperAdmin(ctx.session.user.id!))
+		if (targetKey.owner !== ctx.session.user.id && !isSuperAdmin(ctx.session.user.id || Roles.USER))
 			throw new ForbiddenError()
 		await db.delete(apiKey).where(eq(apiKey.id, input.id))
 		void actionLog({
@@ -250,7 +251,7 @@ export const editAPIKey = adminProcedure
 	.handler(async ({ ctx, input }) => {
 		const [targetKey] = await db.select().from(apiKey).where(eq(apiKey.id, input.id)).limit(1)
 		if (!targetKey) throw new Error(`EDITAPIKEY_ACT: Target API key with id ${input.id} not found.`)
-		if (targetKey.owner !== ctx.session.user.id && !isSuperAdmin(ctx.session.user.id!))
+		if (targetKey.owner !== ctx.session.user.id && !isSuperAdmin(ctx.session.user.id || Roles.USER))
 			throw new ForbiddenError()
 		await db.update(apiKey).set(input.data).where(eq(apiKey.id, input.id))
 		void actionLog({
@@ -267,7 +268,7 @@ export const createInviteCode = async (props: CreateInviteProps): Promise<Create
 		let randomGen = false
 
 		const session = await auth()
-		if (!session || !isAdmin(session.user.role!) || !session.user.id) {
+		if (!session || !isAdmin(session.user.role || Roles.USER) || !session.user.id) {
 			return {
 				status: CreateInviteStatus.FORBIDDEN,
 				code: null,

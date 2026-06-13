@@ -1,9 +1,9 @@
+import type { Metadata } from "next"
+import { redirect } from "next/navigation"
 import { auth } from "@/auth"
 import { RedeemForm } from "@/components/redeemform"
 import AnimatedGridPattern from "@/components/ui/animated-grid-pattern"
 import { cn } from "@/lib/utils"
-import { Metadata } from "next"
-import { redirect } from "next/navigation"
 
 export const metadata: Metadata = {
 	title: "redeem invite | yookbeer",

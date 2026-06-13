@@ -1,14 +1,14 @@
+import { desc, eq, sql } from "drizzle-orm"
 import { AdminLogsTable } from "@/components/table/admin-logs-table"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { db } from "@/db"
 import { logs, users } from "@/db/schema"
-import { desc, eq, sql } from "drizzle-orm"
 
 export const metadata = {
 	title: "Logs | yookbeer",
 }
 
-interface LogEntry {
+/* interface LogEntry {
 	id: number
 	action: string
 	actor: string
@@ -16,7 +16,7 @@ interface LogEntry {
 	target: string | null
 	details: string | null
 	timestamp: Date
-}
+} */
 
 export default async function AdminLogsPage() {
 	const logsData = await db

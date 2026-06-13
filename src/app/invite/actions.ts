@@ -1,19 +1,19 @@
 "use server"
 
+import { eq, sql } from "drizzle-orm"
 import { auth } from "@/auth"
 import { db } from "@/db"
 import { invite, users } from "@/db/schema"
 import { InviteStatus } from "@/lib/const"
 import { actionLog, LogAction } from "@/lib/log"
 import { Roles } from "@/lib/rba"
-import { eq, sql } from "drizzle-orm"
 
 import { RedeemInviteCodeStatus } from "./types"
 
 export const redeemInviteCode = async (code: string) => {
 	const session = await auth()
 
-	if (!session || !session.user.id)
+	if (!session?.user.id)
 		return {
 			status: RedeemInviteCodeStatus.UNAUTHORIZED,
 			code: code,
