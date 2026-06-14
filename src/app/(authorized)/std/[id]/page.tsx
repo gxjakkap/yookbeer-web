@@ -3,6 +3,7 @@ import { Noto_Sans_Thai_Looped } from "next/font/google"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import { auth } from "@/auth"
+import { CopyMenu } from "@/components/copy-menu"
 import { StudentEditButton } from "@/components/student-edit-button"
 import { FacebookIcon } from "@/components/svg/socials/fb"
 import { InstagramIcon } from "@/components/svg/socials/ig"
@@ -37,6 +38,16 @@ export default async function StudentProfilePage({ params }: Props) {
 	const userIsAdmin = isAdmin(session?.user.role || "")
 
 	return (
+		<>
+		<CopyMenu
+			data={{
+				stdid: data.stdid,
+				nameth: data.nameth,
+				nameen: data.nameen,
+				phone: data.phone ?? "",
+				nicken: data.nicken,
+			}}
+		/>
 		<div className={`mx-auto flex flex-col gap-y-3 pb-14`}>
 			<div className="flex flex-col text-center lg:gap-y-1 lg:text-left">
 				<div className="flex items-center justify-center gap-3 lg:justify-start">
@@ -171,5 +182,6 @@ export default async function StudentProfilePage({ params }: Props) {
 				</div>
 			</div>
 		</div>
+		</>
 	)
 }
