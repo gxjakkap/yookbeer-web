@@ -22,13 +22,6 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
 import { cn } from "@/lib/utils"
 
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
 interface DataTableViewOptionsProps<TData> {
 	table: Table<TData>
 }

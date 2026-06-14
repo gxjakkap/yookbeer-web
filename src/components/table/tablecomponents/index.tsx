@@ -23,15 +23,15 @@ import {
 } from "@tanstack/react-table"
 import { RedirectType, redirect } from "next/navigation"
 import {
-	type Parser,
 	parseAsArrayOf,
 	parseAsInteger,
 	parseAsString,
+	type SingleParser,
 	type UseQueryStateOptions,
 	useQueryState,
 	useQueryStates,
 } from "nuqs"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useDebouncedCallback } from "@/hooks/use-debounce-callback"
@@ -41,139 +41,6 @@ import { DataTableViewOptions } from "./column-toggle"
 import { DataTablePagination } from "./pagination"
 import { DataTableSkeleton } from "./skeleton"
 import { DataTableToolbar } from "./toolbar"
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
-
-/**
- * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
- *
- * Original author: beambeambeam
- *
- */
 
 interface DataTableProps<TData, TValue> {
 	columns: ColumnDef<TData, TValue>[]
@@ -186,6 +53,8 @@ interface DataTableProps<TData, TValue> {
 	rowClickable?: boolean
 	hrefColumn?: ColumnDef<TData, TValue> & { accessorKey: keyof TData }
 	hrefPrefix?: string
+	/** Persists column visibility to localStorage under this key. */
+	storageKey?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -197,6 +66,7 @@ export function DataTable<TData, TValue>({
 	rowClickable,
 	hrefColumn,
 	hrefPrefix,
+	storageKey,
 }: DataTableProps<TData, TValue>) {
 	const queryStateOptions = useMemo<Omit<UseQueryStateOptions<string>, "parse">>(() => {
 		return {
@@ -209,9 +79,24 @@ export function DataTable<TData, TValue>({
 		}
 	}, [])
 
-	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(
-		initialState?.columnVisibility ?? {}
-	)
+	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => {
+		if (storageKey && typeof window !== "undefined") {
+			try {
+				const saved = localStorage.getItem(storageKey)
+				if (saved) return JSON.parse(saved) as VisibilityState
+			} catch {
+				// corrupted storage — fall through to default
+			}
+		}
+		return initialState?.columnVisibility ?? {}
+	})
+
+	// Persist column visibility whenever it changes
+	useEffect(() => {
+		if (storageKey) {
+			localStorage.setItem(storageKey, JSON.stringify(columnVisibility))
+		}
+	}, [columnVisibility, storageKey])
 
 	const [page, setPage] = useQueryState(
 		"page",
@@ -229,7 +114,7 @@ export function DataTable<TData, TValue>({
 	)
 
 	const filterParsers = useMemo(() => {
-		return (filterFields ?? []).reduce<Record<string, Parser<string> | Parser<string[]>>>(
+		return (filterFields ?? []).reduce<Record<string, SingleParser<string> | SingleParser<string[]>>>(
 			(acc, field) => {
 				if (field.options) {
 					acc[field.id] = parseAsArrayOf(parseAsString, ",").withOptions(queryStateOptions)
@@ -372,8 +257,8 @@ export function DataTable<TData, TValue>({
 					<DataTableViewOptions table={table} />
 				)}
 			</div>
-			<div className="w-full rounded-sm border">
-				<Table>
+			<div className="w-full overflow-x-auto rounded-sm border">
+				<Table style={{ tableLayout: "fixed" }}>
 					<TableHeader>
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
@@ -403,7 +288,8 @@ export function DataTable<TData, TValue>({
 									{row.getVisibleCells().map((cell) => (
 										<TableCell
 											key={cell.id}
-											className="first:pl-4 last:pr-4"
+											className="overflow-hidden text-ellipsis whitespace-nowrap first:pl-4 last:pr-4"
+											title={String(cell.getValue() ?? "")}
 											onClick={() => {
 												if (rowClickable && hrefColumn) {
 													const hrefVal = row.original[

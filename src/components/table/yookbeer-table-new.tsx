@@ -85,6 +85,7 @@ export function YookbeerTable(props: YookbeerTableProps) {
 		{
 			accessorKey: "stdid",
 			header: "ID",
+			size: 72,
 			cell: ({ row }) => {
 				const shrt = (row.getValue("stdid") as string).substring(7)
 				return <div>{shrt}</div>
@@ -93,11 +94,13 @@ export function YookbeerTable(props: YookbeerTableProps) {
 		{
 			accessorKey: "course",
 			header: "Course",
+			size: 80,
 			cell: ({ row }) => <div>{COURSE_SHORTHAND[row.getValue("course") as number]}</div>,
 		},
 		{
 			accessorKey: "nameth",
 			header: "Name (TH)",
+			size: 160,
 			cell: ({ row }) => {
 				const x = (row.getValue("nameth") || "-") as string
 				return <div>{x}</div>
@@ -106,11 +109,13 @@ export function YookbeerTable(props: YookbeerTableProps) {
 		{
 			accessorKey: "nameen",
 			header: "Name",
+			size: 160,
 			cell: ({ row }) => <div>{row.getValue("nameen")}</div>,
 		},
 		{
 			accessorKey: "nickth",
 			header: "Nick (TH)",
+			size: 70,
 			cell: ({ row }) => {
 				const x = (row.getValue("nickth") || "-") as string
 				return <div>{x}</div>
@@ -119,21 +124,25 @@ export function YookbeerTable(props: YookbeerTableProps) {
 		{
 			accessorKey: "nicken",
 			header: "Nick",
+			size: 70,
 			cell: ({ row }) => <div>{row.getValue("nicken")}</div>,
 		},
 		{
 			accessorKey: "phone",
 			header: "Phone",
+			size: 100,
 			cell: ({ row }) => <div>{row.getValue("phone")}</div>,
 		},
 		{
 			accessorKey: "emailuni",
 			header: "Email (uni)",
+			size: 210,
 			cell: ({ row }) => <div className="lowercase">{row.getValue("emailuni")}</div>,
 		},
 		{
 			accessorKey: "instagram",
 			header: "IG",
+			size: 110,
 			cell: ({ row }) => {
 				const x = (row.getValue("instagram") || "-") as string
 				return <div>{x}</div>
@@ -142,6 +151,7 @@ export function YookbeerTable(props: YookbeerTableProps) {
 		{
 			accessorKey: "action",
 			header: "Action",
+			size: 120,
 			cell: ({ row }) => ActionCell(row, props.isAdmin),
 		},
 	]
@@ -150,7 +160,14 @@ export function YookbeerTable(props: YookbeerTableProps) {
 			columns={columns}
 			data={props.data}
 			filterFields={filterFields}
-			initialState={props.initialState}
+			initialState={{
+				...props.initialState,
+				columnVisibility: {
+					emailuni: false,
+					...props.initialState?.columnVisibility,
+				},
+			}}
+			storageKey="yookbeer-table-columns"
 			rowClickable={true}
 			hrefPrefix={`${props.hrefPrefix || "std/"}`}
 			hrefColumn={
