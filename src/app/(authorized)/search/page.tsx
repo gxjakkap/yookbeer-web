@@ -12,8 +12,7 @@ interface SearchPageProps {
 export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
 	const { q } = await searchParams
 	return {
-		title: q ? `Search "${q}" — yookbeer` : "Search — yookbeer",
-		description: "Search for students across all CPE generations.",
+		title: q ? `Search "${q}" | yookbeer` : "Search | yookbeer",
 	}
 }
 
