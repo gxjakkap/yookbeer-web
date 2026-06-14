@@ -167,7 +167,8 @@ export function YookbeerTable(props: YookbeerTableProps) {
 					...props.initialState?.columnVisibility,
 				},
 			}}
-			storageKey="yookbeer-table-columns"
+			colsLocalStorageKey="yookbeer-table-columns"
+			perpageLocalStorageKey="yookbeer-table-perpage"
 			rowClickable={true}
 			hrefPrefix={`${props.hrefPrefix || "std/"}`}
 			hrefColumn={

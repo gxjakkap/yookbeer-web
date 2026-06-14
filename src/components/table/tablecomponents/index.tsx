@@ -31,7 +31,7 @@ import {
 	useQueryState,
 	useQueryStates,
 } from "nuqs"
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useDebouncedCallback } from "@/hooks/use-debounce-callback"
@@ -53,8 +53,9 @@ interface DataTableProps<TData, TValue> {
 	rowClickable?: boolean
 	hrefColumn?: ColumnDef<TData, TValue> & { accessorKey: keyof TData }
 	hrefPrefix?: string
-	/** Persists column visibility to localStorage under this key. */
-	storageKey?: string
+	/** Persists settings */
+	colsLocalStorageKey?: string
+	perpageLocalStorageKey?: string
 }
 
 export function DataTable<TData, TValue>({
@@ -66,7 +67,8 @@ export function DataTable<TData, TValue>({
 	rowClickable,
 	hrefColumn,
 	hrefPrefix,
-	storageKey,
+	colsLocalStorageKey,
+	perpageLocalStorageKey,
 }: DataTableProps<TData, TValue>) {
 	const queryStateOptions = useMemo<Omit<UseQueryStateOptions<string>, "parse">>(() => {
 		return {
@@ -80,12 +82,13 @@ export function DataTable<TData, TValue>({
 	}, [])
 
 	const [columnVisibility, setColumnVisibility] = useState<VisibilityState>(() => {
-		if (storageKey && typeof window !== "undefined") {
+		if (colsLocalStorageKey && typeof window !== "undefined") {
 			try {
-				const saved = localStorage.getItem(storageKey)
+				const saved = localStorage.getItem(colsLocalStorageKey)
 				if (saved) return JSON.parse(saved) as VisibilityState
 			} catch {
-				// corrupted storage — fall through to default
+				// corrupted storage
+				localStorage.removeItem(colsLocalStorageKey)
 			}
 		}
 		return initialState?.columnVisibility ?? {}
@@ -93,20 +96,45 @@ export function DataTable<TData, TValue>({
 
 	// Persist column visibility whenever it changes
 	useEffect(() => {
-		if (storageKey) {
-			localStorage.setItem(storageKey, JSON.stringify(columnVisibility))
+		if (colsLocalStorageKey) {
+			localStorage.setItem(colsLocalStorageKey, JSON.stringify(columnVisibility))
 		}
-	}, [columnVisibility, storageKey])
+	}, [columnVisibility, colsLocalStorageKey])
 
 	const [page, setPage] = useQueryState(
 		"page",
 		parseAsInteger.withOptions(queryStateOptions).withDefault(1)
 	)
 
+	// Read perPage default from localStorage
+	const defaultPerPage = useRef(
+		(() => {
+			if (perpageLocalStorageKey && typeof window !== "undefined") {
+				try {
+					const saved = localStorage.getItem(perpageLocalStorageKey)
+					if (saved) {
+						const parsed = Number.parseInt(saved, 10)
+						if (!Number.isNaN(parsed) && parsed > 0) return parsed
+					}
+				} catch {
+					localStorage.setItem(perpageLocalStorageKey, "10")
+				}
+			}
+			return initialState?.pagination?.pageSize ?? 10
+		})()
+	).current
+
 	const [perPage, setPerPage] = useQueryState(
 		"perPage",
-		parseAsInteger.withOptions(queryStateOptions).withDefault(initialState?.pagination?.pageSize ?? 10)
+		parseAsInteger.withOptions(queryStateOptions).withDefault(defaultPerPage)
 	)
+
+	// Persist perPage whenever it changes
+	useEffect(() => {
+		if (perpageLocalStorageKey) {
+			localStorage.setItem(perpageLocalStorageKey, String(perPage))
+		}
+	}, [perPage, perpageLocalStorageKey])
 
 	const [search, setSearch] = useQueryState(
 		"q",
