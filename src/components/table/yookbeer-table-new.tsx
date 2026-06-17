@@ -95,6 +95,8 @@ export function YookbeerTable(props: YookbeerTableProps) {
 			accessorKey: "course",
 			header: "Course",
 			size: 80,
+			filterFn: (row, columnId, filterValue: string[]) =>
+				filterValue.includes(String(row.getValue(columnId))),
 			cell: ({ row }) => <div>{COURSE_SHORTHAND[row.getValue("course") as number]}</div>,
 		},
 		{
