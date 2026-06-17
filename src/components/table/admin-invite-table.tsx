@@ -349,7 +349,7 @@ export function AdminInviteTable({ data }: YookbeerInviteTableProps) {
 
 	return (
 		<>
-			<div className="mx-10 w-[95vw]">
+			<div className="w-full">
 				<div className="flex items-center gap-x-2 py-4">
 					<DropdownMenu>
 						<DropdownMenuTrigger asChild>

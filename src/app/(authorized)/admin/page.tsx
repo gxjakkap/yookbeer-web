@@ -63,7 +63,7 @@ export default async function Admin() {
 	})
 
 	return (
-		<div className={`flex w-screen flex-col pb-20`}>
+		<div className={`flex w-full flex-col pb-20`}>
 			<Card className="relative border-none bg-transparent shadow-none">
 				<CardHeader className="pb-0">
 					<CardTitle>Version Info</CardTitle>
