@@ -81,6 +81,7 @@ export default async function StudentProfilePage({ params }: Props) {
 						height={0}
 						sizes="(min-width: 1024px) 500px, 90vw"
 						style={{ width: "auto", height: "auto", maxWidth: "500px", maxHeight: "450px" }}
+						unoptimized
 					/>
 				</div>
 				<div className="mt-4 flex flex-col gap-y-8 text-center lg:mt-0 lg:text-left">
