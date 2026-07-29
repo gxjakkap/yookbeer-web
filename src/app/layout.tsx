@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { Anuphan } from "next/font/google"
 import { NuqsAdapter } from "nuqs/adapters/next/app"
 import { ThemeProvider } from "@/components/provider/theme"
@@ -8,6 +9,12 @@ import "./globals.css"
 const anuphan = Anuphan({
 	subsets: ["latin", "thai"],
 })
+
+export const metadata: Metadata = {
+	appleWebApp: {
+		title: "yookbeer",
+	},
+}
 
 export default async function RootLayout({
 	children,
