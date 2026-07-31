@@ -32,6 +32,7 @@ import { ThemeSwitch } from "../theme-switch"
 interface NavbarProps {
 	role?: string | null
 	session: Session
+	image?: string | null
 }
 
 const NavbarChild = ({
@@ -181,6 +182,7 @@ export function Navbar({ role, session }: NavbarProps) {
 							email={session.user.email ?? ""}
 							name={session.user.name ?? ""}
 							role={session.user.role ?? Roles.USER}
+							image={session.user.image ?? undefined}
 						/>
 					</div>
 				</nav>

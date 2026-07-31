@@ -26,9 +26,11 @@ export default async function AuthorizedLayout({
 		redirect("/noaccess")
 	}
 
+	const img = session.user.image || null
+
 	return (
 		<div className={`bg-backgound flex min-h-screen w-screen flex-col gap-y-4 antialiased`}>
-			<Navbar session={session} role={session.user.role} />
+			<Navbar session={session} role={session.user.role} image={img} />
 			<div className="mt-12 flex flex-col lg:mt-0">{children}</div>
 			<Spotlight />
 		</div>

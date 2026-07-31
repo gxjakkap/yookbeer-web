@@ -1,5 +1,5 @@
 import SignOutButton from "./signout-button"
-import { Avatar, AvatarFallback } from "./ui/avatar"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,6 +13,7 @@ interface UserMenuProps {
 	name: string
 	email: string
 	role: string
+	image?: string
 }
 
 const getInitials = (name: string) => {
@@ -25,6 +26,7 @@ export default function UserMenu(props: UserMenuProps) {
 		<DropdownMenu>
 			<DropdownMenuTrigger>
 				<Avatar className="outline outline-1 outline-slate-300">
+					<AvatarImage src={props.image} alt={props.name} />
 					<AvatarFallback>{getInitials(props.name)}</AvatarFallback>
 				</Avatar>
 			</DropdownMenuTrigger>
