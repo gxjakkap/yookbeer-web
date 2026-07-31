@@ -17,6 +17,7 @@ import type { PgColumn } from "drizzle-orm/pg-core"
 import { ChevronDown, Pencil, Trash2 } from "lucide-react"
 import * as React from "react"
 import { deleteUser, updateUser } from "@/app/(authorized)/admin/actions"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import {
 	Dialog,
@@ -36,8 +37,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-//import { Input } from "@/components/ui/input"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/hooks/use-toast"
 import type { Roles } from "@/lib/rba"
@@ -253,6 +254,12 @@ const ActionCell = (row: Row<YookbeerUserColumn>) => {
 	)
 }
 
+const getInitials = (name: string | null) => {
+	if (!name) return ""
+	const arr = name.split(" ")
+	return `${arr[0].substring(0, 1)}${arr[arr.length - 1].substring(0, 1)}`
+}
+
 const createColumns = (): ColumnDef<YookbeerUserColumn>[] => [
 	{
 		accessorKey: "id",
@@ -261,6 +268,16 @@ const createColumns = (): ColumnDef<YookbeerUserColumn>[] => [
 			const shrt = (row.getValue("id") as string).substring(0, 4)
 			return <div>{shrt}</div>
 		},
+	},
+	{
+		accessorKey: "image",
+		header: "Photo",
+		cell: ({ row }) => (
+			<Avatar className="h-8 w-8">
+				<AvatarImage src={row.getValue("image") ?? undefined} alt={row.original.name ?? ""} />
+				<AvatarFallback>{getInitials(row.original.name)}</AvatarFallback>
+			</Avatar>
+		),
 	},
 	{
 		accessorKey: "name",
@@ -331,14 +348,14 @@ export function AdminUserTable({ data }: YookbeerUserTableProps) {
 	return (
 		<div className="w-full">
 			<div className="flex items-center py-4">
-				{/* <Input
-                    placeholder="Search"
-                    value={table.getState().globalFilter ?? ""}
-                    onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
-                        table.setGlobalFilter(event.target.value)
-                    }
-                    className="max-w-sm"
-                /> */}
+				<Input
+					placeholder="Search"
+					value={table.getState().globalFilter ?? ""}
+					onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
+						table.setGlobalFilter(event.target.value)
+					}
+					className="max-w-sm"
+				/>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
 						<Button variant="outline" className="ml-auto">
