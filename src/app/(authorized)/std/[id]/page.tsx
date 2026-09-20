@@ -42,7 +42,7 @@ export default async function StudentProfilePage({ params }: Props) {
 			<CopyMenu
 				data={{
 					stdid: data.stdid,
-					nameth: data.nameth,
+					nameth: data.nameth || "",
 					nameen: data.nameen,
 					phone: data.phone ?? "",
 					nicken: data.nicken,
