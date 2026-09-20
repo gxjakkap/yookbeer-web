@@ -59,7 +59,7 @@ export const POST = createZodRoute()
 					createdBy: apiU.owner,
 					mode,
 				}),
-			})
+			}).catch(() => {})
 
 			if (res.mode === "plain") {
 				const contentType = res.contentType || (format === "csv" ? "text/csv" : "application/json")
