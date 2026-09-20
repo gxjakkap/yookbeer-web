@@ -9,4 +9,9 @@ export const AVAILABLE = [
 		label: "CPE39",
 		home: "/gen/39",
 	},
+	{
+		gen: 40,
+		label: "CPE40",
+		home: "/gen/40",
+	},
 ]

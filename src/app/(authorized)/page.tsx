@@ -2,6 +2,7 @@ import { Search } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
+import { AVAILABLE } from "@/config/available-yearbook"
 
 export default async function Home() {
 	return (
@@ -19,21 +20,16 @@ export default async function Home() {
 				</form>
 
 				<div className="space-y-4">
-					<Button
-						asChild
-						className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
-						variant="default"
-					>
-						<Link href="/gen/38">CPE 38</Link>
-					</Button>
-
-					<Button
-						asChild
-						className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
-						variant="default"
-					>
-						<Link href="/gen/39">CPE 39</Link>
-					</Button>
+					{AVAILABLE.map((yearbook) => (
+						<Button
+							key={yearbook.gen}
+							asChild
+							className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
+							variant="default"
+						>
+							<Link href={yearbook.home}>{yearbook.label}</Link>
+						</Button>
+					))}
 				</div>
 			</div>
 		</div>
