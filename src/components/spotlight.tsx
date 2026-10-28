@@ -1,29 +1,25 @@
-/** biome-ignore-all lint/a11y/noStaticElementInteractions: <> */
-/** biome-ignore-all lint/a11y/useKeyWithClickEvents: <> */
 "use client"
 
 import { CommandLoading } from "cmdk"
-import { RedirectType, redirect } from "next/navigation"
-import { useCallback, useEffect, useRef, useState } from "react"
+import { useRouter } from "next/navigation"
+import { useCallback, useEffect, useState } from "react"
 import { isMacOs } from "react-device-detect"
 import { useDebounce } from "use-debounce"
 import { nSearch } from "@/app/(authorized)/actions"
 import type { students } from "@/db/schema"
 import { COURSE_SHORTHAND } from "@/lib/const"
 
-import { CommandDialog, CommandEmpty, CommandInput, CommandList } from "./ui/command"
+import { CommandDialog, CommandEmpty, CommandInput, CommandItem, CommandList } from "./ui/command"
 
 type SearchResult = typeof students.$inferSelect
 
 export function Spotlight() {
+	const router = useRouter()
 	const [open, setOpen] = useState(false)
 	const [searchTerm, setSearchTerm] = useState("")
 	const [debouncedSearchTerm] = useDebounce(searchTerm, 300)
 	const [results, setResults] = useState<SearchResult[]>([])
 	const [isLoading, setIsLoading] = useState(false)
-	const [focusIndex, setFocusIndex] = useState<number | null>(null)
-
-	const resultRefs = useRef<(HTMLDivElement | null)[]>([])
 
 	useEffect(() => {
 		const down = (e: KeyboardEvent) => {
@@ -44,7 +40,7 @@ export function Spotlight() {
 		setIsLoading(true)
 		try {
 			const data = await nSearch(term)
-			setResults(data)
+			setResults(data.sort((a, b) => a.gen - b.gen))
 		} catch (error) {
 			console.error("Search error:", error)
 			setResults([])
@@ -57,101 +53,28 @@ export function Spotlight() {
 		performSearch(debouncedSearchTerm)
 	}, [debouncedSearchTerm, performSearch])
 
-	const handleKeyDown = (e: React.KeyboardEvent) => {
-		if (results.length === 0) return
-
-		if (e.key === "Tab") {
-			e.preventDefault()
-			setFocusIndex((prevIndex) => {
-				if (prevIndex === null) return 0
-				const nextIndex = e.shiftKey
-					? (prevIndex - 1 + results.length) % results.length
-					: (prevIndex + 1) % results.length
-
-				setTimeout(() => {
-					resultRefs.current[nextIndex]?.scrollIntoView({
-						behavior: "smooth",
-						block: "nearest",
-					})
-				}, 0)
-				return nextIndex
-			})
-		}
-
-		if (e.key === "Enter" && focusIndex !== null) {
-			const selectedResult = results[focusIndex]
-			if (selectedResult) {
-				setOpen(false)
-				redirect(`/std/${selectedResult.stdid}`, RedirectType.push)
-			}
-		}
-
-		if (e.key === "ArrowDown" && focusIndex !== null) {
-			e.preventDefault()
-			setFocusIndex((prevIndex) => {
-				if (prevIndex === null) return 0
-				const nextIndex = (prevIndex + 1) % results.length
-				setTimeout(() => {
-					resultRefs.current[nextIndex]?.scrollIntoView({
-						behavior: "smooth",
-						block: "nearest",
-					})
-				}, 0)
-				return nextIndex
-			})
-		}
-
-		if (e.key === "ArrowUp" && focusIndex !== null) {
-			e.preventDefault()
-			setFocusIndex((prevIndex) => {
-				if (prevIndex === null) return 0
-				const nextIndex = (prevIndex - 1 + results.length) % results.length
-				setTimeout(() => {
-					resultRefs.current[nextIndex]?.scrollIntoView({
-						behavior: "smooth",
-						block: "nearest",
-					})
-				}, 0)
-				return nextIndex
-			})
-		}
-	}
-
-	results.sort((a, b) => a.gen - b.gen)
-
 	return (
-		<CommandDialog open={open} onOpenChange={setOpen}>
-			<CommandInput
-				placeholder="Search students..."
-				value={searchTerm}
-				onValueChange={setSearchTerm}
-				onKeyDown={handleKeyDown}
-			/>
+		// results are already filtered server-side; cmdk's own fuzzy filter would hide matches on IG/Discord/etc.
+		<CommandDialog open={open} onOpenChange={setOpen} shouldFilter={false}>
+			<CommandInput placeholder="Search students..." value={searchTerm} onValueChange={setSearchTerm} />
 			<CommandList>
 				{isLoading && <CommandLoading>Searching...</CommandLoading>}
-				{!isLoading && results.length === 0 && <CommandEmpty>No results found.</CommandEmpty>}
-				{results.map((r, i) => (
-					<div
+				{!isLoading && searchTerm.trim() !== "" && <CommandEmpty>No results found.</CommandEmpty>}
+				{results.map((r) => (
+					<CommandItem
 						key={r.stdid}
-						className={`flex flex-col rounded p-2 pl-10 ${
-							focusIndex === i
-								? "bg-neutral-200 dark:bg-muted-foreground dark:text-background"
-								: ""
-						}`}
-						ref={(el) => {
-							resultRefs.current[i] = el
-						}}
-						onClick={() => {
+						value={r.stdid}
+						onSelect={() => {
 							setOpen(false)
-							redirect(`/std/${r.stdid}`, RedirectType.push)
+							router.push(`/std/${r.stdid}`)
 						}}
-						tabIndex={-1}
+						className="flex-col items-start gap-0 pl-10"
 					>
 						<span className="font-medium">{r.nameen}</span>
 						<span className="text-sm">
 							{r.nicken}: {COURSE_SHORTHAND[r.course]} {r.gen}
 						</span>
-					</div>
+					</CommandItem>
 				))}
 			</CommandList>
 		</CommandDialog>

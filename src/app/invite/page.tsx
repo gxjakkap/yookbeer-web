@@ -17,10 +17,10 @@ export default async function InvitePage() {
 	}
 
 	return (
-		<div className="flex min-h-screen w-screen flex-col bg-neutral-100">
+		<div className="flex min-h-screen w-screen flex-col bg-muted">
 			<div className="relative flex h-[500px] min-h-screen w-full items-center justify-center overflow-hidden rounded-lg border bg-background p-20 md:shadow-xl">
 				<div className="py-auto z-50 flex flex-col gap-y-3">
-					<h1 className={`text-center text-4xl`}>Enter Invite Code.</h1>
+					<h1 className={`text-center text-4xl`}>Enter invite code</h1>
 					<RedeemForm />
 				</div>
 				<AnimatedGridPattern

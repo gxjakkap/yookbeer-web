@@ -3,6 +3,7 @@
 import type { ColumnDef } from "@tanstack/react-table"
 import { useMemo } from "react"
 import { COURSE_SHORTHAND, Courses, type StudentStatus } from "@/lib/const"
+import { thaiNameFont } from "@/lib/fonts"
 import type { DataTableFilterField, InitialStateTablePage } from "@/types"
 
 import { ActionCell } from "../actioncell"
@@ -104,8 +105,14 @@ export function YookbeerTable(props: YookbeerTableProps) {
 			header: "Name (TH)",
 			size: 160,
 			cell: ({ row }) => {
-				const x = (row.getValue("nameth") || "-") as string
-				return <div>{x}</div>
+				const x = row.getValue("nameth") as string | null
+				return x ? (
+					<div lang="th" className={thaiNameFont.className}>
+						{x}
+					</div>
+				) : (
+					<div>-</div>
+				)
 			},
 		},
 		{
@@ -119,8 +126,14 @@ export function YookbeerTable(props: YookbeerTableProps) {
 			header: "Nick (TH)",
 			size: 70,
 			cell: ({ row }) => {
-				const x = (row.getValue("nickth") || "-") as string
-				return <div>{x}</div>
+				const x = row.getValue("nickth") as string | null
+				return x ? (
+					<div lang="th" className={thaiNameFont.className}>
+						{x}
+					</div>
+				) : (
+					<div>-</div>
+				)
 			},
 		},
 		{

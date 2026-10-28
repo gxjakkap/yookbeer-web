@@ -45,11 +45,11 @@ const INCLUDABLE = [
 	},
 	{
 		id: "emailper",
-		label: "Personal Email",
+		label: "Personal email",
 	},
 	{
 		id: "emailuni",
-		label: "University Email",
+		label: "University email",
 	},
 	{
 		id: "facebook",
@@ -57,7 +57,7 @@ const INCLUDABLE = [
 	},
 	{
 		id: "lineid",
-		label: "Line ID",
+		label: "LINE ID",
 	},
 	{
 		id: "instagram",
@@ -81,25 +81,52 @@ export const AVAILABLE_COURSES = [
 ] as const
 
 const formSchema = z.object({
-	onlyAttending: z.enum(["true", "false"], {
-		required_error: "This field is required",
-		invalid_type_error: "This field must be true or false",
-	}),
+	onlyAttending: z.boolean(),
 	including: z
 		.array(z.enum(INCLUDABLE.map((i) => i.id) as [(typeof INCLUDABLE)[number]["id"], ...string[]]))
-		.min(1, "Select at least one field"),
+		.min(1, "Select at least one column"),
 	format: z.enum(["csv", "json"]),
 	includedCourse: z
 		.array(z.enum(AVAILABLE_COURSES.map((c) => String(c.id)) as [string, ...string[]]))
 		.min(1, "Select at least one course"),
-	includedGen: z.array(z.number()).min(1, "Select at least one gen"),
+	includedGen: z.array(z.number()).min(1, "Select at least one generation"),
 })
+
+function CheckboxGroup<T extends string | number>({
+	options,
+	value,
+	onChange,
+}: {
+	options: readonly { value: T; label: string }[]
+	value: T[]
+	onChange: (value: T[]) => void
+}) {
+	return (
+		<div className="flex flex-col gap-y-2">
+			{options.map((opt) => (
+				<FormItem key={opt.value} className="flex flex-row items-center gap-x-2 space-y-0">
+					<FormControl>
+						<Checkbox
+							checked={value.includes(opt.value)}
+							onCheckedChange={(checked) =>
+								onChange(
+									checked ? [...value, opt.value] : value.filter((v) => v !== opt.value)
+								)
+							}
+						/>
+					</FormControl>
+					<FormLabel className="font-normal">{opt.label}</FormLabel>
+				</FormItem>
+			))}
+		</div>
+	)
+}
 
 export default function TakeoutForm() {
 	const form = useForm<z.infer<typeof formSchema>>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			onlyAttending: "true",
+			onlyAttending: true,
 			including: ["stdid", "course", "nameth", "nameen", "nickth", "nicken"],
 			format: "csv",
 			includedCourse: ["0", "1", "2", "3"],
@@ -109,7 +136,7 @@ export default function TakeoutForm() {
 
 	const onSubmit = async (data: z.infer<typeof formSchema>) => {
 		const prData = {
-			onlyAttending: data.onlyAttending === "true",
+			onlyAttending: data.onlyAttending,
 			including: data.including.map((field) => {
 				if (!TAKEOUT_EXPORTABLE.includes(field as (typeof TAKEOUT_EXPORTABLE)[number])) {
 					throw new Error(`Invalid field included in export: ${field}`)
@@ -125,8 +152,8 @@ export default function TakeoutForm() {
 		if (err) {
 			console.error("Export error:", err)
 			toast({
-				title: "Export failed",
-				description: "An error occurred while exporting data. Please try again later.",
+				title: "Couldn't export data",
+				description: err.message,
 				variant: "destructive",
 			})
 			return
@@ -135,47 +162,34 @@ export default function TakeoutForm() {
 		window.open(url, "_blank")
 
 		toast({
-			title: "Data exported successfully!",
-			description: `Your data has been exported as a ${data.format.toUpperCase()} file.`,
+			title: "Export ready",
+			description: `Your ${data.format.toUpperCase()} file opened in a new tab.`,
 		})
 	}
 
 	return (
-		<Card className="mx-10 my-5">
-			<CardContent>
+		<Card>
+			<CardContent className="pt-6">
 				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="my-5 flex flex-col gap-4">
-						<div className="flex flex-col gap-x-60 gap-y-4 lg:flex-row lg:justify-center">
-							<div className="flex flex-col gap-4">
+					<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-6">
+						<div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+							<div className="flex flex-col gap-6">
 								<FormField
 									control={form.control}
 									name="onlyAttending"
 									render={({ field }) => (
-										<FormItem>
-											<FormLabel className="text-lg">
-												Only include attending students
-											</FormLabel>
+										<FormItem className="flex flex-row items-center gap-x-2 space-y-0">
 											<FormControl>
-												<RadioGroup
-													onValueChange={field.onChange}
-													defaultValue={field.value}
-													className="flex flex-row space-x-4"
-												>
-													<FormItem className="flex items-center space-x-2">
-														<FormControl>
-															<RadioGroupItem value={"true"} />
-														</FormControl>
-														<FormLabel className="text-sm">True</FormLabel>
-													</FormItem>
-													<FormItem className="flex items-center space-x-2">
-														<FormControl>
-															<RadioGroupItem value={"false"} />
-														</FormControl>
-														<FormLabel className="text-sm">False</FormLabel>
-													</FormItem>
-												</RadioGroup>
+												<Checkbox
+													checked={field.value}
+													onCheckedChange={(checked) =>
+														field.onChange(checked === true)
+													}
+												/>
 											</FormControl>
-											<FormMessage />
+											<FormLabel className="font-normal">
+												Only attending students
+											</FormLabel>
 										</FormItem>
 									)}
 								/>
@@ -184,24 +198,24 @@ export default function TakeoutForm() {
 									name="format"
 									render={({ field }) => (
 										<FormItem>
-											<FormLabel className="text-lg">Data Format</FormLabel>
+											<FormLabel className="text-base">Format</FormLabel>
 											<FormControl>
 												<RadioGroup
 													onValueChange={field.onChange}
 													defaultValue={field.value}
-													className="flex flex-row space-x-4"
+													className="flex flex-row gap-x-4"
 												>
-													<FormItem className="flex items-center space-x-2">
+													<FormItem className="flex items-center gap-x-2 space-y-0">
 														<FormControl>
 															<RadioGroupItem value="csv" />
 														</FormControl>
-														<FormLabel className="text-sm">CSV</FormLabel>
+														<FormLabel className="font-normal">CSV</FormLabel>
 													</FormItem>
-													<FormItem className="flex items-center space-x-2">
+													<FormItem className="flex items-center gap-x-2 space-y-0">
 														<FormControl>
 															<RadioGroupItem value="json" />
 														</FormControl>
-														<FormLabel className="text-sm">JSON</FormLabel>
+														<FormLabel className="font-normal">JSON</FormLabel>
 													</FormItem>
 												</RadioGroup>
 											</FormControl>
@@ -209,128 +223,58 @@ export default function TakeoutForm() {
 										</FormItem>
 									)}
 								/>
-								<FormField
-									control={form.control}
-									name="includedGen"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className="text-lg">Included Gen</FormLabel>
-											<FormControl>
-												<div className="flex flex-col space-y-2">
-													{AVAILABLE.map((gen) => (
-														<FormItem
-															key={gen.gen}
-															className="flex flex-row items-start space-x-3 space-y-0"
-														>
-															<FormControl>
-																<Checkbox
-																	checked={field.value.includes(gen.gen)}
-																	onCheckedChange={(checked) => {
-																		return checked
-																			? field.onChange([
-																					...field.value,
-																					gen.gen,
-																				])
-																			: field.onChange(
-																					field.value.filter(
-																						(value) =>
-																							value !== gen.gen
-																					)
-																				)
-																	}}
-																/>
-															</FormControl>
-															<FormLabel className="font-normal">
-																{gen.label}
-															</FormLabel>
-														</FormItem>
-													))}
-												</div>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
 							</div>
-							<div className="flex flex-col gap-4">
-								<FormField
-									control={form.control}
-									name="including"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className="text-lg">Include Column</FormLabel>
-											<FormControl>
-												<div className="flex flex-col space-y-2">
-													{INCLUDABLE.map((item) => (
-														<label
-															key={item.id}
-															className="flex items-center space-x-2"
-														>
-															<input
-																type="checkbox"
-																value={item.id}
-																checked={field.value.includes(item.id)}
-																onChange={(e) => {
-																	const value = e.target.checked
-																		? [...field.value, item.id]
-																		: field.value.filter(
-																				(v) => v !== item.id
-																			)
-																	field.onChange(value)
-																}}
-															/>
-															<span>{item.label}</span>
-														</label>
-													))}
-												</div>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
-							<div className="flex flex-col gap-4">
-								<FormField
-									control={form.control}
-									name="includedCourse"
-									render={({ field }) => (
-										<FormItem>
-											<FormLabel className="text-lg">Included Courses</FormLabel>
-											<FormControl>
-												<div className="flex flex-col space-y-2">
-													{AVAILABLE_COURSES.map((course) => (
-														<label
-															key={course.id}
-															className="flex items-center space-x-2"
-														>
-															<input
-																type="checkbox"
-																value={String(course.id)}
-																checked={field.value.includes(
-																	String(course.id)
-																)}
-																onChange={(e) => {
-																	const value = e.target.checked
-																		? [...field.value, String(course.id)]
-																		: field.value.filter(
-																				(v) => v !== String(course.id)
-																			)
-																	field.onChange(value)
-																}}
-															/>
-															<span>{course.label}</span>
-														</label>
-													))}
-												</div>
-											</FormControl>
-											<FormMessage />
-										</FormItem>
-									)}
-								/>
-							</div>
+							<FormField
+								control={form.control}
+								name="includedGen"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="text-base">Generations</FormLabel>
+										<CheckboxGroup
+											options={AVAILABLE.map((g) => ({ value: g.gen, label: g.label }))}
+											value={field.value}
+											onChange={field.onChange}
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="includedCourse"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="text-base">Courses</FormLabel>
+										<CheckboxGroup
+											options={AVAILABLE_COURSES.map((c) => ({
+												value: String(c.id),
+												label: c.label,
+											}))}
+											value={field.value}
+											onChange={field.onChange}
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
+							<FormField
+								control={form.control}
+								name="including"
+								render={({ field }) => (
+									<FormItem>
+										<FormLabel className="text-base">Columns</FormLabel>
+										<CheckboxGroup
+											options={INCLUDABLE.map((i) => ({ value: i.id, label: i.label }))}
+											value={field.value}
+											onChange={field.onChange}
+										/>
+										<FormMessage />
+									</FormItem>
+								)}
+							/>
 						</div>
-						<Button type="submit" className="mt-4 w-full">
-							Export Data
+						<Button type="submit" className="self-start" disabled={form.formState.isSubmitting}>
+							{form.formState.isSubmitting ? "Exporting…" : "Export data"}
 						</Button>
 					</form>
 				</Form>

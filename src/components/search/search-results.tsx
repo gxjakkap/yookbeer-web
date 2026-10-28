@@ -5,6 +5,7 @@ import Link from "next/link"
 import type { YookbeerColumn } from "@/components/table/yookbeer-table-new"
 import { Badge } from "@/components/ui/badge"
 import { COURSE_SHORTHAND } from "@/lib/const"
+import { thaiNameFont } from "@/lib/fonts"
 
 interface SearchResultsProps {
 	results: YookbeerColumn[]
@@ -25,18 +26,30 @@ function StudentCard({ student }: { student: YookbeerColumn }) {
 					<div className="flex flex-wrap items-center gap-2">
 						<p className="truncate font-medium text-sm">{student.nameen}</p>
 						{student.nameth && (
-							<p className="truncate text-xs text-muted-foreground">{student.nameth}</p>
+							<p
+								lang="th"
+								className={`truncate text-xs text-muted-foreground ${thaiNameFont.className}`}
+							>
+								{student.nameth}
+							</p>
 						)}
 					</div>
 					<div className="mt-0.5 flex flex-wrap items-center gap-2">
 						<span className="text-xs text-muted-foreground">
 							{student.nicken}
-							{student.nickth ? ` / ${student.nickth}` : ""}
+							{student.nickth && (
+								<>
+									{" / "}
+									<span lang="th" className={thaiNameFont.className}>
+										{student.nickth}
+									</span>
+								</>
+							)}
 						</span>
-						<Badge variant="secondary" className="text-[10px] px-1.5 py-0">
+						<Badge variant="secondary" className="px-1.5 py-0 text-xs">
 							{COURSE_SHORTHAND[student.course]}
 						</Badge>
-						<Badge variant="outline" className="text-[10px] px-1.5 py-0">
+						<Badge variant="outline" className="px-1.5 py-0 text-xs">
 							CPE {student.gen}
 						</Badge>
 					</div>

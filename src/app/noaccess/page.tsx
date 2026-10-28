@@ -17,10 +17,14 @@ export default async function NoAccessPage() {
 		redirect("/login")
 	}
 	return (
-		<div className="flex min-h-screen w-screen flex-col bg-neutral-100">
+		<div className="flex min-h-screen w-screen flex-col bg-muted">
 			<div className="relative flex h-[500px] min-h-screen w-full items-center justify-center overflow-hidden rounded-lg border bg-background p-20 md:shadow-xl">
 				<div className="py-auto z-50 flex flex-col gap-y-3">
-					<h1 className={`text-center text-4xl`}>No Access</h1>
+					<h1 className={`text-center text-4xl`}>No access</h1>
+					<h2 className={`text-center text-2xl`}>Have an invite code?</h2>
+					<Button asChild className="mx-auto">
+						<Link href="/invite">Redeem an invite code</Link>
+					</Button>
 					<form
 						action={async () => {
 							"use server"
@@ -30,14 +34,10 @@ export default async function NoAccessPage() {
 						}}
 						className="flex flex-col"
 					>
-						<Button type="submit" className="mx-auto">
-							<span>Sign out</span>
+						<Button type="submit" variant="link" className="mx-auto">
+							Sign out
 						</Button>
 					</form>
-					<h2 className={`text-center text-2xl`}>Have an invite code?</h2>
-					<Link href="/invite" className="mx-auto">
-						<Button className="mx-auto">Redeem an invite code</Button>
-					</Link>
 				</div>
 				<AnimatedGridPattern
 					numSquares={30}

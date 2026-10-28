@@ -146,10 +146,10 @@ export const ImageDropzone = ({ currentImg, onFileSelected, selectedFile }: Imag
 							<button
 								type="button"
 								onClick={handleClear}
-								className="absolute right-2 top-2 rounded-full bg-background p-0.5 shadow ring-1 ring-muted hover:bg-muted"
+								className="absolute right-1 top-1 flex size-8 items-center justify-center rounded-full bg-background shadow ring-1 ring-muted hover:bg-muted"
 								aria-label="Remove selected image"
 							>
-								<X className="h-3 w-3" />
+								<X className="h-4 w-4" />
 							</button>
 						)}
 					</>
@@ -159,7 +159,7 @@ export const ImageDropzone = ({ currentImg, onFileSelected, selectedFile }: Imag
 						<span className="text-xs text-muted-foreground">
 							{isDragOver ? "Drop to upload" : "Drag & drop or click to select"}
 						</span>
-						<span className="text-xs text-muted-foreground/60">JPG, JPEG, WebP, PNG</span>
+						<span className="text-xs text-muted-foreground">JPG, JPEG, WebP, PNG</span>
 						{currentImg && (
 							<span className="text-xs text-muted-foreground">Current: {currentImg}</span>
 						)}
@@ -205,7 +205,7 @@ export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="max-h-[90vh] overflow-y-scroll sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Edit Student Information</DialogTitle>
+					<DialogTitle>Edit student information</DialogTitle>
 					<DialogDescription>
 						{data.nameen} ({data.nicken}) - {data.stdid}
 					</DialogDescription>
@@ -236,7 +236,7 @@ export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }
 						})}
 						<div className="grid grid-cols-4 items-center gap-4">
 							<Label htmlFor={"birthMonth"} className="text-right capitalize">
-								Birth Month
+								Birth month
 							</Label>
 							<Select
 								value={formData.birthMonth ? String(formData.birthMonth) : ""}

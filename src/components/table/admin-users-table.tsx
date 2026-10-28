@@ -15,6 +15,7 @@ import {
 import type { ColumnBaseConfig, ColumnDataType, SQL } from "drizzle-orm"
 import type { PgColumn } from "drizzle-orm/pg-core"
 import { ChevronDown, Pencil, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import * as React from "react"
 import { deleteUser, updateUser } from "@/app/(authorized)/admin/actions"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -31,14 +32,11 @@ import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
-	DropdownMenuLabel,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { useToast } from "@/hooks/use-toast"
 import type { Roles } from "@/lib/rba"
@@ -85,7 +83,7 @@ const EditDialog = ({ isOpen, onClose, data, onUpdate, isPending }: EditDialogPr
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Edit Student Information</DialogTitle>
+					<DialogTitle>Edit user role</DialogTitle>
 					<DialogDescription>
 						{data.name} ({data.email})
 					</DialogDescription>
@@ -93,28 +91,22 @@ const EditDialog = ({ isOpen, onClose, data, onUpdate, isPending }: EditDialogPr
 				<form action={() => onUpdate(formData)}>
 					<div className="grid gap-4 py-4">
 						<div className="grid grid-cols-4 items-center gap-4">
-							<Label className="text-right capitalize">Role</Label>
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button variant="outline" className="w-32">
-										{formData.role?.replace(/([A-Z])/g, " $1").trim()}
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent className="w-56">
-									<DropdownMenuLabel>Select user&apos;s role</DropdownMenuLabel>
-									<DropdownMenuSeparator />
-									<DropdownMenuRadioGroup
-										value={formData.role || "NULL"}
-										onValueChange={(val) => setFormData({ ...formData, role: val })}
-									>
-										<DropdownMenuRadioItem value="admin">Admin</DropdownMenuRadioItem>
-										<DropdownMenuRadioItem value="user">User</DropdownMenuRadioItem>
-										<DropdownMenuRadioItem value="unauthorized">
-											No Access
-										</DropdownMenuRadioItem>
-									</DropdownMenuRadioGroup>
-								</DropdownMenuContent>
-							</DropdownMenu>
+							<Label htmlFor={`role-${data.id}`} className="text-right">
+								Role
+							</Label>
+							<Select
+								value={formData.role ?? undefined}
+								onValueChange={(val) => setFormData({ ...formData, role: val })}
+							>
+								<SelectTrigger id={`role-${data.id}`} className="col-span-3">
+									<SelectValue placeholder="Choose a role" />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="admin">Admin</SelectItem>
+									<SelectItem value="user">User</SelectItem>
+									<SelectItem value="unauthorized">No access</SelectItem>
+								</SelectContent>
+							</Select>
 						</div>
 					</div>
 					<DialogFooter>
@@ -144,7 +136,7 @@ const DeleteDialog = ({ isOpen, onClose, onConfirm, userName, isPending }: Delet
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Confirm Deletion</DialogTitle>
+					<DialogTitle>Confirm deletion</DialogTitle>
 					<DialogDescription>
 						Are you sure you want to delete the record for {userName}? This action cannot be
 						undone.
@@ -170,25 +162,27 @@ const ActionCell = (row: Row<YookbeerUserColumn>) => {
 	const data = row.original
 
 	const { toast } = useToast()
+	const router = useRouter()
 
 	const handleUpdate = async (data: Partial<YookbeerUserColumn>) => {
-		console.log(data)
 		startTransition(async () => {
 			try {
-				await updateUser({
+				const [, err] = await updateUser({
 					id: data.id as string,
-					data: {
-						...data,
-						role: data.role as EditableRole,
-					},
+					data: { ...data, role: data.role as EditableRole },
 				})
-				toast({
-					title: "Record updated succesfully",
-				})
+				if (err) {
+					toast({ title: "Couldn't update role", description: err.message, variant: "destructive" })
+					return
+				}
+				toast({ title: "Role updated" })
 				setIsEditOpen(false)
+				router.refresh()
 			} catch (error) {
 				toast({
-					title: "Failed to update record",
+					title: "Couldn't update role",
+					description: "Check your connection and try again.",
+					variant: "destructive",
 				})
 				console.error(error)
 			}
@@ -198,16 +192,19 @@ const ActionCell = (row: Row<YookbeerUserColumn>) => {
 	const handleDelete = async () => {
 		startTransition(async () => {
 			try {
-				await deleteUser({
-					id: data.id,
-				})
-				toast({
-					title: "Record deleted succesfully",
-				})
+				const [, err] = await deleteUser({ id: data.id })
+				if (err) {
+					toast({ title: "Couldn't delete user", description: err.message, variant: "destructive" })
+					return
+				}
+				toast({ title: "User deleted" })
 				setIsDeleteOpen(false)
+				router.refresh()
 			} catch (error) {
 				toast({
-					title: "Failed to delete record",
+					title: "Couldn't delete user",
+					description: "Check your connection and try again.",
+					variant: "destructive",
 				})
 				console.error(error)
 			}
@@ -222,6 +219,7 @@ const ActionCell = (row: Row<YookbeerUserColumn>) => {
 				onClick={() => setIsEditOpen(true)}
 				className="h-8 w-8 p-0"
 				disabled={isPending}
+				aria-label={`Edit ${data.name ?? data.email}`}
 			>
 				<Pencil className="h-4 w-4" />
 			</Button>
@@ -231,6 +229,7 @@ const ActionCell = (row: Row<YookbeerUserColumn>) => {
 				onClick={() => setIsDeleteOpen(true)}
 				className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
 				disabled={isPending}
+				aria-label={`Delete ${data.name ?? data.email}`}
 			>
 				<Trash2 className="h-4 w-4" />
 			</Button>
@@ -383,7 +382,7 @@ export function AdminUserTable({ data }: YookbeerUserTableProps) {
 			</div>
 			<div className="rounded-md border">
 				<Table>
-					<TableHeader className="bg-neutral-100 dark:bg-background">
+					<TableHeader className="bg-muted">
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
 								{headerGroup.headers.map((header) => {
@@ -423,10 +422,6 @@ export function AdminUserTable({ data }: YookbeerUserTableProps) {
 				</Table>
 			</div>
 			<div className="flex items-center justify-end space-x-2 py-4">
-				<div className="flex-1 text-sm text-muted-foreground">
-					{table.getFilteredSelectedRowModel().rows.length} of{" "}
-					{table.getFilteredRowModel().rows.length} row(s) selected.
-				</div>
 				<div className="space-x-2">
 					<Button
 						variant="outline"

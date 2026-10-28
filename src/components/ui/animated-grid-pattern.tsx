@@ -4,7 +4,7 @@
 /** biome-ignore-all lint/correctness/useExhaustiveDependencies: <> */
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, useReducedMotion } from "framer-motion"
 import { useEffect, useId, useRef, useState } from "react"
 import { cn } from "@/lib/utils"
 
@@ -35,6 +35,7 @@ export default function AnimatedGridPattern({
 	...props
 }: AnimatedGridPatternProps) {
 	const id = useId()
+	const reduceMotion = useReducedMotion()
 	const containerRef = useRef(null)
 	const [dimensions, setDimensions] = useState({ width: 0, height: 0 })
 	const [squares, setSquares] = useState(() => generateSquares(numSquares))
@@ -113,28 +114,31 @@ export default function AnimatedGridPattern({
 				</pattern>
 			</defs>
 			<rect width="100%" height="100%" fill={`url(#${id})`} />
-			<svg x={x} y={y} className="overflow-visible">
-				{squares.map(({ pos: [x, y], id }, index) => (
-					<motion.rect
-						initial={{ opacity: 0 }}
-						animate={{ opacity: maxOpacity }}
-						transition={{
-							duration,
-							repeat: 1,
-							delay: index * 0.1,
-							repeatType: "reverse",
-						}}
-						onAnimationComplete={() => updateSquarePosition(id)}
-						key={`${x}-${y}-${index}`}
-						width={width - 1}
-						height={height - 1}
-						x={x * width + 1}
-						y={y * height + 1}
-						fill="currentColor"
-						strokeWidth="0"
-					/>
-				))}
-			</svg>
+			{/* blinking squares are decoration only; drop them when the OS asks for reduced motion */}
+			{!reduceMotion && (
+				<svg x={x} y={y} className="overflow-visible">
+					{squares.map(({ pos: [x, y], id }, index) => (
+						<motion.rect
+							initial={{ opacity: 0 }}
+							animate={{ opacity: maxOpacity }}
+							transition={{
+								duration,
+								repeat: 1,
+								delay: index * 0.1,
+								repeatType: "reverse",
+							}}
+							onAnimationComplete={() => updateSquarePosition(id)}
+							key={`${x}-${y}-${index}`}
+							width={width - 1}
+							height={height - 1}
+							x={x * width + 1}
+							y={y * height + 1}
+							fill="currentColor"
+							strokeWidth="0"
+						/>
+					))}
+				</svg>
+			)}
 		</svg>
 	)
 }

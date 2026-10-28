@@ -36,7 +36,7 @@ export function useStudentUpdate(data: YookbeerColumn) {
 						mimeToExtension(imageFile.type) ?? (getExtension(imageFile.name) as AllowedExtension)
 
 					if (!ext || !ALLOWED_EXTENSIONS.includes(ext)) {
-						toast({ title: "Unsupported image format", variant: "destructive" })
+						toast({ title: "Use a JPG, PNG or WebP photo", variant: "destructive" })
 						return
 					}
 
@@ -49,7 +49,7 @@ export function useStudentUpdate(data: YookbeerColumn) {
 
 					if (presignedErr || !presignedRes) {
 						toast({
-							title: "Failed to initiate image upload",
+							title: "Couldn't start the photo upload",
 							description: presignedErr?.message,
 							variant: "destructive",
 						})
@@ -65,7 +65,7 @@ export function useStudentUpdate(data: YookbeerColumn) {
 
 					if (!uploadRes.ok) {
 						toast({
-							title: "Failed to upload image",
+							title: "Couldn't upload photo",
 							description: `HTTP ${uploadRes.status}`,
 							variant: "destructive",
 						})
@@ -82,7 +82,7 @@ export function useStudentUpdate(data: YookbeerColumn) {
 
 					if (finalizeErr) {
 						toast({
-							title: "Image uploaded but failed to update record",
+							title: "Photo uploaded, but the record wasn't updated",
 							description: finalizeErr.message,
 							variant: "destructive",
 						})
@@ -111,17 +111,21 @@ export function useStudentUpdate(data: YookbeerColumn) {
 
 				if (updateErr) {
 					toast({
-						title: "Failed to update record",
+						title: "Couldn't update student",
 						description: updateErr.message,
 						variant: "destructive",
 					})
 					return
 				}
 
-				toast({ title: "Record updated successfully" })
+				toast({ title: "Student updated" })
 				setIsEditOpen(false)
 			} catch (error) {
-				toast({ title: "Failed to update record" })
+				toast({
+					title: "Couldn't update student",
+					description: "Check your connection and try again.",
+					variant: "destructive",
+				})
 				console.error(error)
 			}
 		})

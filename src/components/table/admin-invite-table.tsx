@@ -15,11 +15,12 @@ import {
 } from "@tanstack/react-table"
 import { format } from "date-fns"
 import { ChevronDown, PlusIcon, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import * as React from "react"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 import { createInviteCode, deleteInviteCode } from "@/app/(authorized)/admin/actions"
-import { CreateInviteStatus } from "@/app/(authorized)/admin/types"
+import { CreateInviteStatus, DeleteInviteStatus } from "@/app/(authorized)/admin/types"
 import { Button } from "@/components/ui/button"
 import {
 	Dialog,
@@ -89,7 +90,7 @@ const AddDialog = ({ isOpen, onClose, onAdd, isPending }: AddDialogProps) => {
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Create Invite Code</DialogTitle>
+					<DialogTitle>Create invite code</DialogTitle>
 				</DialogHeader>
 				<Form {...addForm}>
 					<form onSubmit={addForm.handleSubmit(handleSubmit)}>
@@ -140,7 +141,7 @@ const DeleteDialog = ({ isOpen, onClose, onConfirm, code, isPending }: DeleteDia
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Confirm Deletion</DialogTitle>
+					<DialogTitle>Confirm deletion</DialogTitle>
 					<DialogDescription>
 						Are you sure you want to delete invite code <span className="font-bold">{code}</span>?
 						This action cannot be undone.
@@ -165,19 +166,31 @@ const ActionCell = (row: Row<YookbeerInviteColumn>) => {
 	const data = row.original
 
 	const { toast } = useToast()
+	const router = useRouter()
 
 	const handleDelete = async () => {
 		startTransition(async () => {
 			try {
-				await deleteInviteCode(data.code)
-				toast({
-					title: "Record deleted succesfully",
-				})
+				const res = await deleteInviteCode(data.code)
+				if (res.status !== DeleteInviteStatus.OK) {
+					toast({
+						title: "Couldn't delete invite code",
+						description:
+							res.status === DeleteInviteStatus.FORBIDDEN
+								? "You don't have permission to delete invite codes."
+								: "It may already have been deleted. Refresh and try again.",
+						variant: "destructive",
+					})
+					return
+				}
+				toast({ title: "Invite code deleted" })
 				setIsDeleteOpen(false)
-				location.reload()
+				router.refresh()
 			} catch (error) {
 				toast({
-					title: "Failed to delete record",
+					title: "Couldn't delete invite code",
+					description: "Check your connection and try again.",
+					variant: "destructive",
 				})
 				console.error(error)
 			}
@@ -192,6 +205,7 @@ const ActionCell = (row: Row<YookbeerInviteColumn>) => {
 				onClick={() => setIsDeleteOpen(true)}
 				className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
 				disabled={isPending}
+				aria-label={`Delete invite ${data.code}`}
 			>
 				<Trash2 className="h-4 w-4" />
 			</Button>
@@ -218,7 +232,7 @@ const createColumns = (): ColumnDef<YookbeerInviteColumn>[] => [
 	},
 	{
 		accessorKey: "code",
-		header: "Invite Code",
+		header: "Invite code",
 		cell: ({ row }) => <div>{row.getValue("code")}</div>,
 	},
 	{
@@ -233,7 +247,7 @@ const createColumns = (): ColumnDef<YookbeerInviteColumn>[] => [
 	},
 	{
 		accessorKey: "creationDate",
-		header: "Creation Date",
+		header: "Created",
 		cell: ({ row }) => {
 			const dateValue = row.getValue("creationDate")
 			return <div>{dateValue ? format(dateValue as Date, "PPP") : ""}</div>
@@ -252,7 +266,7 @@ const createColumns = (): ColumnDef<YookbeerInviteColumn>[] => [
 	},
 	{
 		accessorKey: "claimDate",
-		header: "Used Date",
+		header: "Used",
 		cell: ({ row }) => {
 			const dateValue = row.getValue("claimDate")
 			return <div>{dateValue ? format(dateValue as Date, "PPP") : ""}</div>
@@ -276,36 +290,35 @@ export function AdminInviteTable({ data }: YookbeerInviteTableProps) {
 	const [rowSelection, setRowSelection] = React.useState({})
 
 	const { toast } = useToast()
+	const router = useRouter()
 
 	const columns = React.useMemo(() => createColumns(), [])
 
 	const handleCreate = async (data: Partial<YookbeerInviteColumn>) => {
-		console.log(data)
 		startCreateTransition(async () => {
 			try {
 				const res = await createInviteCode({
 					code: data.code,
 				})
-				if (res.status === CreateInviteStatus.OK) {
+				if (res.status === CreateInviteStatus.DUPLICATE) {
 					toast({
-						title: `Invite code "${res.code}" created!`,
-					})
-				} else if (res.status === CreateInviteStatus.DUPLICATE) {
-					toast({
-						title: `Invite code "${res.code}" already existed!`,
+						title: `Invite code "${res.code}" already exists`,
+						description: "Choose a different code, or leave it blank to generate one.",
 						variant: "destructive",
 					})
-				} else {
-					toast({
-						title: "Failed to create invite code.",
-						variant: "destructive",
-					})
+					return
 				}
+				if (res.status !== CreateInviteStatus.OK) {
+					toast({ title: "Couldn't create invite code", variant: "destructive" })
+					return
+				}
+				toast({ title: `Invite code "${res.code}" created` })
 				setIsAddOpen(false)
-				location.reload()
+				router.refresh()
 			} catch (error) {
 				toast({
-					title: "Failed to create invite code.",
+					title: "Couldn't create invite code",
+					description: "Check your connection and try again.",
 					variant: "destructive",
 				})
 				console.error(error)
@@ -381,7 +394,7 @@ export function AdminInviteTable({ data }: YookbeerInviteTableProps) {
 				</div>
 				<div className="rounded-md border">
 					<Table>
-						<TableHeader className="bg-neutral-100 dark:bg-background">
+						<TableHeader className="bg-muted">
 							{table.getHeaderGroups().map((headerGroup) => (
 								<TableRow key={headerGroup.id}>
 									{headerGroup.headers.map((header) => {
@@ -421,10 +434,6 @@ export function AdminInviteTable({ data }: YookbeerInviteTableProps) {
 					</Table>
 				</div>
 				<div className="flex items-center justify-end space-x-2 py-4">
-					<div className="flex-1 text-sm text-muted-foreground">
-						{table.getFilteredSelectedRowModel().rows.length} of{" "}
-						{table.getFilteredRowModel().rows.length} row(s) selected.
-					</div>
 					<div className="space-x-2">
 						<Button
 							variant="outline"

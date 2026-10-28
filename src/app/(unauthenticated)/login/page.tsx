@@ -25,13 +25,35 @@ export const metadata: Metadata = {
 	title: "log in | yookbeer",
 }
 
-export default async function SignInPage(props: { searchParams: Promise<{ callbackUrl?: string }> }) {
+// Keys are Auth.js error codes: `?error=` from pages.error/pages.signIn, or AuthError.type from the action below.
+const ERROR_MESSAGES: Record<string, string> = {
+	AccessDenied: "This account isn't allowed to sign in. Use your KMUTT Microsoft account.",
+	Configuration:
+		"Sign-in isn't working on the server right now. Try again later, or tell a yookbeer admin.",
+	OAuthAccountNotLinked:
+		"This email is already linked to a different sign-in. Ask a yookbeer admin to fix it.",
+	Verification: "That sign-in link has expired. Sign in again.",
+}
+const DEFAULT_ERROR = "Sign-in didn't complete. Try again, and tell a yookbeer admin if it keeps happening."
+
+export default async function SignInPage(props: {
+	searchParams: Promise<{ callbackUrl?: string; error?: string }>
+}) {
 	const spr = await props.searchParams
+	const errorMessage = spr.error ? (ERROR_MESSAGES[spr.error] ?? DEFAULT_ERROR) : null
 	return (
-		<div className="flex min-h-screen w-screen flex-col bg-neutral-100">
+		<div className="flex min-h-screen w-screen flex-col bg-muted">
 			<div className="relative flex h-[500px] min-h-screen w-full items-center justify-center overflow-hidden rounded-lg border bg-background p-20 md:shadow-xl">
-				<div className="py-auto z-50 flex flex-col gap-y-3">
+				<div className="py-auto z-50 flex max-w-sm flex-col gap-y-3">
 					<h1 className={`text-center text-4xl`}>yookbeer</h1>
+					{errorMessage && (
+						<p
+							role="alert"
+							className="rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3 text-center text-sm text-foreground"
+						>
+							{errorMessage}
+						</p>
+					)}
 					<form
 						action={async () => {
 							"use server"
@@ -41,7 +63,9 @@ export default async function SignInPage(props: { searchParams: Promise<{ callba
 								})
 							} catch (error) {
 								if (error instanceof AuthError) {
-									return redirect(`/login/err?error=${error.type}`)
+									const params = new URLSearchParams({ error: error.type })
+									if (spr.callbackUrl) params.set("callbackUrl", spr.callbackUrl)
+									return redirect(`/login?${params}`)
 								}
 								throw error
 							}

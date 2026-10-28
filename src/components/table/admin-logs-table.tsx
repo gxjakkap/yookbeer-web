@@ -162,7 +162,7 @@ export function AdminLogsTable({ data }: AdminLogsTableProps) {
 			</div>
 			<div className="rounded-md border">
 				<Table>
-					<TableHeader className="bg-neutral-100 dark:bg-background">
+					<TableHeader className="bg-muted">
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
 								{headerGroup.headers.map((header) => (

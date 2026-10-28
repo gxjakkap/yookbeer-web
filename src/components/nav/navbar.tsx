@@ -4,8 +4,6 @@ import { ChevronDown } from "lucide-react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import type { Session } from "next-auth"
-import { useEffect, useState } from "react"
-import { useMediaQuery } from "usehooks-ts"
 import { MobileNav } from "@/components/nav/mobile-nav"
 import { Button } from "@/components/ui/button"
 import {
@@ -47,20 +45,21 @@ const NavbarChild = ({
 	fullWidth?: boolean
 }) => (
 	<NavigationMenuItem>
-		<Link key={href} href={href}>
-			<Button
-				className={cn(
-					"relative px-4 text-sm font-medium transition-all",
-					isActive
-						? "font-bold text-primary before:absolute before:bottom-0 before:left-1/2 before:h-0.5 before:w-1/2 before:-translate-x-1/2 before:transform before:bg-primary before:content-[''] hover:text-primary/90"
-						: "text-foreground/80 hover:bg-accent/50 hover:text-foreground",
-					fullWidth ? "w-full" : ""
-				)}
-				variant="ghost"
-			>
+		<Button
+			asChild
+			className={cn(
+				"relative px-4 text-sm font-medium transition-all",
+				isActive
+					? "font-bold text-primary before:absolute before:bottom-0 before:left-1/2 before:h-0.5 before:w-1/2 before:-translate-x-1/2 before:transform before:bg-primary before:content-[''] hover:text-primary/90"
+					: "text-foreground/80 hover:bg-accent/50 hover:text-foreground",
+				fullWidth ? "w-full" : ""
+			)}
+			variant="ghost"
+		>
+			<Link href={href} aria-current={isActive ? "page" : undefined}>
 				{text}
-			</Button>
-		</Link>
+			</Link>
+		</Button>
 	</NavigationMenuItem>
 )
 
@@ -115,87 +114,54 @@ const NavbarList = ({
 
 export function Navbar({ role, session }: NavbarProps) {
 	const pathname = usePathname()
-	const isDesktop = useMediaQuery("(min-width: 768px)")
-	const [isMounted, setIsMounted] = useState(false)
-
-	useEffect(() => {
-		setIsMounted(true)
-	}, [])
-
-	if (!isMounted) {
-		return (
-			<div className="sticky top-0 z-50 flex border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-				<nav className="flex w-full items-center justify-between">
-					<MobileNav role={role} />
-					<div className="flex items-center gap-2">
-						<ThemeSwitch />
-					</div>
-				</nav>
-			</div>
-		)
+	const user = {
+		email: session.user.email ?? "",
+		name: session.user.name ?? "",
+		role: session.user.role ?? Roles.USER,
+		image: session.user.image ?? undefined,
 	}
 
-	if (isDesktop) {
-		return (
-			<div className="sticky top-0 z-50 flex border-b bg-background/95 px-6 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-				<nav className="flex w-full items-center justify-between">
-					<NavigationMenu>
-						<NavigationMenuList className="flex-wrap">
-							<NavbarChild key="/" href="/" text="Home" isActive={pathname === "/"} />
-							<NavbarList
-								text="Year"
-								isActive={pathname.startsWith("/gen/")}
-								currentPath={pathname}
-								items={AVAILABLE.map((x) => {
-									return { text: x.label, link: x.home }
-								})}
-							/>
-							<NavbarChild
-								href="/search"
-								text="Search"
-								isActive={pathname.startsWith("/search")}
-							/>
-							{!!role && isAdmin(role) && (
-								<>
-									<NavbarChild
-										href="/not-attending"
-										text="Not Attending"
-										isActive={pathname === "/not-attending"}
-									/>
-									<NavbarChild
-										href="/admin"
-										text="Admin"
-										isActive={pathname === "/admin"}
-									/>
-									<NavbarChild
-										href="/admin/logs"
-										text="Logs"
-										isActive={pathname === "/admin/logs"}
-									/>
-								</>
-							)}
-						</NavigationMenuList>
-					</NavigationMenu>
-					<div className="flex items-center gap-3">
-						<ThemeSwitch />
-						<UserMenu
-							email={session.user.email ?? ""}
-							name={session.user.name ?? ""}
-							role={session.user.role ?? Roles.USER}
-							image={session.user.image ?? undefined}
-						/>
-					</div>
-				</nav>
-			</div>
-		)
-	}
-
+	// One markup for both sizes; CSS picks which nav shows, so there's no mobile→desktop flash on load.
 	return (
-		<div className="sticky top-0 z-50 flex border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+		<div className="sticky top-0 z-50 flex border-b bg-background/95 px-4 py-3 backdrop-blur supports-[backdrop-filter]:bg-background/60 md:px-6">
 			<nav className="flex w-full items-center justify-between">
-				<MobileNav role={role} />
-				<div className="flex items-center gap-2">
+				<div className="md:hidden">
+					<MobileNav role={role} user={user} />
+				</div>
+				<NavigationMenu className="hidden md:flex">
+					<NavigationMenuList className="flex-wrap">
+						<NavbarChild key="/" href="/" text="Home" isActive={pathname === "/"} />
+						<NavbarList
+							text="Year"
+							isActive={pathname.startsWith("/gen/")}
+							currentPath={pathname}
+							items={AVAILABLE.map((x) => {
+								return { text: x.label, link: x.home }
+							})}
+						/>
+						<NavbarChild href="/search" text="Search" isActive={pathname.startsWith("/search")} />
+						{!!role && isAdmin(role) && (
+							<>
+								<NavbarChild
+									href="/not-attending"
+									text="Not attending"
+									isActive={pathname === "/not-attending"}
+								/>
+								<NavbarChild href="/admin" text="Admin" isActive={pathname === "/admin"} />
+								<NavbarChild
+									href="/admin/logs"
+									text="Logs"
+									isActive={pathname.startsWith("/admin/logs")}
+								/>
+							</>
+						)}
+					</NavigationMenuList>
+				</NavigationMenu>
+				<div className="flex items-center gap-3">
 					<ThemeSwitch />
+					<div className="hidden md:block">
+						<UserMenu {...user} />
+					</div>
 				</div>
 			</nav>
 		</div>
