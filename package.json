@@ -4,6 +4,7 @@
 	"private": true,
 	"scripts": {
 		"dev": "next dev --turbopack",
+		"dev:ts": "tailscale serve --bg 3000 && AUTH_URL=https://$(tailscale status --json | jq -r '.Self.DNSName | rtrimstr(\".\")') next dev --turbopack",
 		"build": "next build",
 		"start": "next start",
 		"lint": "biome lint .",
