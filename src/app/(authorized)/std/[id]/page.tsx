@@ -98,7 +98,7 @@ export default async function StudentProfilePage({ params }: Props) {
 			</header>
 
 			<div className="flex flex-col gap-x-16 gap-y-8 lg:flex-row lg:items-start">
-				<div className="mx-auto shrink-0 lg:mx-0">
+				<div className="mx-auto max-w-[min(500px,100%)] shrink-0 lg:mx-0">
 					{imgUrl ? (
 						<Image
 							className="rounded-md"
@@ -110,7 +110,7 @@ export default async function StudentProfilePage({ params }: Props) {
 							style={{
 								width: "auto",
 								height: "auto",
-								maxWidth: "min(500px, 100%)",
+								maxWidth: "100%",
 								maxHeight: "450px",
 							}}
 							unoptimized
