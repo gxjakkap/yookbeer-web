@@ -21,6 +21,8 @@
 		--accent-foreground: 0 0% 9%;
 		--destructive: 0 72.2% 50.6%;
 		--destructive-foreground: 0 0% 98%;
+		/* red for text/icons on the page background (not on a destructive fill) */
+		--destructive-text: 0 72.2% 50.6%;
 		--border: 0 0% 89.8%;
 		--input: 0 0% 89.8%;
 		--ring: 0 0% 3.9%;
@@ -48,6 +50,7 @@
 		--accent-foreground: 0 0% 98%;
 		--destructive: 0 62.8% 30.6%;
 		--destructive-foreground: 0 0% 98%;
+		--destructive-text: 0 91.2% 71.4%;
 		--border: 0 0% 14.9%;
 		--input: 0 0% 14.9%;
 		--ring: 0 0% 83.1%;

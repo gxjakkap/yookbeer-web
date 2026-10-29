@@ -45,6 +45,8 @@ interface ImageDropzoneProps {
 export const ImageDropzone = ({ currentImg, onFileSelected, selectedFile }: ImageDropzoneProps) => {
 	const [isDragOver, setIsDragOver] = React.useState(false)
 	const [previewUrl, setPreviewUrl] = React.useState<string | null>(null)
+	const [error, setError] = React.useState<string | null>(null)
+	const errorId = React.useId()
 	const inputRef = React.useRef<HTMLInputElement>(null)
 
 	React.useEffect(() => {
@@ -63,9 +65,10 @@ export const ImageDropzone = ({ currentImg, onFileSelected, selectedFile }: Imag
 			!ALLOWED_MIME_TYPES.includes(file.type) ||
 			!ALLOWED_EXTENSIONS.includes(ext as AllowedExtension)
 		) {
-			alert(`Unsupported file type "${file.type || ext}". Only JPG, JPEG, WebP, and PNG are allowed.`)
+			setError(`"${file.name}" isn't a supported image. Choose a JPG, PNG or WebP file.`)
 			return
 		}
+		setError(null)
 		onFileSelected(file)
 	}
 
@@ -106,6 +109,8 @@ export const ImageDropzone = ({ currentImg, onFileSelected, selectedFile }: Imag
 				role="button"
 				tabIndex={0}
 				aria-label="Upload student image"
+				aria-describedby={error ? errorId : undefined}
+				aria-invalid={error ? true : undefined}
 				onClick={handleClick}
 				onDrop={handleDrop}
 				onDragOver={handleDragOver}
@@ -115,7 +120,9 @@ export const ImageDropzone = ({ currentImg, onFileSelected, selectedFile }: Imag
 					"relative flex cursor-pointer select-none flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed p-4 text-center transition-colors",
 					isDragOver
 						? "border-primary bg-primary/5"
-						: "border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/30",
+						: error
+							? "border-destructive-text"
+							: "border-muted-foreground/30 hover:border-primary/50 hover:bg-muted/30",
 				].join(" ")}
 				style={{ minHeight: "110px" }}
 			>
@@ -166,6 +173,11 @@ export const ImageDropzone = ({ currentImg, onFileSelected, selectedFile }: Imag
 					</>
 				)}
 			</div>
+			{error && (
+				<p id={errorId} role="alert" className="mt-1.5 text-xs font-medium text-destructive-text">
+					{error}
+				</p>
+			)}
 		</div>
 	)
 }
@@ -178,31 +190,89 @@ export interface StudentEditDialogProps {
 	isPending: boolean
 }
 
-export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }: StudentEditDialogProps) => {
-	const [formData, setFormData] = React.useState<Partial<YookbeerColumn>>({
-		stdid: data.stdid,
-		nameth: data.nameth,
-		nameen: data.nameen,
-		nickth: data.nickth,
-		nicken: data.nicken,
-		phone: data.phone,
-		emailper: data.emailper,
-		emailuni: data.emailuni,
-		emerphone: data.emerphone,
-		facebook: data.facebook,
-		lineid: data.lineid,
-		instagram: data.instagram,
-		discord: data.discord,
-		status: data.status,
-		birthMonth: data.birthMonth,
-		birthDay: data.birthDay,
-	})
+// Field behaviour is inferred from the key so a new column renders without touching this dialog.
+const READ_ONLY_KEYS = ["stdid"]
+const inputPropsFor = (key: string): React.ComponentProps<"input"> => {
+	if (READ_ONLY_KEYS.includes(key))
+		return { readOnly: true, className: "col-span-3 bg-muted text-muted-foreground" }
+	if (/email/i.test(key)) return { type: "email", inputMode: "email", autoComplete: "off" }
+	if (/phone/i.test(key)) return { type: "tel", inputMode: "tel", autoComplete: "off" }
+	return {}
+}
 
+const MONTHS = [
+	"January",
+	"February",
+	"March",
+	"April",
+	"May",
+	"June",
+	"July",
+	"August",
+	"September",
+	"October",
+	"November",
+	"December",
+]
+
+export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }: StudentEditDialogProps) => {
+	const initialData = React.useMemo<Partial<YookbeerColumn>>(
+		() => ({
+			stdid: data.stdid,
+			nameth: data.nameth,
+			nameen: data.nameen,
+			nickth: data.nickth,
+			nicken: data.nicken,
+			phone: data.phone,
+			emailper: data.emailper,
+			emailuni: data.emailuni,
+			emerphone: data.emerphone,
+			facebook: data.facebook,
+			lineid: data.lineid,
+			instagram: data.instagram,
+			discord: data.discord,
+			status: data.status,
+			birthMonth: data.birthMonth,
+			birthDay: data.birthDay,
+		}),
+		[data]
+	)
+	const [formData, setFormData] = React.useState<Partial<YookbeerColumn>>(initialData)
 	const [selectedImageFile, setSelectedImageFile] = React.useState<File | null>(null)
-	const inputMapExcludeList = ["status", "birthMonth", "img"]
+	const [confirmingDiscard, setConfirmingDiscard] = React.useState(false)
+	const inputMapExcludeList = ["status", "birthMonth", "birthDay", "img"]
+
+	// start every open from the current record (also clears a picked image after a successful save)
+	// biome-ignore lint/correctness/useExhaustiveDependencies: only on open, so a background refresh can't wipe edits in progress
+	React.useEffect(() => {
+		if (!isOpen) return
+		setFormData(initialData)
+		setSelectedImageFile(null)
+		setConfirmingDiscard(false)
+	}, [isOpen])
+
+	// String() on both sides: inputs store edits as strings while initial values may be numbers/null
+	const isDirty =
+		selectedImageFile !== null ||
+		Object.keys(formData).some(
+			(k) =>
+				String(formData[k as keyof YookbeerColumn] ?? "") !==
+				String(initialData[k as keyof YookbeerColumn] ?? "")
+		)
+
+	const discardAndClose = () => {
+		setConfirmingDiscard(false)
+		onClose()
+	}
+
+	const requestClose = () => {
+		if (isPending) return
+		if (isDirty) setConfirmingDiscard(true)
+		else discardAndClose()
+	}
 
 	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
+		<Dialog open={isOpen} onOpenChange={(open) => !open && requestClose()}>
 			<DialogContent className="max-h-[90vh] overflow-y-scroll sm:max-w-md">
 				<DialogHeader>
 					<DialogTitle>Edit student information</DialogTitle>
@@ -210,7 +280,8 @@ export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }
 						{data.nameen} ({data.nicken}) - {data.stdid}
 					</DialogDescription>
 				</DialogHeader>
-				<form action={() => onUpdate(formData, selectedImageFile)}>
+				{/* noValidate: type=email/tel are for mobile keyboards; a malformed legacy value must not block saving other fields */}
+				<form noValidate action={() => onUpdate(formData, selectedImageFile)}>
 					<div className="grid gap-4 py-4">
 						{/** biome-ignore lint/suspicious/useIterableCallbackReturn: <> */}
 						{Object.entries(formData).map(([key, value]) => {
@@ -230,48 +301,54 @@ export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }
 											}))
 										}
 										className="col-span-3"
+										{...inputPropsFor(key)}
 									/>
 								</div>
 							)
 						})}
 						<div className="grid grid-cols-4 items-center gap-4">
-							<Label htmlFor={"birthMonth"} className="text-right capitalize">
-								Birth month
+							<Label htmlFor="birthDay" className="text-right">
+								Birthday
 							</Label>
-							<Select
-								value={formData.birthMonth ? String(formData.birthMonth) : ""}
-								onValueChange={(val) =>
-									setFormData((prev) => ({
-										...prev,
-										birthMonth: Number(val),
-									}))
-								}
-							>
-								<SelectTrigger className="col-span-3">
-									<SelectValue placeholder="Month" />
-								</SelectTrigger>
-								<SelectContent>
-									{[
-										"January",
-										"February",
-										"March",
-										"April",
-										"May",
-										"June",
-										"July",
-										"August",
-										"September",
-										"October",
-										"November",
-										"December",
-									].map((month, i) => (
-										// biome-ignore lint/suspicious/noArrayIndexKey: <>
-										<SelectItem key={i + 1} value={String(i + 1)}>
-											{month}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+							<div className="col-span-3 flex gap-2">
+								<Input
+									id="birthDay"
+									type="number"
+									inputMode="numeric"
+									min={1}
+									max={31}
+									placeholder="Day"
+									aria-label="Birth day"
+									value={formData.birthDay == null ? "" : String(formData.birthDay)}
+									onChange={(e) =>
+										setFormData((prev) => ({
+											...prev,
+											birthDay: e.target.value === "" ? null : Number(e.target.value),
+										}))
+									}
+									className="w-20"
+								/>
+								<Select
+									value={formData.birthMonth ? String(formData.birthMonth) : ""}
+									onValueChange={(val) =>
+										setFormData((prev) => ({
+											...prev,
+											birthMonth: Number(val),
+										}))
+									}
+								>
+									<SelectTrigger aria-label="Birth month" className="flex-1">
+										<SelectValue placeholder="Month" />
+									</SelectTrigger>
+									<SelectContent>
+										{MONTHS.map((month, i) => (
+											<SelectItem key={month} value={String(i + 1)}>
+												{month}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
 						</div>
 						<div className="grid grid-cols-4 items-center gap-4">
 							<Label htmlFor={"status"} className="text-right capitalize">
@@ -287,7 +364,7 @@ export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }
 								}
 								defaultValue={formData.status || StudentStatus.ATTENDING}
 							>
-								<SelectTrigger className="w-[180px]">
+								<SelectTrigger id="status" className="col-span-3">
 									<SelectValue placeholder="Status" />
 								</SelectTrigger>
 								<SelectContent>
@@ -305,14 +382,46 @@ export const StudentEditDialog = ({ isOpen, onClose, data, onUpdate, isPending }
 							/>
 						</div>
 					</div>
-					<DialogFooter>
-						<Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
-							Cancel
-						</Button>
-						<Button type="submit" disabled={isPending}>
-							{isPending ? "Saving..." : "Save changes"}
-						</Button>
-					</DialogFooter>
+					{confirmingDiscard ? (
+						<div
+							role="alert"
+							className="flex flex-col gap-3 rounded-md border bg-muted p-3 sm:flex-row sm:items-center sm:justify-between"
+						>
+							<p className="text-sm">Discard your unsaved changes?</p>
+							<div className="flex justify-end gap-2">
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									onClick={() => setConfirmingDiscard(false)}
+								>
+									Keep editing
+								</Button>
+								<Button
+									type="button"
+									variant="destructive"
+									size="sm"
+									onClick={discardAndClose}
+								>
+									Discard changes
+								</Button>
+							</div>
+						</div>
+					) : (
+						<DialogFooter>
+							<Button
+								type="button"
+								variant="outline"
+								onClick={requestClose}
+								disabled={isPending}
+							>
+								Cancel
+							</Button>
+							<Button type="submit" disabled={isPending || !isDirty}>
+								{isPending ? "Saving..." : "Save changes"}
+							</Button>
+						</DialogFooter>
+					)}
 				</form>
 			</DialogContent>
 		</Dialog>

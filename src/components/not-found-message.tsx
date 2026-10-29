@@ -10,7 +10,7 @@ export function NotFoundMessage() {
 				<h2 className="text-[24px] leading-none">This page could not be found.</h2>
 			</div>
 			<Button asChild variant="outline">
-				<Link href="/">Back to yearbooks</Link>
+				<Link href="/">Back to yookbeer</Link>
 			</Button>
 		</div>
 	)

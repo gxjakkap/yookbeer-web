@@ -203,7 +203,7 @@ const ActionCell = (row: Row<YookbeerInviteColumn>) => {
 				variant="ghost"
 				size="icon"
 				onClick={() => setIsDeleteOpen(true)}
-				className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+				className="h-8 w-8 p-0 text-destructive-text hover:bg-destructive/10 hover:text-destructive-text"
 				disabled={isPending}
 				aria-label={`Delete invite ${data.code}`}
 			>

@@ -1,4 +1,5 @@
 import { eq } from "drizzle-orm"
+import { UserRound } from "lucide-react"
 import Image from "next/image"
 import { notFound } from "next/navigation"
 import type { ReactNode } from "react"
@@ -54,7 +55,7 @@ export default async function StudentProfilePage({ params }: Props) {
 	const { id } = await params
 	const [data] = await db.select().from(students).where(eq(students.stdid, id)).limit(1)
 	if (!data) notFound()
-	const imgUrl = await getPresignedURLForYookbeerPic(`${data.gen}/${data.img}` || "")
+	const imgUrl = data.img ? await getPresignedURLForYookbeerPic(`${data.gen}/${data.img}`) : null
 	const status = data.status
 	const session = await auth()
 	const userIsAdmin = isAdmin(session?.user.role || "")
@@ -98,21 +99,32 @@ export default async function StudentProfilePage({ params }: Props) {
 
 			<div className="flex flex-col gap-x-16 gap-y-8 lg:flex-row lg:items-start">
 				<div className="mx-auto shrink-0 lg:mx-0">
-					<Image
-						className="rounded-md"
-						src={imgUrl}
-						alt={`${data.nicken}'s portrait`}
-						width={0}
-						height={0}
-						sizes="(min-width: 1024px) 500px, 90vw"
-						style={{
-							width: "auto",
-							height: "auto",
-							maxWidth: "min(500px, 100%)",
-							maxHeight: "450px",
-						}}
-						unoptimized
-					/>
+					{imgUrl ? (
+						<Image
+							className="rounded-md"
+							src={imgUrl}
+							alt={`${data.nicken}'s portrait`}
+							width={0}
+							height={0}
+							sizes="(min-width: 1024px) 500px, 90vw"
+							style={{
+								width: "auto",
+								height: "auto",
+								maxWidth: "min(500px, 100%)",
+								maxHeight: "450px",
+							}}
+							unoptimized
+						/>
+					) : (
+						<div
+							role="img"
+							aria-label={`No photo of ${data.nicken}`}
+							className="flex aspect-[4/5] w-64 flex-col items-center justify-center gap-2 rounded-md border border-dashed bg-muted text-muted-foreground"
+						>
+							<UserRound className="size-16" aria-hidden="true" />
+							<span className="text-sm">No photo</span>
+						</div>
+					)}
 				</div>
 
 				<div className="flex min-w-0 flex-1 flex-col gap-y-6">
