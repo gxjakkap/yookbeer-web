@@ -77,3 +77,7 @@
 	animation: none;
 	mix-blend-mode: normal;
 }
+/* Start the new snapshot fully masked, or it shows unclipped until the JS animation starts */
+html[data-magicui-theme-vt="active"]::view-transition-new(root) {
+	clip-path: var(--magicui-theme-vt-clip-from);
+}
