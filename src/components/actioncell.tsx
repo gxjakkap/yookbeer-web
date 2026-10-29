@@ -45,7 +45,7 @@ import { useStudentUpdate } from "./use-student-update"
               className="max-h-[60vh] max-w-full rounded-lg object-contain"
             />
           ) : (
-            <div className="text-gray-500">No image available</div>
+            <div className="text-muted-foreground">No image available</div>
           )}
         </div>
       </DialogContent>

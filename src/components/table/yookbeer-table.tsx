@@ -220,7 +220,7 @@ export function YookbeerTable({ data }: YookbeerTableProps) {
 							Columns <ChevronDown />
 						</Button>
 					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="bg-neutral-100">
+					<DropdownMenuContent align="end" className="bg-muted">
 						{table
 							.getAllColumns()
 							.filter((column) => column.getCanHide())
@@ -241,7 +241,7 @@ export function YookbeerTable({ data }: YookbeerTableProps) {
 			</div>
 			<div className="rounded-md border">
 				<Table>
-					<TableHeader className="bg-neutral-100">
+					<TableHeader className="bg-muted">
 						{table.getHeaderGroups().map((headerGroup) => (
 							<TableRow key={headerGroup.id}>
 								{headerGroup.headers.map((header) => {
