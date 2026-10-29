@@ -21,7 +21,8 @@ import {
 	useReactTable,
 	type VisibilityState,
 } from "@tanstack/react-table"
-import { RedirectType, redirect } from "next/navigation"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
 import {
 	parseAsArrayOf,
 	parseAsInteger,
@@ -70,6 +71,7 @@ export function DataTable<TData, TValue>({
 	colsLocalStorageKey,
 	perpageLocalStorageKey,
 }: DataTableProps<TData, TValue>) {
+	const router = useRouter()
 	const queryStateOptions = useMemo<Omit<UseQueryStateOptions<string>, "parse">>(() => {
 		return {
 			history: "push",
@@ -294,7 +296,7 @@ export function DataTable<TData, TValue>({
 									return (
 										<TableHead
 											key={header.id}
-											className="bg-gray-50 text-foreground first:pl-4 last:pr-4 dark:bg-zinc-900"
+											className="bg-muted text-foreground first:pl-4 last:pr-4"
 											style={{ width: `${header.getSize()}px` }}
 										>
 											{header.isPlaceholder
@@ -311,32 +313,50 @@ export function DataTable<TData, TValue>({
 					</TableHeader>
 					<TableBody>
 						{table.getRowModel().rows?.length ? (
-							table.getRowModel().rows.map((row) => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-									{row.getVisibleCells().map((cell) => (
-										<TableCell
-											key={cell.id}
-											className="overflow-hidden text-ellipsis whitespace-nowrap first:pl-4 last:pr-4"
-											title={String(cell.getValue() ?? "")}
-											onClick={() => {
-												if (rowClickable && hrefColumn) {
-													const hrefVal = row.original[
-														hrefColumn.accessorKey as keyof TData
-													] as string
-													if (cell.column.id !== "action") {
-														redirect(
-															`/${hrefPrefix ?? ""}${hrefVal}`,
-															RedirectType.push
-														)
-													}
-												}
-											}}
-										>
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
-										</TableCell>
-									))}
-								</TableRow>
-							))
+							table.getRowModel().rows.map((row) => {
+								const href =
+									rowClickable && hrefColumn
+										? `/${hrefPrefix ?? ""}${row.original[hrefColumn.accessorKey] as string}`
+										: null
+								return (
+									// Keyboard/screen-reader path is the <Link> in the href cell; row click is a mouse shortcut.
+									<TableRow
+										key={row.id}
+										data-state={row.getIsSelected() && "selected"}
+										className={href ? "cursor-pointer" : undefined}
+										onClick={(e) => {
+											const target = e.target as Element
+											// portaled dialogs bubble React events here; ignore anything outside the row's DOM
+											if (!href || !e.currentTarget.contains(target)) return
+											if (target.closest('a, button, [data-column="action"]')) return
+											if (e.metaKey || e.ctrlKey) window.open(href, "_blank")
+											else router.push(href)
+										}}
+									>
+										{row.getVisibleCells().map((cell) => (
+											<TableCell
+												key={cell.id}
+												className="overflow-hidden text-ellipsis whitespace-nowrap first:pl-4 last:pr-4"
+												title={String(cell.getValue() ?? "")}
+											>
+												{href && cell.column.id === hrefColumn?.accessorKey ? (
+													<Link
+														href={href}
+														className="rounded-sm underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+													>
+														{flexRender(
+															cell.column.columnDef.cell,
+															cell.getContext()
+														)}
+													</Link>
+												) : (
+													flexRender(cell.column.columnDef.cell, cell.getContext())
+												)}
+											</TableCell>
+										))}
+									</TableRow>
+								)
+							})
 						) : (
 							<TableRow>
 								<TableCell colSpan={columns.length} className="h-24 text-center font-bold">

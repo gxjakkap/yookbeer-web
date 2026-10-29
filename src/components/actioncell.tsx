@@ -1,10 +1,9 @@
 import type { Row } from "@tanstack/react-table"
 import { Pencil, Trash2 } from "lucide-react"
-import Link from "next/link"
+import { useRouter } from "next/navigation"
 import React from "react"
 import { deleteStudent } from "@/app/(authorized)/admin/actions"
 import { useToast } from "@/hooks/use-toast"
-import { cn } from "@/lib/utils"
 import { StudentEditDialog } from "./student-edit-dialog"
 import { InstagramIcon } from "./svg/socials/ig"
 import { LineIcon } from "./svg/socials/line"
@@ -67,7 +66,7 @@ const DeleteDialog = ({ isOpen, onClose, onConfirm, studentName, isPending }: De
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Confirm Deletion</DialogTitle>
+					<DialogTitle>Confirm deletion</DialogTitle>
 					<DialogDescription>
 						Are you sure you want to delete the record for {studentName}? This action cannot be
 						undone.
@@ -92,20 +91,28 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
 	const [isDeleteOpen, setIsDeleteOpen] = React.useState(false)
 	const [isDeletePending, startDeleteTransition] = React.useTransition()
 	const { toast } = useToast()
+	const router = useRouter()
 
 	const handleDelete = async () => {
 		startDeleteTransition(async () => {
 			try {
-				await deleteStudent({
-					id: data.stdid,
-				})
-				toast({
-					title: "Record deleted succesfully",
-				})
+				const [, err] = await deleteStudent({ id: data.stdid })
+				if (err) {
+					toast({
+						title: "Couldn't delete student",
+						description: err.message,
+						variant: "destructive",
+					})
+					return
+				}
+				toast({ title: "Student deleted" })
 				setIsDeleteOpen(false)
+				router.refresh()
 			} catch (error) {
 				toast({
-					title: "Failed to delete record",
+					title: "Couldn't delete student",
+					description: "Check your connection and try again.",
+					variant: "destructive",
 				})
 				console.error(error)
 			}
@@ -135,59 +142,35 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
         <PersonIcon />
       </Button> */}
 
-			<Button
-				variant="ghost"
-				size="icon"
-				className={cn(
-					"h-8 w-8 p-0",
-					row.original.instagram === null ? "cursor-not-allowed" : "cursor-pointer"
-				)}
-				disabled={row.original.instagram === null}
-			>
-				<Link
-					href={
-						row.original.instagram !== null
-							? `https://instagram.com/${row.original.instagram}`
-							: "#"
-					}
-					target="_blank"
-					rel="noopener,noreferrer"
-					className={
-						row.original.instagram === null
-							? "pointer-events-none cursor-not-allowed"
-							: "cursor-pointer"
-					}
-					aria-disabled={row.original.instagram === null}
-				>
-					<InstagramIcon />
-				</Link>
-			</Button>
+			{data.instagram ? (
+				<Button variant="ghost" size="icon" className="h-8 w-8 p-0" asChild>
+					<a
+						href={`https://instagram.com/${data.instagram}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label={`${data.nicken} on Instagram`}
+					>
+						<InstagramIcon />
+					</a>
+				</Button>
+			) : (
+				<span className="h-8 w-8" aria-hidden="true" />
+			)}
 
-			<Button
-				variant="ghost"
-				size="icon"
-				className={cn(
-					"h-8 w-8 p-0",
-					row.original.instagram === null ? "cursor-not-allowed" : "cursor-pointer"
-				)}
-				disabled={row.original.instagram === null}
-			>
-				<Link
-					href={
-						row.original.lineid !== null ? `https://line.me/R/ti/p/~${row.original.lineid}` : "#"
-					}
-					target="_blank"
-					rel="noopener,noreferrer"
-					className={
-						row.original.lineid === null
-							? "pointer-events-none cursor-not-allowed"
-							: "cursor-pointer"
-					}
-					aria-disabled={row.original.lineid === null}
-				>
-					<LineIcon />
-				</Link>
-			</Button>
+			{data.lineid ? (
+				<Button variant="ghost" size="icon" className="h-8 w-8 p-0" asChild>
+					<a
+						href={`https://line.me/R/ti/p/~${data.lineid}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						aria-label={`${data.nicken} on LINE`}
+					>
+						<LineIcon />
+					</a>
+				</Button>
+			) : (
+				<span className="h-8 w-8" aria-hidden="true" />
+			)}
 
 			{isAdmin && (
 				<>
@@ -197,6 +180,7 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
 						onClick={() => setIsEditOpen(true)}
 						className="h-8 w-8 p-0"
 						disabled={isPending}
+						aria-label={`Edit ${data.nicken}`}
 					>
 						<Pencil className="h-4 w-4" />
 					</Button>
@@ -204,8 +188,9 @@ export const ActionCell = (row: Row<YookbeerColumn>, isAdmin: boolean) => {
 						variant="ghost"
 						size="icon"
 						onClick={() => setIsDeleteOpen(true)}
-						className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+						className="h-8 w-8 p-0 text-destructive-text hover:bg-destructive/10 hover:text-destructive-text"
 						disabled={isDeletePending}
+						aria-label={`Delete ${data.nicken}`}
 					>
 						<Trash2 className="h-4 w-4" />
 					</Button>

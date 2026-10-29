@@ -16,7 +16,7 @@ interface UserMenuProps {
 	image?: string
 }
 
-const getInitials = (name: string) => {
+export const getInitials = (name: string) => {
 	const arr = name.split(" ")
 	return `${arr[0].substring(0, 1)}${arr[arr.length - 1].substring(0, 1)}`
 }
@@ -24,9 +24,9 @@ const getInitials = (name: string) => {
 export default function UserMenu(props: UserMenuProps) {
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger>
-				<Avatar className="outline outline-1 outline-slate-300">
-					<AvatarImage src={props.image} alt={props.name} />
+			<DropdownMenuTrigger aria-label="Account menu" className="rounded-full">
+				<Avatar className="outline outline-1 outline-border">
+					<AvatarImage src={props.image} alt="" />
 					<AvatarFallback>{getInitials(props.name)}</AvatarFallback>
 				</Avatar>
 			</DropdownMenuTrigger>

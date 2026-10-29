@@ -23,6 +23,7 @@ export function StudentEditButton({ data }: StudentEditButtonProps) {
 				onClick={() => setIsEditOpen(true)}
 				disabled={isPending}
 				className="h-8 w-8"
+				aria-label={`Edit ${data.nicken}`}
 			>
 				<Pencil className="h-4 w-4" />
 			</Button>

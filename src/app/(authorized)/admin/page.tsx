@@ -4,10 +4,29 @@ import { AdminAPIKeyTable } from "@/components/table/admin-apikey-table"
 import { AdminInviteTable } from "@/components/table/admin-invite-table"
 import { AdminUserTable } from "@/components/table/admin-users-table"
 import TakeoutForm from "@/components/takeout-form"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { VersionInfo } from "@/components/version-info"
 import { db } from "@/db"
 import { apiKey, invite, users } from "@/db/schema"
+
+function AdminSection({
+	title,
+	description,
+	children,
+}: {
+	title: string
+	description?: string
+	children: React.ReactNode
+}) {
+	return (
+		<section className="flex flex-col gap-y-3">
+			<div>
+				<h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
+				{description && <p className="text-sm text-muted-foreground">{description}</p>}
+			</div>
+			{children}
+		</section>
+	)
+}
 
 export default async function Admin() {
 	const session = await auth()
@@ -63,55 +82,28 @@ export default async function Admin() {
 	})
 
 	return (
-		<div className={`flex w-full flex-col pb-20`}>
-			<Card className="relative border-none bg-transparent shadow-none">
-				<CardHeader className="pb-0">
-					<CardTitle>Version Info</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<VersionInfo
-						sha={process.env.NEXT_PUBLIC_YB_SHA || "0"}
-						commitMsg={process.env.NEXT_PUBLIC_YB_COMMIT || "-"}
-						buildDate={new Date(
-							Number(process.env.NEXT_PUBLIC_YB_BUILDDATE) * 1000 || 0
-						).toISOString()}
-					/>
-				</CardContent>
-			</Card>
-			<Card className="relative border-none bg-transparent shadow-none">
-				<CardHeader className="pb-0">
-					<CardTitle>User Management</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<AdminUserTable data={userData} />
-				</CardContent>
-			</Card>
-			<Card className="relative border-none bg-transparent shadow-none">
-				<CardHeader>
-					<CardTitle>Invite Code</CardTitle>
-				</CardHeader>
-				<CardContent>
-					<AdminInviteTable data={inviteCodeData} />
-				</CardContent>
-			</Card>
-			<Card className="relative border-none bg-transparent shadow-none">
-				<CardHeader className="pb-0">
-					<CardTitle>API Key</CardTitle>
-					<CardDescription>To interact with YB API</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<AdminAPIKeyTable data={apiKeyData} />
-				</CardContent>
-			</Card>
-			<Card className="relative border-none bg-transparent shadow-none">
-				<CardHeader className="pb-0">
-					<CardTitle>Takeout</CardTitle>
-					<CardDescription>Export data to CSV/JSON</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<TakeoutForm />
-				</CardContent>
-			</Card>
+		<div className="mx-auto flex w-full max-w-[90vw] flex-col gap-y-12 pb-20">
+			<AdminSection title="User management">
+				<AdminUserTable data={userData} />
+			</AdminSection>
+			<AdminSection title="Invite codes">
+				<AdminInviteTable data={inviteCodeData} />
+			</AdminSection>
+			<AdminSection title="API keys" description="Keys for the yookbeer API">
+				<AdminAPIKeyTable data={apiKeyData} />
+			</AdminSection>
+			<AdminSection title="Takeout" description="Export student data as CSV or JSON">
+				<TakeoutForm />
+			</AdminSection>
+			<footer className="border-t pt-4">
+				<VersionInfo
+					sha={process.env.NEXT_PUBLIC_YB_SHA || "0"}
+					commitMsg={process.env.NEXT_PUBLIC_YB_COMMIT || "-"}
+					buildDate={new Date(
+						Number(process.env.NEXT_PUBLIC_YB_BUILDDATE) * 1000 || 0
+					).toISOString()}
+				/>
+			</footer>
 		</div>
 	)
 }

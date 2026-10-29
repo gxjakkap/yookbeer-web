@@ -14,9 +14,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "
 import { Input } from "./ui/input"
 
 const formSchema = z.object({
-	code: z
-		.string({ message: "Invite code must be a string" })
-		.min(3, { message: "Invite code must be longer that 3 letters" }),
+	code: z.string().trim().min(3, { message: "Invite codes are at least 3 characters" }),
 })
 
 export function RedeemForm() {
@@ -36,35 +34,30 @@ export function RedeemForm() {
 				const res = await redeemInviteCode(val.code)
 
 				if (res.status === RedeemInviteCodeStatus.USED) {
-					toast({
-						title: `Invite code "${res.code}" is already used!`,
-						variant: "destructive",
+					form.setError("code", {
+						message: `"${res.code}" has already been used. Ask for a new code.`,
 					})
 				} else if (res.status === RedeemInviteCodeStatus.INVALID) {
-					toast({
-						title: `Invite code "${res.code}" is invalid!`,
-						variant: "destructive",
+					form.setError("code", {
+						message: `"${res.code}" isn't a valid code. Check it and try again.`,
 					})
-				} else if (res.status === RedeemInviteCodeStatus.UNNECESSARY) {
-					toast({
-						title: `You already have access to yookbeer!`,
-						variant: "destructive",
-					})
-					window.location.href = "/"
-				} else if (res.status === RedeemInviteCodeStatus.OK) {
-					toast({
-						title: "Invite code redeemed successfully",
-					})
+				} else if (
+					res.status === RedeemInviteCodeStatus.OK ||
+					res.status === RedeemInviteCodeStatus.UNNECESSARY
+				) {
+					// full reload so the session picks up the new role
 					window.location.href = "/"
 				} else {
 					toast({
-						title: `Unknown error occurred!`,
+						title: "Couldn't redeem invite code",
+						description: "Try again.",
 						variant: "destructive",
 					})
 				}
 			} catch (error) {
 				toast({
-					title: `Unknown error occurred!`,
+					title: "Couldn't redeem invite code",
+					description: "Check your connection and try again.",
 					variant: "destructive",
 				})
 				console.error(error)
@@ -73,31 +66,31 @@ export function RedeemForm() {
 	}
 
 	return (
-		<>
-			{isPending ? (
-				<LoaderCircle className="mx-auto h-16 w-16 animate-spin" />
-			) : (
-				<Form {...form}>
-					<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
-						<FormField
-							control={form.control}
-							name="code"
-							render={({ field }) => (
-								<FormItem>
-									<FormLabel>Invite Code</FormLabel>
-									<FormControl>
-										<Input placeholder="Enter it here." {...field} />
-									</FormControl>
-									<FormMessage />
-								</FormItem>
-							)}
-						/>
-						<Button type="submit" className="mx-auto w-full">
-							Redeem
-						</Button>
-					</form>
-				</Form>
-			)}
-		</>
+		<Form {...form}>
+			<form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-y-3">
+				<FormField
+					control={form.control}
+					name="code"
+					render={({ field }) => (
+						<FormItem>
+							<FormLabel>Invite code</FormLabel>
+							<FormControl>
+								<Input
+									autoComplete="off"
+									autoCapitalize="none"
+									spellCheck={false}
+									{...field}
+								/>
+							</FormControl>
+							<FormMessage />
+						</FormItem>
+					)}
+				/>
+				<Button type="submit" className="mx-auto w-full" disabled={isPending}>
+					{isPending && <LoaderCircle className="animate-spin" aria-hidden="true" />}
+					{isPending ? "Redeeming…" : "Redeem"}
+				</Button>
+			</form>
+		</Form>
 	)
 }

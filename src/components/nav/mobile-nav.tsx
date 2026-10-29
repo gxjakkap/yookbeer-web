@@ -2,19 +2,18 @@
 
 import { ChevronDown, Menu } from "lucide-react"
 import Link, { type LinkProps } from "next/link"
-import { usePathname, useRouter } from "next/navigation"
+import { usePathname } from "next/navigation"
 import { signOut } from "next-auth/react"
-import { useCallback, useState } from "react"
+import { useState } from "react"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Button } from "@/components/ui/button"
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from "@/components/ui/drawer"
-import { VisuallyHidden } from "@/components/ui/visually-hidden"
+import { getInitials } from "@/components/user-menu"
 import { AVAILABLE } from "@/config/available-yearbook"
 import { isAdmin } from "@/lib/rba"
 import { cn } from "@/lib/utils"
 
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/collapsible"
-
-// import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from "../ui/dropdown-menu"
 
 /**
  * Shamelessly stolen from https://github.com/gxjakkap/cc36staffapp
@@ -25,38 +24,40 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "../ui/colla
 
 interface MobileNavProps {
 	role?: string | null
+	user: { name: string; email: string; role: string; image?: string }
 }
 
-export function MobileNav({ role }: MobileNavProps) {
+export function MobileNav({ role, user }: MobileNavProps) {
 	const pathname = usePathname()
 	const [open, setOpen] = useState(false)
 
-	const onOpenChange = useCallback((open: boolean) => {
-		setOpen(open)
-	}, [])
-
 	return (
-		<Drawer open={open} onOpenChange={onOpenChange}>
+		<Drawer open={open} onOpenChange={setOpen}>
 			<DrawerTrigger asChild>
 				<Button variant="ghost" size="icon">
 					<Menu />
-					<span className="sr-only">Toggle Menu</span>
+					<span className="sr-only">Toggle menu</span>
 				</Button>
 			</DrawerTrigger>
 			<DrawerContent className="max-h-[80svh] p-0">
-				<VisuallyHidden asChild>
-					<DrawerHeader>
-						<DrawerTitle></DrawerTitle>
-					</DrawerHeader>
-				</VisuallyHidden>
+				<DrawerHeader className="flex items-center gap-3 border-b px-6 py-4 text-left">
+					<Avatar className="outline outline-1 outline-border">
+						<AvatarImage src={user.image} alt="" />
+						<AvatarFallback>{getInitials(user.name)}</AvatarFallback>
+					</Avatar>
+					<div className="min-w-0">
+						<DrawerTitle className="truncate text-base">{user.name}</DrawerTitle>
+						<p className="text-sm capitalize text-muted-foreground">{user.role}</p>
+					</div>
+				</DrawerHeader>
 				<div className="overflow-auto p-6">
 					<div className="flex flex-col space-y-1">
-						<MobileLink key="/" href="/" onOpenChange={setOpen} isActive={pathname === "/"}>
+						<MobileLink href="/" onOpenChange={setOpen} isActive={pathname === "/"}>
 							Home
 						</MobileLink>
 
-						<Collapsible>
-							<CollapsibleTrigger>
+						<Collapsible defaultOpen={pathname.startsWith("/gen")}>
+							<CollapsibleTrigger className="w-full">
 								<span
 									className={cn(
 										"flex items-center rounded-md px-4 py-3 text-[1.1rem] transition-all duration-200",
@@ -97,14 +98,21 @@ export function MobileNav({ role }: MobileNavProps) {
 									onOpenChange={setOpen}
 									isActive={pathname.startsWith("/not-attending")}
 								>
-									Not Attending
+									Not attending
 								</MobileLink>
 								<MobileLink
 									href="/admin"
 									onOpenChange={setOpen}
-									isActive={pathname.startsWith("/admin/")}
+									isActive={pathname === "/admin"}
 								>
 									Admin
+								</MobileLink>
+								<MobileLink
+									href="/admin/logs"
+									onOpenChange={setOpen}
+									isActive={pathname.startsWith("/admin/logs")}
+								>
+									Logs
 								</MobileLink>
 							</>
 						)}
@@ -134,14 +142,11 @@ interface MobileLinkProps extends LinkProps {
 }
 
 function MobileLink({ href, onOpenChange, className, children, isActive, ...props }: MobileLinkProps) {
-	const router = useRouter()
 	return (
 		<Link
 			href={href}
-			onClick={() => {
-				router.push(href.toString())
-				onOpenChange?.(false)
-			}}
+			onClick={() => onOpenChange?.(false)}
+			aria-current={isActive ? "page" : undefined}
 			className={cn(
 				"flex items-center rounded-md px-4 py-3 text-[1.1rem] transition-all duration-200",
 				isActive

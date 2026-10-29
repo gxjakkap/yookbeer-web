@@ -38,7 +38,7 @@ export function DataTableViewOptions<TData>({ table }: DataTableViewOptionsProps
 					variant="outline"
 					role="combobox"
 					size="sm"
-					className="ml-auto hidden h-8 gap-2 focus:outline-none focus:ring-1 focus:ring-ring focus-visible:ring-0 lg:flex"
+					className="ml-auto flex h-8 gap-2 focus:outline-none focus:ring-1 focus:ring-ring focus-visible:ring-0"
 					onPointerDown={(event) => {
 						const target = event.target
 						if (!(target instanceof Element)) return

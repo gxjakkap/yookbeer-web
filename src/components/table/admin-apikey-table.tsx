@@ -14,6 +14,7 @@ import {
 } from "@tanstack/react-table"
 import { addDays, format } from "date-fns"
 import { CalendarIcon, ChevronDown, Pencil, PlusIcon, Trash2 } from "lucide-react"
+import { useRouter } from "next/navigation"
 import * as React from "react"
 import { addAPIKey, deleteAPIKey, editAPIKey } from "@/app/(authorized)/admin/actions"
 import { Button } from "@/components/ui/button"
@@ -81,12 +82,12 @@ const AddDialog = ({ isOpen, onClose, onAdd, isPending }: AddDialogProps) => {
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Create API Key</DialogTitle>
+					<DialogTitle>Create API key</DialogTitle>
 				</DialogHeader>
 				<form onSubmit={handleSubmit}>
 					<div className="flex flex-col gap-y-4">
 						<div className="flex flex-col">
-							<Label className="mb-2">Expiration Date</Label>
+							<Label className="mb-2">Expiration date</Label>
 							<Popover>
 								<PopoverTrigger asChild>
 									<Button
@@ -189,7 +190,7 @@ const EditDialog = ({ isOpen, onClose, data, onUpdate, isPending }: EditDialogPr
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Edit API Key Data</DialogTitle>
+					<DialogTitle>Edit API key</DialogTitle>
 					<DialogDescription>
 						{data.key} - Created by {data.owner}
 					</DialogDescription>
@@ -197,7 +198,7 @@ const EditDialog = ({ isOpen, onClose, data, onUpdate, isPending }: EditDialogPr
 				<form action={() => onUpdate(formData)}>
 					<div className="grid gap-4 py-4">
 						<div className="grid grid-cols-4 items-center gap-4">
-							<Label className="text-right capitalize">Expiration Date</Label>
+							<Label className="text-right capitalize">Expiration date</Label>
 							<Popover>
 								<PopoverTrigger asChild>
 									<Button
@@ -280,7 +281,7 @@ const DeleteDialog = ({ isOpen, onClose, onConfirm, apiKey, isPending }: DeleteD
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent className="sm:max-w-md">
 				<DialogHeader>
-					<DialogTitle>Confirm Deletion</DialogTitle>
+					<DialogTitle>Confirm deletion</DialogTitle>
 					<DialogDescription>
 						Are you sure you want to delete API key {apiKey}? This action cannot be undone.
 					</DialogDescription>
@@ -305,24 +306,29 @@ const ActionCell = (row: Row<YookbeerAPIKeyColumn>) => {
 	const data = row.original
 
 	const { toast } = useToast()
+	const router = useRouter()
 
 	const handleUpdate = async (data: Partial<YookbeerAPIKeyColumn>) => {
-		console.log(data)
 		startTransition(async () => {
+			if (!data.id) return
 			try {
-				if (!data.id) throw Error("No id")
-				await editAPIKey({
-					id: data.id,
-					data,
-				})
-				toast({
-					title: "Record updated succesfully",
-				})
+				const [, err] = await editAPIKey({ id: data.id, data })
+				if (err) {
+					toast({
+						title: "Couldn't update API key",
+						description: err.message,
+						variant: "destructive",
+					})
+					return
+				}
+				toast({ title: "API key updated" })
 				setIsEditOpen(false)
-				location.reload()
+				router.refresh()
 			} catch (error) {
 				toast({
-					title: "Failed to update record",
+					title: "Couldn't update API key",
+					description: "Check your connection and try again.",
+					variant: "destructive",
 				})
 				console.error(error)
 			}
@@ -332,17 +338,23 @@ const ActionCell = (row: Row<YookbeerAPIKeyColumn>) => {
 	const handleDelete = async () => {
 		startTransition(async () => {
 			try {
-				await deleteAPIKey({
-					id: data.id,
-				})
-				toast({
-					title: "Record deleted succesfully",
-				})
+				const [, err] = await deleteAPIKey({ id: data.id })
+				if (err) {
+					toast({
+						title: "Couldn't delete API key",
+						description: err.message,
+						variant: "destructive",
+					})
+					return
+				}
+				toast({ title: "API key deleted" })
 				setIsDeleteOpen(false)
-				location.reload()
+				router.refresh()
 			} catch (error) {
 				toast({
-					title: "Failed to delete record",
+					title: "Couldn't delete API key",
+					description: "Check your connection and try again.",
+					variant: "destructive",
 				})
 				console.error(error)
 			}
@@ -357,6 +369,7 @@ const ActionCell = (row: Row<YookbeerAPIKeyColumn>) => {
 				onClick={() => setIsEditOpen(true)}
 				className="h-8 w-8 p-0"
 				disabled={isPending}
+				aria-label={`Edit API key ${data.name}`}
 			>
 				<Pencil className="h-4 w-4" />
 			</Button>
@@ -364,8 +377,9 @@ const ActionCell = (row: Row<YookbeerAPIKeyColumn>) => {
 				variant="ghost"
 				size="icon"
 				onClick={() => setIsDeleteOpen(true)}
-				className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+				className="h-8 w-8 p-0 text-destructive-text hover:bg-destructive/10 hover:text-destructive-text"
 				disabled={isPending}
+				aria-label={`Delete API key ${data.name}`}
 			>
 				<Trash2 className="h-4 w-4" />
 			</Button>
@@ -410,7 +424,7 @@ const createColumns = (): ColumnDef<YookbeerAPIKeyColumn>[] => [
 	},
 	{
 		accessorKey: "expiresAt",
-		header: "Expiration Date",
+		header: "Expires",
 		cell: ({ row }) => {
 			const dateValue = row.getValue("expiresAt")
 			return <div>{dateValue ? format(dateValue as Date, "PPP") : "No expiration"}</div>
@@ -434,26 +448,34 @@ export function AdminAPIKeyTable({ data }: YookbeerAPIKeyTableProps) {
 	const [rowSelection, setRowSelection] = React.useState({})
 
 	const { toast } = useToast()
+	const router = useRouter()
 
 	const columns = React.useMemo(() => createColumns(), [])
 
 	const handleCreate = async (data: Partial<YookbeerAPIKeyColumn>) => {
-		console.log(data)
 		startCreateTransition(async () => {
+			if (!data.name || data.expiresAt === undefined) {
+				toast({ title: "Enter a name and an expiry", variant: "destructive" })
+				return
+			}
 			try {
-				if (!data.name || data.expiresAt === undefined) throw Error("Missing Data")
-				await addAPIKey({
-					name: data.name,
-					expiresAt: data.expiresAt,
-				})
-				toast({
-					title: "API key created",
-				})
+				const [, err] = await addAPIKey({ name: data.name, expiresAt: data.expiresAt })
+				if (err) {
+					toast({
+						title: "Couldn't create API key",
+						description: err.message,
+						variant: "destructive",
+					})
+					return
+				}
+				toast({ title: "API key created" })
 				setIsAddOpen(false)
-				location.reload()
+				router.refresh()
 			} catch (error) {
 				toast({
-					title: "Failed to create API Key",
+					title: "Couldn't create API key",
+					description: "Check your connection and try again.",
+					variant: "destructive",
 				})
 				console.error(error)
 			}
@@ -528,7 +550,7 @@ export function AdminAPIKeyTable({ data }: YookbeerAPIKeyTableProps) {
 				</div>
 				<div className="rounded-md border">
 					<Table>
-						<TableHeader className="bg-neutral-100 dark:bg-background">
+						<TableHeader className="bg-muted">
 							{table.getHeaderGroups().map((headerGroup) => (
 								<TableRow key={headerGroup.id}>
 									{headerGroup.headers.map((header) => {
@@ -568,10 +590,6 @@ export function AdminAPIKeyTable({ data }: YookbeerAPIKeyTableProps) {
 					</Table>
 				</div>
 				<div className="flex items-center justify-end space-x-2 py-4">
-					<div className="flex-1 text-sm text-muted-foreground">
-						{table.getFilteredSelectedRowModel().rows.length} of{" "}
-						{table.getFilteredRowModel().rows.length} row(s) selected.
-					</div>
 					<div className="space-x-2">
 						<Button
 							variant="outline"

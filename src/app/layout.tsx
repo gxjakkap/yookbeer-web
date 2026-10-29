@@ -29,7 +29,7 @@ export default async function RootLayout({
 				</head>
 			)}
 			<body className={`antialiased ${anuphan.className}`}>
-				<ThemeProvider attribute="class" defaultTheme="light" enableSystem disableTransitionOnChange>
+				<ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
 					<NuqsAdapter>{children}</NuqsAdapter>
 					<Toaster />
 				</ThemeProvider>

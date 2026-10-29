@@ -9,7 +9,7 @@ export default async function Home() {
 		<div className={`flex min-h-[90dvh] w-screen items-center justify-center`}>
 			<div className="mx-4 w-full max-w-sm rounded-sm border p-6 sm:p-8">
 				<header className="mb-8">
-					<h1 className="text-center text-3xl font-bold text-foreground">Select Yearbook</h1>
+					<h1 className="text-center text-3xl font-bold text-foreground">Select yearbook</h1>
 				</header>
 
 				<form action="/search" method="get" className="mb-6">
@@ -21,12 +21,7 @@ export default async function Home() {
 
 				<div className="space-y-4">
 					{AVAILABLE.map((yearbook) => (
-						<Button
-							key={yearbook.gen}
-							asChild
-							className="w-full py-6 text-lg shadow-md transition-shadow duration-200 hover:shadow-lg"
-							variant="default"
-						>
+						<Button key={yearbook.gen} asChild className="w-full py-6 text-lg" variant="outline">
 							<Link href={yearbook.home}>{yearbook.label}</Link>
 						</Button>
 					))}
