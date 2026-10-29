@@ -70,3 +70,10 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+/* Theme switch reveal, animated by ui/animated-theme-toggler.tsx */
+::view-transition-old(root),
+::view-transition-new(root) {
+	animation: none;
+	mix-blend-mode: normal;
+}
