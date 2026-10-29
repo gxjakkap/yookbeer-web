@@ -223,7 +223,10 @@ export const AnimatedThemeToggler = ({
 			}
 		}
 
-		if (typeof document.startViewTransition !== "function") {
+		if (
+			typeof document.startViewTransition !== "function" ||
+			window.matchMedia("(prefers-reduced-motion: reduce)").matches
+		) {
 			applyTheme()
 			return
 		}
