@@ -16,7 +16,7 @@ function StudentCard({ student }: { student: YookbeerColumn }) {
 	return (
 		<Link
 			href={`/std/${student.stdid}`}
-			className="block rounded-lg border bg-card text-card-foreground shadow-sm transition-all hover:border-primary/50 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+			className="block rounded-lg border bg-card text-card-foreground transition-[border-color,box-shadow] hover:border-primary hover:shadow-[3px_3px_0_hsl(var(--primary))] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
 		>
 			<div className="flex items-center gap-3 p-4">
 				<div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-primary/10 text-sm font-semibold text-primary">
