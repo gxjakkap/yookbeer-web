@@ -74,7 +74,14 @@ export function DataTableFacetedFilter<TData, TValue>({
 					)}
 				</Button>
 			</PopoverTrigger>
-			<PopoverContent className="w-auto p-0" align="start">
+			<PopoverContent
+				className="w-auto p-0"
+				align="start"
+				onOpenAutoFocus={(e) => {
+					// focusing the search box opens the on-screen keyboard, which squeezes the list
+					if (window.matchMedia("(pointer: coarse)").matches) e.preventDefault()
+				}}
+			>
 				<Command>
 					<CommandInput placeholder={title} />
 					<CommandList className="max-h-full">

@@ -2,7 +2,9 @@
 
 import {
 	type ColumnDef,
+	type ColumnFiltersState,
 	flexRender,
+	functionalUpdate,
 	getCoreRowModel,
 	getFilteredRowModel,
 	getPaginationRowModel,
@@ -13,7 +15,9 @@ import {
 } from "@tanstack/react-table"
 import { ChevronDown } from "lucide-react"
 import { useRouter } from "next/navigation"
+import { parseAsArrayOf, parseAsString, useQueryState } from "nuqs"
 import * as React from "react"
+import { DataTableFacetedFilter } from "@/components/table/tablecomponents/faceted-filter"
 import { Button } from "@/components/ui/button"
 import {
 	DropdownMenu,
@@ -60,6 +64,7 @@ const columns: ColumnDef<LogEntry>[] = [
 	{
 		accessorKey: "action",
 		header: "Action",
+		filterFn: (row, columnId, filterValue: string[]) => filterValue.includes(row.getValue(columnId)),
 		cell: ({ row }) => (
 			<div className="font-mono text-xs px-1.5 py-0.5 rounded bg-muted inline-block">
 				{row.getValue("action")}
@@ -94,12 +99,25 @@ const columns: ColumnDef<LogEntry>[] = [
 ]
 
 const filterKeys: Array<keyof LogEntry> = ["action", "actorName", "target", "details"]
+const actionFilterParser = parseAsArrayOf(parseAsString).withDefault([])
 
 export function AdminLogsTable({ data }: AdminLogsTableProps) {
 	const router = useRouter()
 	const [sorting, setSorting] = React.useState<SortingState>([{ id: "timestamp", desc: true }])
 	const [globalFilter, setGlobalFilter] = React.useState<string>("")
+	const [actionFilter, setActionFilter] = useQueryState("action", actionFilterParser)
+	const columnFilters = React.useMemo<ColumnFiltersState>(
+		() => (actionFilter.length ? [{ id: "action", value: actionFilter }] : []),
+		[actionFilter]
+	)
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
+	const actionOptions = React.useMemo(
+		() =>
+			[...new Set(data.map((log) => log.action))]
+				.sort()
+				.map((action) => ({ label: action, value: action })),
+		[data]
+	)
 
 	const table = useReactTable({
 		data,
@@ -109,6 +127,10 @@ export function AdminLogsTable({ data }: AdminLogsTableProps) {
 		getPaginationRowModel: getPaginationRowModel(),
 		getSortedRowModel: getSortedRowModel(),
 		getFilteredRowModel: getFilteredRowModel(),
+		onColumnFiltersChange: (updater) => {
+			const next = functionalUpdate(updater, columnFilters)
+			void setActionFilter((next.find((f) => f.id === "action")?.value as string[]) ?? null)
+		},
 		onColumnVisibilityChange: setColumnVisibility,
 		onGlobalFilterChange: setGlobalFilter,
 		globalFilterFn: (row, _columnId, filterValue) => {
@@ -120,6 +142,7 @@ export function AdminLogsTable({ data }: AdminLogsTableProps) {
 		},
 		state: {
 			sorting,
+			columnFilters,
 			columnVisibility,
 			globalFilter,
 		},
@@ -129,13 +152,18 @@ export function AdminLogsTable({ data }: AdminLogsTableProps) {
 	})
 
 	return (
-		<div className="mx-10 w-[95vw]">
-			<div className="flex items-center gap-2 py-4">
+		<div className="w-full">
+			<div className="flex flex-wrap items-center gap-2 py-4">
 				<Input
 					placeholder="Search logs…"
 					value={table.getState().globalFilter ?? ""}
 					onChange={(e) => table.setGlobalFilter(e.target.value)}
 					className="max-w-sm"
+				/>
+				<DataTableFacetedFilter
+					column={table.getColumn("action")}
+					title="Action"
+					options={actionOptions}
 				/>
 				<DropdownMenu>
 					<DropdownMenuTrigger asChild>
@@ -192,7 +220,9 @@ export function AdminLogsTable({ data }: AdminLogsTableProps) {
 								<TableRow
 									key={row.id}
 									className="cursor-pointer hover:bg-muted/60"
-									onClick={() => router.push(`/admin/logs/${row.original.id}`)}
+									onClick={() =>
+										router.push(`/admin/logs/${row.original.id}${window.location.search}`)
+									}
 								>
 									{row.getVisibleCells().map((cell) => (
 										<TableCell key={cell.id}>

@@ -7,13 +7,38 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator"
 import { db } from "@/db"
 import { logs, users } from "@/db/schema"
+import { LogAction } from "@/lib/log"
+import {
+	apiKeyCreatedRows,
+	apiKeyDeletedRows,
+	apiKeyEditedRows,
+	type DetailRow,
+	editDiff,
+	formatDateTime,
+	inviteClaimRows,
+	inviteRows,
+	takeoutRows,
+} from "@/lib/log-details"
+import type { SearchParams } from "@/types"
 
 export const dynamic = "force-dynamic"
+
+const ROW_FORMATTERS: Partial<Record<LogAction, (details: string) => DetailRow[] | null>> = {
+	[LogAction.TAKEOUT]: takeoutRows,
+	[LogAction.CREATE_NEW_INVITE]: inviteRows,
+	[LogAction.DELETE_INVITE]: inviteRows,
+	[LogAction.CLAIM_INVITE]: inviteClaimRows,
+	[LogAction.CLAIM_INVITE_FAILED]: inviteClaimRows,
+	[LogAction.CREATE_API_KEY]: apiKeyCreatedRows,
+	[LogAction.DELETE_API_KEY]: apiKeyDeletedRows,
+	[LogAction.EDIT_API_KEY]: apiKeyEditedRows,
+}
 
 interface LogDetailPageProps {
 	params: Promise<{
 		id: string
 	}>
+	searchParams: Promise<SearchParams>
 }
 
 type LogDetailItemProps = {
@@ -30,8 +55,9 @@ function LogDetailItem({ label, value }: LogDetailItemProps) {
 	)
 }
 
-export default async function LogDetailPage({ params }: LogDetailPageProps) {
+export default async function LogDetailPage({ params, searchParams }: LogDetailPageProps) {
 	const { id } = await params
+	const { action } = await searchParams
 
 	const parsedId = parseInt(id, 10)
 	if (Number.isNaN(parsedId)) {
@@ -57,18 +83,16 @@ export default async function LogDetailPage({ params }: LogDetailPageProps) {
 		notFound()
 	}
 
-	const formatDateTime = (value: Date) => {
-		return new Intl.DateTimeFormat("th-TH", {
-			dateStyle: "long",
-			timeStyle: "medium",
-		}).format(value)
-	}
+	const isEdit = logRecord.action === LogAction.EDIT_STD || logRecord.action === LogAction.EDIT_USER
+	const diff = isEdit && logRecord.details ? editDiff(logRecord.details) : null
+	const toRows = ROW_FORMATTERS[logRecord.action as LogAction]
+	const rows = toRows && logRecord.details ? toRows(logRecord.details) : null
 
 	return (
 		<div className="container mx-auto space-y-6 px-6 py-8">
 			<div className="flex flex-wrap items-center gap-3">
 				<Button variant="outline" size="sm" asChild>
-					<Link href="/admin/logs">
+					<Link href={{ pathname: "/admin/logs", query: action ? { action } : {} }}>
 						<ArrowLeft className="mr-1 h-4 w-4" />
 						Back
 					</Link>
@@ -105,13 +129,35 @@ export default async function LogDetailPage({ params }: LogDetailPageProps) {
 
 					<LogDetailItem label="Target" value={logRecord.target ?? "—"} />
 
-					{logRecord.details ? (
+					{rows ? (
+						<>
+							<Separator />
+							{rows.map(({ label, value }) => (
+								<LogDetailItem key={label} label={label} value={value} />
+							))}
+						</>
+					) : logRecord.details ? (
 						<>
 							<Separator />
 							<div className="space-y-2">
 								<p className="text-muted-foreground text-sm font-medium">Details</p>
 								<pre className="bg-muted max-h-80 overflow-auto rounded-md border p-3 text-xs whitespace-pre-wrap break-words">
-									{logRecord.details}
+									{!diff
+										? logRecord.details
+										: diff.length === 0
+											? "No fields changed."
+											: diff.map(({ sign, text }) => (
+													<span
+														key={sign + text}
+														className={
+															sign === "-"
+																? "bg-destructive/10 text-destructive-text block"
+																: "block bg-green-500/10 text-green-700 dark:text-green-400"
+														}
+													>
+														{sign} {text}
+													</span>
+												))}
 								</pre>
 							</div>
 						</>

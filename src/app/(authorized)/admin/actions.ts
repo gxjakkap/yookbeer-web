@@ -46,12 +46,13 @@ export const updateStudent = adminProcedure
 		})
 	)
 	.handler(async ({ input, ctx }) => {
+		const [existing] = await db.select().from(students).where(eq(students.stdid, input.id)).limit(1)
 		await db.update(students).set(input.data).where(eq(students.stdid, input.id))
 		void actionLog({
 			action: LogAction.EDIT_STD,
 			actor: ctx.session.user.id || "",
 			target: input.id,
-			details: `new data: ${JSON.stringify(input)}`,
+			details: JSON.stringify({ before: existing, after: input.data }),
 		})
 		revalidatePath("/gen/[gen]", "page")
 		revalidatePath(`/std/${input.id}`, "page")
