@@ -2,10 +2,16 @@
 
 import { GetObjectCommand, S3Client } from "@aws-sdk/client-s3"
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner"
+import { revalidatePath } from "next/cache"
 import { auth } from "@/auth"
+import { db } from "@/db"
+import { reports } from "@/db/schema"
 import { StudentStatus } from "@/lib/const"
+import { ForbiddenError } from "@/lib/errors"
 import { isAuthorized, Roles } from "@/lib/rba"
+import { reportSchema } from "@/lib/report"
 import { searchStudents } from "@/lib/search"
+import { authedProcedure } from "@/lib/server-actions"
 
 const S3 = new S3Client({
 	region: "auto",
@@ -30,3 +36,12 @@ export async function nSearch(q: string) {
 	const results = await searchStudents(q)
 	return results.filter((v) => v.status === StudentStatus.ATTENDING)
 }
+
+export const createReport = authedProcedure
+	.createServerAction()
+	.input(reportSchema)
+	.handler(async ({ input, ctx }) => {
+		if (!isAuthorized(ctx.session.user.role || Roles.UNAUTHORIZED)) throw new ForbiddenError()
+		await db.insert(reports).values({ ...input, reporter: ctx.session.user.id })
+		revalidatePath("/admin/reports")
+	})

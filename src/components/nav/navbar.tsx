@@ -153,6 +153,11 @@ export function Navbar({ role, session }: NavbarProps) {
 									text="Logs"
 									isActive={pathname.startsWith("/admin/logs")}
 								/>
+								<NavbarChild
+									href="/admin/reports"
+									text="Reports"
+									isActive={pathname.startsWith("/admin/reports")}
+								/>
 							</>
 						)}
 					</NavigationMenuList>

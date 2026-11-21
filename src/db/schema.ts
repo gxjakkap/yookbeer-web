@@ -2,7 +2,7 @@ import { boolean, integer, pgTable, primaryKey, text, timestamp, varchar } from 
 import { drizzle } from "drizzle-orm/postgres-js"
 import type { AdapterAccountType } from "next-auth/adapters"
 import postgres from "postgres"
-import { StudentStatus } from "@/lib/const"
+import { ReportStatus, StudentStatus } from "@/lib/const"
 
 const connectionString = process.env.DATABASE_URL || ""
 const pool = postgres(connectionString, { max: 1 })
@@ -183,4 +183,21 @@ export const logs = pgTable("log", {
 	target: text("target"),
 	details: text("details"),
 	timestamp: timestamp("timestamp", { withTimezone: true }).defaultNow().notNull(),
+})
+
+export const reports = pgTable("report", {
+	id: integer("id").generatedAlwaysAsIdentity().primaryKey(),
+	stdid: varchar({ length: 20 })
+		.notNull()
+		.references(() => students.stdid, { onDelete: "cascade" }),
+	reporter: text("reporter").references(() => users.id, { onDelete: "set null" }),
+	reasons: text("reasons").array().notNull(),
+	deadSocials: text("dead_socials").array().notNull().default([]),
+	wrongFields: text("wrong_fields").array().notNull().default([]),
+	newStdid: varchar("new_stdid", { length: 20 }),
+	note: text("note"),
+	status: text("status").notNull().default(ReportStatus.UNRESOLVED),
+	createdAt: timestamp("created_at", { withTimezone: true }).defaultNow().notNull(),
+	statusChangedBy: text("status_changed_by").references(() => users.id, { onDelete: "set null" }),
+	statusChangedAt: timestamp("status_changed_at", { withTimezone: true }),
 })

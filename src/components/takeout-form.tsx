@@ -7,71 +7,12 @@ import { takeoutAction } from "@/app/(authorized)/admin/actions"
 import { Card, CardContent } from "@/components/ui/card"
 import { AVAILABLE } from "@/config/available-yearbook"
 import { toast } from "@/hooks/use-toast"
-import { TAKEOUT_EXPORTABLE } from "@/lib/const"
+import { INCLUDABLE, TAKEOUT_EXPORTABLE } from "@/lib/const"
 
 import { Button } from "./ui/button"
 import { Checkbox } from "./ui/checkbox"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "./ui/form"
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
-
-const INCLUDABLE = [
-	{
-		id: "stdid",
-		label: "Student ID",
-	},
-	{
-		id: "course",
-		label: "Course",
-	},
-	{
-		id: "nameth",
-		label: "Name (TH)",
-	},
-	{
-		id: "nameen",
-		label: "Name (EN)",
-	},
-	{
-		id: "nickth",
-		label: "Nickname (TH)",
-	},
-	{
-		id: "nicken",
-		label: "Nickname (EN)",
-	},
-	{
-		id: "phone",
-		label: "Phone",
-	},
-	{
-		id: "emailper",
-		label: "Personal email",
-	},
-	{
-		id: "emailuni",
-		label: "University email",
-	},
-	{
-		id: "facebook",
-		label: "Facebook",
-	},
-	{
-		id: "lineid",
-		label: "LINE ID",
-	},
-	{
-		id: "instagram",
-		label: "Instagram",
-	},
-	{
-		id: "discord",
-		label: "Discord",
-	},
-	{
-		id: "status",
-		label: "Status",
-	},
-] as const
 
 export const AVAILABLE_COURSES = [
 	{ id: 0, label: "Regular" },
