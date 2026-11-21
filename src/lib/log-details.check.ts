@@ -7,6 +7,7 @@ import {
 	editDiff,
 	inviteClaimRows,
 	inviteRows,
+	reportStatusRows,
 	takeoutRows,
 } from "./log-details"
 
@@ -108,5 +109,12 @@ assert.deepStrictEqual(apiKeyEditedRows('new data: {"id":5,"data":{"name":"ci","
 	{ label: "Expires", value: "Never" },
 ])
 assert.strictEqual(apiKeyEditedRows('{"id":5}'), null)
+
+// report status
+assert.deepStrictEqual(reportStatusRows(JSON.stringify({ report: 3, from: "unresolved", to: "resolved" })), [
+	{ label: "Report ID", value: "3" },
+	{ label: "Status", value: "Unresolved → Resolved" },
+])
+assert.strictEqual(reportStatusRows("not json"), null)
 
 console.log("log-details: ok")

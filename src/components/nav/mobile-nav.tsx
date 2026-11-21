@@ -114,6 +114,13 @@ export function MobileNav({ role, user }: MobileNavProps) {
 								>
 									Logs
 								</MobileLink>
+								<MobileLink
+									href="/admin/reports"
+									onOpenChange={setOpen}
+									isActive={pathname.startsWith("/admin/reports")}
+								>
+									Reports
+								</MobileLink>
 							</>
 						)}
 

@@ -97,3 +97,50 @@ export const INCLUDABLE = [
 		label: "Status",
 	},
 ] as const
+
+export enum ReportStatus {
+	UNRESOLVED = "unresolved",
+	RESOLVED = "resolved",
+	DISMISSED = "dismissed",
+}
+
+export const REPORT_STATUS_LABEL: Record<ReportStatus, string> = {
+	[ReportStatus.UNRESOLVED]: "Unresolved",
+	[ReportStatus.RESOLVED]: "Resolved",
+	[ReportStatus.DISMISSED]: "Dismissed",
+}
+
+export enum ReportReason {
+	DEAD_SOCIALS = "dead_socials",
+	WRONG_INFO = "wrong_info",
+	REASSIGNED = "reassigned",
+	OTHER = "other",
+}
+
+export const REPORT_REASON_LABEL: Record<ReportReason, string> = {
+	[ReportReason.DEAD_SOCIALS]: "Dead social links",
+	[ReportReason.WRONG_INFO]: "Wrong/outdated info",
+	[ReportReason.REASSIGNED]: "Resigned/reassigned to new cohort",
+	[ReportReason.OTHER]: "Others",
+}
+
+export const REPORT_SOCIALS = {
+	lineid: "LINE",
+	instagram: "Instagram",
+	facebook: "Facebook",
+	discord: "Discord",
+} as const
+
+export const REPORT_FIELDS = {
+	nameen: "Name (EN)",
+	nameth: "Name (TH)",
+	nicken: "Nickname (EN)",
+	nickth: "Nickname (TH)",
+	course: "Course",
+	birthday: "Birthday",
+	phone: "Phone",
+	emailuni: "University email",
+	emailper: "Personal email",
+	emergency: "Emergency contact",
+	photo: "Photo",
+} as const

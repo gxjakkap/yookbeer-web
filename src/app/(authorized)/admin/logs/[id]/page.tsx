@@ -17,6 +17,7 @@ import {
 	formatDateTime,
 	inviteClaimRows,
 	inviteRows,
+	reportStatusRows,
 	takeoutRows,
 } from "@/lib/log-details"
 import type { SearchParams } from "@/types"
@@ -32,6 +33,7 @@ const ROW_FORMATTERS: Partial<Record<LogAction, (details: string) => DetailRow[]
 	[LogAction.CREATE_API_KEY]: apiKeyCreatedRows,
 	[LogAction.DELETE_API_KEY]: apiKeyDeletedRows,
 	[LogAction.EDIT_API_KEY]: apiKeyEditedRows,
+	[LogAction.EDIT_REPORT_STATUS]: reportStatusRows,
 }
 
 interface LogDetailPageProps {

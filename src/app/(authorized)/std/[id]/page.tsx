@@ -6,6 +6,7 @@ import type { ReactNode } from "react"
 import { auth } from "@/auth"
 import { CopyMenu } from "@/components/copy-menu"
 import { StudentEditButton } from "@/components/student-edit-button"
+import { StudentReportButton } from "@/components/student-report-button"
 import { FacebookIcon } from "@/components/svg/socials/fb"
 import { InstagramIcon } from "@/components/svg/socials/ig"
 import { LineIcon } from "@/components/svg/socials/line"
@@ -14,7 +15,7 @@ import { Badge } from "@/components/ui/badge"
 import { db } from "@/db"
 import { students } from "@/db/schema"
 import { birthdayPrettifier } from "@/lib/bd"
-import { COURSE_PRETTYNAME, StudentStatus } from "@/lib/const"
+import { COURSE_PRETTYNAME, REPORT_SOCIALS, StudentStatus } from "@/lib/const"
 import { thaiNameFont } from "@/lib/fonts"
 import { isAdmin } from "@/lib/rba"
 
@@ -75,6 +76,13 @@ export default async function StudentProfilePage({ params }: Props) {
 							phone: data.phone ?? "",
 							nicken: data.nicken,
 						}}
+					/>
+					<StudentReportButton
+						stdid={data.stdid}
+						nicken={data.nicken}
+						socials={(Object.keys(REPORT_SOCIALS) as (keyof typeof REPORT_SOCIALS)[]).filter(
+							(k) => data[k]
+						)}
 					/>
 				</div>
 				<div className="flex flex-wrap items-center gap-x-3 gap-y-1">

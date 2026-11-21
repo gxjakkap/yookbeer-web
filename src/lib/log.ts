@@ -19,6 +19,7 @@ export enum LogAction {
 	TAKEOUT = "takeout",
 	LOGIN = "login",
 	CLAIM_INVITE_FAILED = "claim_invite_failed",
+	EDIT_REPORT_STATUS = "edit_report_status",
 }
 
 interface LogArgs {

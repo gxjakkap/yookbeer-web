@@ -16,8 +16,8 @@ import {
 } from "@/app/(authorized)/admin/types"
 import { auth } from "@/auth"
 import { db } from "@/db"
-import { apiKey, invite, students, users } from "@/db/schema"
-import { TAKEOUT_EXPORTABLE } from "@/lib/const"
+import { apiKey, invite, reports, students, users } from "@/db/schema"
+import { ReportStatus, TAKEOUT_EXPORTABLE } from "@/lib/const"
 import { AuthenticationError, ForbiddenError } from "@/lib/errors"
 import { actionLog, LogAction } from "@/lib/log"
 import { isAdmin, isSuperAdmin, Roles } from "@/lib/rba"
@@ -406,4 +406,28 @@ export const takeoutAction = adminProcedure
 			throw new Error("TAKEOUT_ACT: invalid mode returned from takeout function, expected 's3'")
 
 		return res.url
+	})
+
+export const updateReportStatus = adminProcedure
+	.createServerAction()
+	.input(z.object({ id: z.number(), status: z.nativeEnum(ReportStatus) }))
+	.handler(async ({ input, ctx }) => {
+		const actor = ctx.session.user.id || ""
+		const [existing] = await db
+			.select({ status: reports.status, stdid: reports.stdid })
+			.from(reports)
+			.where(eq(reports.id, input.id))
+			.limit(1)
+		if (!existing || existing.status === input.status) return
+		await db
+			.update(reports)
+			.set({ status: input.status, statusChangedBy: actor, statusChangedAt: new Date() })
+			.where(eq(reports.id, input.id))
+		void actionLog({
+			action: LogAction.EDIT_REPORT_STATUS,
+			actor,
+			target: existing.stdid,
+			details: JSON.stringify({ report: input.id, from: existing.status, to: input.status }),
+		})
+		revalidatePath("/admin/reports")
 	})

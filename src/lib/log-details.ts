@@ -1,4 +1,4 @@
-import { COURSE_PRETTYNAME, INCLUDABLE } from "@/lib/const"
+import { COURSE_PRETTYNAME, INCLUDABLE, REPORT_STATUS_LABEL, type ReportStatus } from "@/lib/const"
 
 export type DiffLine = { sign: "-" | "+"; text: string }
 
@@ -132,5 +132,15 @@ export function apiKeyEditedRows(details: string): DetailRow[] | null {
 			? []
 			: [{ label: "Expires", value: expiresAt ? formatDateTime(new Date(expiresAt)) : "Never" }]),
 		...(owner === undefined ? [] : [{ label: "Owner ID", value: owner }]),
+	]
+}
+
+export function reportStatusRows(details: string): DetailRow[] | null {
+	const parsed = parseJson<{ report?: number; from?: ReportStatus; to?: ReportStatus }>(details)
+	if (!parsed?.report || !parsed.from || !parsed.to) return null
+
+	return [
+		{ label: "Report ID", value: String(parsed.report) },
+		{ label: "Status", value: `${REPORT_STATUS_LABEL[parsed.from]} → ${REPORT_STATUS_LABEL[parsed.to]}` },
 	]
 }
