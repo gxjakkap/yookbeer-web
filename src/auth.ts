@@ -73,7 +73,11 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 					id: profile.oid,
 					name: profile.name,
 					// upn/unique_name are optional claims, fall back to the standard ones
-					email: profile.email || profile.preferred_username || profile.upn || profile.unique_name,
+					email:
+						profile.email ||
+						profile.preferred_username ||
+						profile.upn ||
+						(profile as { unique_name?: string }).unique_name,
 					emailVerified: null,
 				}
 			},
