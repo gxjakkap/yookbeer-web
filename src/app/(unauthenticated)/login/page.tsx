@@ -55,6 +55,7 @@ export default async function SignInPage(props: {
 						</p>
 					)}
 					<form
+						className="flex justify-center"
 						action={async () => {
 							"use server"
 							try {
